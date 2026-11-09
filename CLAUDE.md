@@ -14,7 +14,7 @@ Se istruzioni e Figma divergono, valgono le istruzioni.
 ## Stack e comandi
 
 - React 19 + Vite. Font self-hosted con Fontsource (Inter, Mona Sans).
-- In arrivo: MapLibre GL + MapTiler (chiave in `VITE_MAPTILER_KEY`, vedi `.env.example`).
+- Mappa: MapLibre GL (worker servito come file a parte, `setWorkerUrl`) + MapTiler topo-v2 / hybrid (chiave in `VITE_MAPTILER_KEY`, vedi `.env.example`; su Netlify va nelle variabili d'ambiente). Cluster con Supercluster.
 - `npm install` · `npm run dev` (aperto in LAN per provare sul telefono) · `npm run build`.
 - Pubblicazione: Netlify, build da `main` (`netlify.toml`).
 - **Installazione (PWA):** aperta nel browser l'app mostra solo la guida all'installazione; dall'icona sulla Home mostra l'app. Per vederla nel browser senza installarla: pulsante `Preview app here` in fondo alla guida, oppure `?preview` nell'indirizzo. L'anteprima è una voce della cronologia sopra la guida (`history.state.preview`): Indietro torna sempre alla guida. Ogni `pushState` futuro deve mantenere `{ preview: true }` nello stato.
@@ -30,12 +30,14 @@ src/
   styles/tokens.css   token §9 delle istruzioni, copia esatta: non modificare a mano
   styles/fonts.css    font e override dei nomi famiglia Fontsource
   styles/base.css     reset, comportamento da app, safe area, durate di movimento
-  data/               dati ITRS e dati finti (JSON route e track)
+  data/               itrs.js (livelli e nomi), garda.js + garda-geometry.json (route e track di
+                      prova sul Garda: tracciati veri da BRouter/OSM, vedi scripts/README-garda.md), demo.js
   assets/             foto e badge esportati dal Figma (pagina UI Design), webp
   components/         componenti riusabili (.jsx + .css): Icon, LevelShape, Button (+ ActionBar,
                       FilterBar, FabMap…), Chip, Controls (Checkbox, Switch), Cards (RouteCard,
-                      ListingCard, RatingRow, RatingCard, Pentagon), BottomSheet, InfoSheet, TabBar
-  screens/            schermate (Components = galleria del passo 0.3, BaseCheck, InstallGuide)
+                      ListingCard, RatingRow, RatingCard, Pentagon), BottomSheet, InfoSheet, TabBar,
+                      Searchbar, RouteToggle; map/ (MapView, marker HTML, layer del percorso selezionato)
+  screens/            Explore (mappa), Components (galleria, da Profile), BaseCheck, InstallGuide
 ```
 
 ## Regole
