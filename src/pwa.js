@@ -37,32 +37,45 @@ export function displayMode() {
 }
 
 /*
- * Anteprima nel browser senza installare: ?preview nell'indirizzo.
- * Resta attiva per la scheda corrente (sessionStorage). ?preview=0 la toglie.
+ * Anteprima nel browser senza installare (per le interviste, se l'installazione non va).
+ * L'anteprima è una voce della cronologia sopra la guida: Indietro torna sempre alla guida.
+ * - Pulsante "Preview app here" nella guida → startPreview()
+ * - Link diretto con ?preview → la guida viene messa dietro l'anteprima
+ * Il segno è in history.state.preview, che sopravvive al ricaricamento della pagina.
+ * Le schermate future che usano pushState devono mantenere { preview: true } nello stato.
  */
-const PREVIEW_KEY = 'itrs-preview'
-function readPreviewParam() {
+function previewUrl() {
   const params = new URLSearchParams(location.search)
-  if (!params.has('preview')) return
-  try {
-    if (params.get('preview') === '0') sessionStorage.removeItem(PREVIEW_KEY)
-    else sessionStorage.setItem(PREVIEW_KEY, '1')
-  } catch { /* storage non disponibile: vale solo per questo caricamento */ }
+  params.set('preview', '')
+  return location.pathname + '?' + params.toString().replace(/preview=(&|$)/, 'preview$1') + location.hash
+}
+function guideUrl() {
+  const params = new URLSearchParams(location.search)
   params.delete('preview')
   const query = params.toString()
-  history.replaceState(null, '', location.pathname + (query ? `?${query}` : '') + location.hash)
-  previewFromUrl = true
+  return location.pathname + (query ? `?${query}` : '') + location.hash
 }
-let previewFromUrl = false
-readPreviewParam()
+
+;(function readPreviewParam() {
+  if (history.state?.preview) return                 // ricaricamento: già in anteprima
+  const params = new URLSearchParams(location.search)
+  if (!params.has('preview')) return
+  if (params.get('preview') === '0') {
+    history.replaceState(null, '', guideUrl())
+    return
+  }
+  const target = previewUrl()
+  history.replaceState(null, '', guideUrl())         // la guida resta dietro
+  history.pushState({ preview: true }, '', target)
+})()
 
 export function isPreview() {
-  if (previewFromUrl) return true
-  try { return sessionStorage.getItem(PREVIEW_KEY) === '1' } catch { return false }
+  return history.state?.preview === true
 }
 
 export function startPreview() {
-  try { sessionStorage.setItem(PREVIEW_KEY, '1') } catch { previewFromUrl = true }
+  history.pushState({ preview: true }, '', previewUrl())
+  window.scrollTo(0, 0)
 }
 
 // Prompt di installazione di Chrome Android

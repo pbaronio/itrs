@@ -13,7 +13,9 @@ import './InstallGuide.css'
  * Compare quando il prototipo è aperto nel browser invece che dall'icona sulla Home.
  * iPhone: Safari → ⋯ → Share → Add to Home Screen → Open as Web App → Add (iOS 26).
  * Android: pulsante "Install app" se Chrome lo permette, altrimenti menu ⋮.
- * Desktop: QR code per aprire il link sul telefono e anteprima nel browser.
+ * Desktop: QR code per aprire il link sul telefono.
+ * In fondo, su tutti i dispositivi: "Preview app here" (anteprima senza installare,
+ * Indietro torna qui).
  */
 
 const STEPS = {
@@ -133,14 +135,14 @@ export default function InstallGuide({ onPreview }) {
         </section>
       )}
 
-      {desktop && (
-        <div className="ig-preview">
-          <button type="button" className="ig-btn ig-btn--secondary t-md-em" onClick={handlePreview}>
-            Preview in this browser
-          </button>
-          <p className="t-sm ig-muted">Only for reviewing the screens. Testers should use the installed app.</p>
-        </div>
-      )}
+      <div className="ig-preview">
+        <button type="button" className="ig-btn ig-btn--secondary t-md-em" onClick={handlePreview}>
+          Preview app here
+        </button>
+        <p className="t-sm ig-muted">
+          Use this only if installing doesn’t work. Go back to return to these instructions.
+        </p>
+      </div>
 
       {showInstallButton && (
         <div className="ig-bar">

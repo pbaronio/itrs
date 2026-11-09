@@ -17,7 +17,7 @@ Se istruzioni e Figma divergono, valgono le istruzioni.
 - In arrivo: MapLibre GL + MapTiler (chiave in `VITE_MAPTILER_KEY`, vedi `.env.example`).
 - `npm install` · `npm run dev` (aperto in LAN per provare sul telefono) · `npm run build`.
 - Pubblicazione: Netlify, build da `main` (`netlify.toml`).
-- **Installazione (PWA):** aperta nel browser l'app mostra solo la guida all'installazione; dall'icona sulla Home mostra l'app. Per vederla nel browser senza installarla: aggiungi `?preview` all'indirizzo (vale per la scheda; `?preview=0` la toglie).
+- **Installazione (PWA):** aperta nel browser l'app mostra solo la guida all'installazione; dall'icona sulla Home mostra l'app. Per vederla nel browser senza installarla: pulsante `Preview app here` in fondo alla guida, oppure `?preview` nell'indirizzo. L'anteprima è una voce della cronologia sopra la guida (`history.state.preview`): Indietro torna sempre alla guida. Ogni `pushState` futuro deve mantenere `{ preview: true }` nello stato.
 
 ## Struttura
 
