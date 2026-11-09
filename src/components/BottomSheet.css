@@ -25,7 +25,6 @@
   cursor: grab;
 }
 .sheet.is-dragging .sheet__head { cursor: grabbing; }
-.sheet.is-locked .sheet__head { cursor: auto; }
 .sheet__handle {
   position: absolute;
   top: 7px;
@@ -37,7 +36,7 @@
   transform: translateX(-50%);
   transition: opacity var(--dur-base) var(--ease-out);
 }
-.sheet.is-locked .sheet__handle { opacity: 0; }
+.sheet.is-handle-hidden .sheet__handle { opacity: 0; }
 
 /* Contenuto: scorre solo con il foglio al massimo */
 .sheet__content {

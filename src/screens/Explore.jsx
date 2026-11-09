@@ -12,7 +12,7 @@ import './Explore.css'
  * Explore: mappa e overlay a 3 stati (passi 1.1 e 1.2).
  * - Stato 1 (86): handle e conteggio.
  * - Stato 2 (226): carosello delle route/track dell'area visibile; scorrendo, la mappa segue la card.
- * - Stato 3: listing a tutta pagina, senza maniglia: si esce solo col FAB Map, che torna allo stato di prima.
+ * - Stato 3: listing a tutta pagina, senza maniglia visibile: si esce con uno swipe in giù dall'inizio della lista o col FAB Map (torna allo stato di prima).
  * Tap su un pin: percorso sulla mappa e overlay in stato 2 con la sua card.
  * Ricerca e filtri: passo 1.4.
  */
@@ -152,7 +152,7 @@ export default function Explore() {
         bottom={insets.tabH}
         className="explore__overlay"
         label={title}
-        lockTop
+        hideHandleAtTop
         header={<p className="t-display explore__overlay-title" aria-live="polite">{title}</p>}
       >
         {listing ? (

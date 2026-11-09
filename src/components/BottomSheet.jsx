@@ -10,8 +10,8 @@ import './BottomSheet.css'
  *   della lista il foglio scende.
  * - Al rilascio si aggancia allo stato più vicino tenendo conto della velocità.
  * - dismissible: trascinando sotto lo stato più basso si chiude (onClose).
- * - lockTop: allo stato più alto il foglio non si trascina e la maniglia sparisce;
- *   si esce solo con un comando (es. FAB Map nel listing).
+ * - hideHandleAtTop: allo stato più alto la maniglia sparisce, ma il foglio si
+ *   trascina in giù come sempre (es. listing: swipe in giù o FAB Map).
  */
 export default function BottomSheet({
   open = true,
@@ -27,7 +27,7 @@ export default function BottomSheet({
   children,
   className = '',
   label,
-  lockTop = false,
+  hideHandleAtTop = false,
 }) {
   const sheetRef = useRef(null)
   const scrollRef = useRef(null)
@@ -39,9 +39,7 @@ export default function BottomSheet({
   const drag = useRef(null)
   const heightRef = useRef(height)
   heightRef.current = height
-  const locked = lockTop && index === snaps.length - 1
-  const lockedRef = useRef(locked)
-  lockedRef.current = locked
+  const handleHidden = hideHandleAtTop && index === snaps.length - 1
 
   // Stato controllato dall'esterno (es. FAB Map → stato 1)
   useEffect(() => {
@@ -83,7 +81,7 @@ export default function BottomSheet({
       startY: y,
       startX: x,
       startH: heightRef.current,
-      mode: lockedRef.current ? 'scroll' : fromHeader ? 'sheet' : 'pending',
+      mode: fromHeader ? 'sheet' : 'pending',
       samples: [{ y, t: performance.now() }],
     }
   }, [])
@@ -183,7 +181,7 @@ export default function BottomSheet({
       )}
       <section
         ref={sheetRef}
-        className={`sheet${dragging ? ' is-dragging' : ''}${expanded ? ' is-expanded' : ''}${locked ? ' is-locked' : ''} ${className}`}
+        className={`sheet${dragging ? ' is-dragging' : ''}${expanded ? ' is-expanded' : ''}${handleHidden ? ' is-handle-hidden' : ''} ${className}`}
         style={{
           height: maxH,
           bottom,
@@ -194,7 +192,7 @@ export default function BottomSheet({
         aria-modal={scrim || undefined}
         aria-label={label}
       >
-        <div className="sheet__head" data-sheet-handle={locked ? undefined : ''}>
+        <div className="sheet__head" data-sheet-handle>
           <span className="sheet__handle" aria-hidden="true" />
           {header}
         </div>
