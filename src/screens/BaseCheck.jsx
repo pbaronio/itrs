@@ -120,7 +120,7 @@ export default function BaseCheck() {
           <button type="button" className="bc-btn bc-btn--secondary t-md-em">Clear filters</button>
         </div>
         <p className="t-sm bc-muted bc-note">
-          Real components (buttons, chips, cards, bottom sheet) arrive in step 0.3.
+          Real components are in the Components page (step 0.3).
         </p>
       </Section>
     </main>

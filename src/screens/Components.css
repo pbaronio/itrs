@@ -1,0 +1,100 @@
+.cmp {
+  padding: calc(var(--safe-top) + var(--s-2xl)) var(--s-m) calc(var(--tab-bar-h) + var(--s-3xl));
+}
+.cmp-head { display: grid; gap: var(--s-xs); }
+.cmp-title { font-size: 30px; line-height: 32px; }
+.cmp-sub, .cmp-note { color: var(--text-sub-700); }
+
+/* Sezioni: 32 sopra e sotto il divisore, 20 dal titolo al contenuto (§4) */
+.cmp-section {
+  padding-top: var(--s-2xl);
+  margin-top: var(--s-2xl);
+  border-top: 1px solid var(--stroke-soft-100);
+}
+.cmp-section-title { margin-bottom: var(--s-l); }
+.cmp-label { margin: var(--s-xl) 0 var(--s-s); }
+.cmp-section-title + .cmp-label { margin-top: 0; }
+.cmp-note { margin-bottom: var(--s-m); }
+
+.cmp-stack { display: grid; gap: var(--s-xs); }
+.cmp-row { display: flex; align-items: center; gap: var(--s-xs); flex-wrap: wrap; }
+.cmp-row--fill { flex-wrap: nowrap; }
+.cmp-chips { display: flex; flex-wrap: wrap; gap: var(--s-xs); }
+
+/* Fascia "mappa" per mostrare i pulsanti bianchi */
+.cmp-mapstrip {
+  display: grid;
+  gap: var(--s-s);
+  padding: var(--s-m);
+  border-radius: var(--r-card);
+  background: var(--sabbia-dark);
+}
+
+/* Pannello sabbia */
+.cmp-sand {
+  padding: var(--s-m);
+  border-radius: var(--r-card);
+  background: var(--sabbia-light);
+}
+
+/* Carosello: card centrata, laterali visibili, gap 12 */
+.cmp-carousel {
+  display: flex;
+  gap: var(--s-s);
+  margin: 0 calc(-1 * var(--s-m));
+  padding: 4px calc((100% + 2 * var(--s-m) - 347px) / 2) 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.cmp-carousel::-webkit-scrollbar { display: none; }
+.cmp-carousel--sheet { margin: 0; padding: 12px calc((100% - 347px) / 2) 24px; }
+
+.cmp-link {
+  display: block;
+  margin-top: var(--s-2xl);
+  padding: var(--s-s) 0;
+  color: var(--brand-dark);
+}
+
+/* Demo overlay mappa */
+.overlay-demo {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+.overlay-demo__map {
+  height: 100%;
+  padding: calc(var(--safe-top) + var(--s-m)) var(--s-m);
+  background: var(--sabbia-dark);
+}
+.overlay-demo__hint { margin-top: var(--s-m); color: var(--text-sub-700); }
+.overlay-demo__title {
+  padding: 21px var(--s-m) 13px;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -.01em;
+  text-align: center;
+  color: var(--text-strong-950);
+}
+.overlay-demo__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2xl);
+  padding: var(--s-xs) var(--s-m) 110px;
+}
+.overlay-demo__fab {
+  position: absolute;
+  left: 50%;
+  bottom: var(--s-m);
+  transform: translateX(-50%);
+}
+
+/* L'overlay sta sotto la tab bar: la parte non visibile scorre dietro di lei */
+.sheet.overlay-demo__sheet { z-index: 29; }
+.overlay-demo__sheet .cmp-carousel { transition: opacity var(--dur-base) var(--ease-out); }
+.overlay-demo__sheet[data-snap="0"]:not(.is-dragging) .cmp-carousel { opacity: 0; }

@@ -12,6 +12,11 @@
   --dur-base: 300ms;
   --dur-map: 500ms;
 
+  /* Valori del Figma senza token (non sono colori nuovi: nero e bianco con opacità) */
+  --shadow-bar: 0 4px 24px 0 rgba(0, 0, 0, .06);   /* barra azioni fissa (§4) */
+  --scrim: rgba(14, 14, 15, .32);                   /* velo sotto i bottom sheet informativi */
+  --glass: rgba(255, 255, 255, .3);                 /* salva sulla foto della card listing */
+
   color-scheme: light;
 }
 
@@ -86,4 +91,16 @@ button {
     --dur-base: 1ms;
     --dur-map: 1ms;
   }
+}
+
+/* Guscio del prototipo (passo 0.3) */
+.page-with-tabs { padding: calc(var(--safe-top) + var(--s-m)) 0 var(--tab-bar-h); }
+.page-with-tabs .bc { padding-top: var(--s-m); }
+.back-link { padding: var(--s-s) var(--s-m); color: var(--brand-dark); }
+.empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--safe-top) var(--s-m) var(--tab-bar-h);
+  color: var(--text-soft-500);
 }

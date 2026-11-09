@@ -31,11 +31,16 @@ src/
   styles/fonts.css    font e override dei nomi famiglia Fontsource
   styles/base.css     reset, comportamento da app, safe area, durate di movimento
   data/               dati ITRS e dati finti (JSON route e track)
-  components/         componenti riusabili (un file .jsx + .css per componente)
-  screens/            schermate
+  assets/             foto e badge esportati dal Figma (pagina UI Design), webp
+  components/         componenti riusabili (.jsx + .css): Icon, LevelShape, Button (+ ActionBar,
+                      FilterBar, FabMap…), Chip, Controls (Checkbox, Switch), Cards (RouteCard,
+                      ListingCard, RatingRow, RatingCard, Pentagon), BottomSheet, InfoSheet, TabBar
+  screens/            schermate (Components = galleria del passo 0.3, BaseCheck, InstallGuide)
 ```
 
 ## Regole
+
+0. **Riusa i componenti** di `src/components/` prima di crearne di nuovi; icone solo da `Icon.jsx` (tracciati del Figma).
 
 1. **Solo token.** Niente colori, raggi o spazi scritti a mano fuori da `tokens.css`. Se manca un token, chiedi.
 2. **Testi con le classi** `.t-*` di `tokens.css`. Mona Sans (`.t-display`) solo nei casi del §3 delle istruzioni.

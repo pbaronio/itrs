@@ -2,32 +2,23 @@ import { LEVELS } from '../data/itrs.js'
 
 /*
  * Forma del livello ITRS: cerchio, quadrato, triangolo, rombo, forma doppia.
- * Va sempre accanto al nome del livello (il colore non è mai l'unico segnale).
- * Forma doppia (Extreme): due rombi affiancati, da verificare sul Figma.
+ * Tracciati del Figma (filtri e card, riquadro 14×14): va sempre accanto al
+ * nome del livello, perché il colore non deve mai essere l'unico segnale.
  */
-export default function LevelShape({ level, size = 12, title }) {
+export const SHAPE_PATHS = {
+  circle: (fill) => <circle cx="7" cy="7" r="4.5" fill={fill} />,
+  square: (fill) => <rect x="2.5" y="2.5" width="9" height="9" fill={fill} />,
+  triangle: (fill) => <path d="M7 2.067 12.5 11.593H1.5Z" fill={fill} />,
+  diamond: (fill) => <path d="M7 .636 13.364 7 7 13.364.636 7Z" fill={fill} />,
+  double: (fill) => <path d="M14 6.977 9.432 13.021 7 9.803 4.567 13.021 0 6.977 4.567.934 7 4.151 9.432.934Z" fill={fill} />,
+}
+
+export default function LevelShape({ level, size = 14, title }) {
   const { color, shape } = LEVELS[level]
   const a11y = title ? { role: 'img', 'aria-label': title } : { 'aria-hidden': true }
-
-  if (shape === 'double') {
-    return (
-      <svg width={size * 1.75} height={size} viewBox="0 0 21 12" {...a11y}>
-        <path d="M5.5 0 11 6 5.5 12 0 6Z" fill={color} />
-        <path d="M15.5 0 21 6 15.5 12 10 6Z" fill={color} />
-      </svg>
-    )
-  }
-
-  const paths = {
-    circle: <circle cx="6" cy="6" r="6" fill={color} />,
-    square: <rect width="12" height="12" rx="1.5" fill={color} />,
-    triangle: <path d="M6 .5 12 11.5H0Z" fill={color} />,
-    diamond: <path d="M6 0 12 6 6 12 0 6Z" fill={color} />,
-  }
-
   return (
-    <svg width={size} height={size} viewBox="0 0 12 12" {...a11y}>
-      {paths[shape]}
+    <svg width={size} height={size} viewBox="0 0 14 14" focusable="false" {...a11y}>
+      {SHAPE_PATHS[shape](color)}
     </svg>
   )
 }

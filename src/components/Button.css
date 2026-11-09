@@ -1,0 +1,113 @@
+/* Feedback al tocco comune (§7): leggera scala e opacità */
+.btn, .btn-icon, .btn-round, .btn-map, .btn-close, .btn-fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+:is(.btn, .btn-icon, .btn-round, .btn-map, .btn-close, .btn-fab):not(:disabled):active {
+  transform: scale(.98);
+  opacity: .85;
+}
+
+/* Pieni h 60 */
+.btn {
+  height: 60px;
+  padding: 0 var(--s-xl);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.btn--action    { background: var(--bg-strong-950); color: var(--text-white-0); }
+.btn--confirm   { background: var(--brand-base);    color: var(--text-strong-950); }
+.btn--secondary { background: var(--bg-weak-50);    color: var(--text-strong-950); }
+.btn--disabled  { background: var(--bg-soft-100);   color: var(--text-disabled-400); cursor: default; }
+
+/* Secondario icona 60, sabbia */
+.btn-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--r-pill);
+  background: var(--sand-button);
+  color: var(--text-strong-950);
+}
+
+/* Tondo bianco 46 */
+.btn-round {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--r-pill);
+  background: var(--bg-white-0);
+  color: var(--text-sub-700);
+}
+
+/* Su mappa h 36 (area di tocco estesa a 44) */
+.btn-map {
+  position: relative;
+  gap: 6px;
+  height: 36px;
+  padding: 0 var(--s-s);
+  border-radius: 26px;
+  background: var(--bg-white-0);
+  color: var(--text-strong-950);
+}
+.btn-map::after { content: ''; position: absolute; inset: -4px 0; }
+
+/* Chiusura 40, sabbia (area di tocco estesa a 44) */
+.btn-close {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-sm);
+  background: var(--sabbia-light);
+  color: var(--text-strong-950);
+}
+.btn-close::after { content: ''; position: absolute; inset: -2px; }
+
+/* FAB Map 70 */
+.btn-fab {
+  flex-direction: column;
+  gap: 0;
+  width: 70px;
+  height: 70px;
+  padding-top: 2px;
+  border-radius: var(--r-pill);
+  background: var(--brand-base);
+  color: var(--blu-900);
+}
+.btn-fab .t-xs-em { color: var(--blu-950); margin-top: -1px; }
+
+/* Barra azioni fissa 402×114 */
+.action-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: var(--s-xs);
+  width: 100%;
+  max-width: 430px;
+  transform: translateX(-50%);
+  padding: 23px var(--s-m) max(var(--s-m), var(--safe-bottom));
+  background: var(--bg-white-0);
+  box-shadow: var(--shadow-bar);
+}
+.action-bar--inline {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  margin: 0 calc(-1 * var(--s-m));
+  width: calc(100% + 2 * var(--s-m));
+  padding-bottom: 31px;
+}
+.action-bar__secondary { display: flex; gap: var(--s-2xs); }
+.action-bar__start { flex: 1; min-width: 0; }
+
+/* Barra filtri */
+.filter-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.filter-bar .btn { padding: 0 var(--s-s); }

@@ -1,0 +1,145 @@
+/* Meta */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2xs) var(--s-s);
+  color: var(--text-sub-700);
+}
+.meta__item { display: inline-flex; align-items: center; gap: var(--s-2xs); white-space: nowrap; }
+.meta__item svg { color: var(--text-strong-950); }
+.meta__item--level { gap: 2px; }
+
+/* Etichetta livello Mona 12 */
+.level-label { display: inline-flex; align-items: center; gap: var(--s-2xs); }
+.level-label .t-display { font-size: 12px; line-height: 16px; color: var(--text-strong-950); }
+
+/* Card overlay 347×125 */
+.route-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 347px;
+  height: 125px;
+  flex-shrink: 0;
+  padding: 7px;
+  border-radius: var(--r-card);
+  background: var(--bg-white-0);
+  box-shadow: inset 0 0 0 1px var(--stroke-soft-100), var(--shadow-card);
+  text-align: left;
+  scroll-snap-align: center;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.route-card:active { transform: scale(.98); }
+.route-card__img {
+  width: 111px;
+  height: 111px;
+  flex-shrink: 0;
+  border-radius: var(--r-img);
+  object-fit: cover;
+}
+.route-card__body { display: flex; flex-direction: column; gap: var(--s-xs); min-width: 0; flex: 1; }
+.route-card__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--text-strong-950);
+}
+
+/* Card listing */
+.listing-card { display: flex; flex-direction: column; gap: var(--s-s); width: 100%; }
+.listing-card__media {
+  position: relative;
+  height: 247px;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--sabbia-dark);
+}
+.listing-card__photo { display: block; width: 100%; height: 100%; }
+.listing-card__photo img { width: 100%; height: 100%; object-fit: cover; }
+.listing-card__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 17px;
+  transform: translateX(-50%);
+  fill: var(--text-white-0);
+  pointer-events: none;
+}
+.listing-card__save {
+  position: absolute;
+  top: 15px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-pill);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--text-white-0);
+  transition: color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.listing-card__save::after { content: ''; position: absolute; inset: -6px; }   /* tocco 44 */
+.listing-card__save:active { transform: scale(.94); }
+.listing-card__save[aria-pressed="true"] { color: var(--brand-base); }
+.listing-card__map {
+  position: absolute;
+  right: 14px;
+  bottom: 17px;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--stroke-white-0);
+  overflow: hidden;
+  pointer-events: none;
+}
+.listing-card__map img { width: 100%; height: 100%; object-fit: cover; }
+.listing-card__map-tint {
+  position: absolute;
+  inset: 0;
+  background: var(--gray-950);
+  opacity: .4;
+  mix-blend-mode: color;
+}
+.listing-card__map-route { position: absolute; left: -1px; top: 21.6px; }
+.listing-card__body { display: flex; flex-direction: column; gap: var(--s-xs); }
+.listing-card__body h3 { color: var(--text-strong-950); }
+.listing-card__place { color: var(--text-sub-700); }
+
+/* Pentagono */
+.pentagon { display: block; flex-shrink: 0; overflow: visible; }
+
+/* Riga rating */
+.rating-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-xs);
+  width: 100%;
+  text-align: left;
+}
+.rating-row__text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.rating-row__value { color: var(--text-sub-700); }
+.rating-row__chevron { color: var(--text-strong-950); flex-shrink: 0; }
+.rating-rows { display: flex; flex-direction: column; gap: 19px; }
+.rating-rows > hr { margin: 0; border: 0; border-top: 1px solid var(--stroke-sand); }
+
+/* Small card rating 181×194 */
+.rating-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 194px;
+  padding-top: 14px;
+  border-radius: var(--r-sm);
+  background: var(--sabbia-light);
+  text-align: center;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.rating-card:active { transform: scale(.98); }
+.rating-card__badge { display: block; width: 89px; height: 84px; margin-bottom: 21px; }
+.rating-card__value { color: var(--text-sub-700); }
