@@ -12,6 +12,20 @@
  * Malga Ciapa riprende nomi e livelli di ITRS_contesto.md §2.
  */
 import GEOMETRY from './garda-geometry.json'
+import riders from '../assets/photos/riders.webp'
+import trail from '../assets/photos/trail-thumb.webp'
+
+// Solo due foto di esempio dal Figma: si alternano tra route e track
+const PHOTOS = [
+  { photo: riders, photoPosition: '50% 62%' },
+  { photo: trail, photoPosition: '50% 40%' },
+]
+// Località della track → provincia e regione, come nelle card del Figma
+const REGION = {
+  'Tremosine sul Garda': 'Brescia, Lombardy, Italy',
+  'Limone sul Garda': 'Brescia, Lombardy, Italy',
+}
+const placeOf = (town) => `${town}, ${REGION[town] ?? 'Trentino, Italy'}`
 
 // ---------- Track ----------
 // difficulty ed exposure: chiavi di LEVELS (data/itrs.js)
@@ -186,7 +200,7 @@ function surfaceShare(s) {
   return { road: s.road / tot, gravel: s.gravel / tot, single: s.single / tot }
 }
 
-export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
+export const TRACKS = Object.entries(TRACK_META).map(([id, meta], i) => {
   const g = GEOMETRY[id]
   const points = decode(g.line)
   const { up, down } = climbOf(points)
@@ -195,7 +209,9 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
     id,
     kind: 'track',
     ...meta,
+    place: placeOf(meta.place),
     level: meta.difficulty,
+    ...PHOTOS[(i + 1) % 2],
     points,                                  // [lon, lat, quota]
     km,
     climb: up,
@@ -209,7 +225,7 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
 
 const TRACK_BY_ID = Object.fromEntries(TRACKS.map((t) => [t.id, t]))
 
-export const ROUTES = ROUTE_DEFS.map((def) => {
+export const ROUTES = ROUTE_DEFS.map((def, i) => {
   const legs = def.tracks.map((key) => {
     const reverse = key.startsWith('-')
     const track = TRACK_BY_ID[key.replace('-', '')]
@@ -230,6 +246,7 @@ export const ROUTES = ROUTE_DEFS.map((def) => {
     place: def.place,
     ratings: def.ratings,
     level: def.ratings.difficulty,
+    ...PHOTOS[i % 2],
     legs: legs.map(({ track, reverse }) => ({ trackId: track.id, reverse })),
     points,
     km,
@@ -241,6 +258,13 @@ export const ROUTES = ROUTE_DEFS.map((def) => {
     pin: points[0].slice(0, 2),              // il pin della route sta alla partenza
   }
 })
+
+// Testi già formattati per le card (§8)
+for (const it of [...TRACKS, ...ROUTES]) {
+  it.distance = fmtKm(it.km)
+  it.climbLabel = fmtClimb(it.climb)
+  it.duration = fmtDuration(it.minutes)
+}
 
 // Area di tutti i percorsi, per la vista iniziale
 export const ALL_BOUNDS = bboxOf(ROUTES.flatMap((r) => r.points))

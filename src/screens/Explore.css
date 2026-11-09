@@ -38,6 +38,7 @@
 .explore__top > * { pointer-events: auto; }
 .explore__top .route-toggle { margin-top: 9px; }
 .explore__buttons {
+  transition: opacity var(--dur-base) var(--ease-out);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -56,6 +57,62 @@
   text-align: center;
   color: var(--text-strong-950);
 }
+
+/* Stato 2: carosello di card 347×125, card centrata e laterali visibili, gap 12 */
+.explore__carousel {
+  display: flex;
+  gap: var(--s-s);
+  padding: var(--s-s) calc((100% - 347px) / 2) var(--s-xl);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  overflow-anchor: none;            /* l'elenco cambia ordine: niente salti dello scorrimento */
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.explore__carousel::-webkit-scrollbar { display: none; }
+.explore__carousel.is-hidden { opacity: 0; }
+.sheet.explore__overlay.is-dragging .explore__carousel { opacity: 1; }
+.explore__slide { flex: 0 0 auto; scroll-snap-align: center; }
+.explore__empty {
+  padding: var(--s-s) var(--s-m);
+  text-align: center;
+  color: var(--text-sub-700);
+}
+
+/* Stato 3: listing a tutta pagina, card a 32 di distanza, FAB Map */
+.explore__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2xl);
+  padding: var(--s-xs) var(--s-m) 120px;
+}
+.explore__fab {
+  position: absolute;
+  left: 50%;
+  bottom: var(--s-xl);
+  transform: translateX(-50%);
+}
+.explore.is-listing .explore__overlay-title { opacity: 0; }
+.explore__overlay-title { transition: opacity var(--dur-base) var(--ease-out); }
+
+/* Nel listing la parte sopra il foglio diventa bianca (pagina listing del Figma) */
+.explore__list-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--list-top) + var(--r-sheet));
+  z-index: 1;
+  background: var(--bg-white-0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.explore.is-listing .explore__list-bg { opacity: 1; pointer-events: auto; }
+.explore.is-listing .explore__veil { opacity: 0; }
+.explore.is-listing .explore__buttons { opacity: 0; pointer-events: none; }
+.explore__veil { transition: opacity var(--dur-base) var(--ease-out); }
 
 /* Errore: stile sobrio, testo md/default e una sola azione (§7) */
 .explore__error {

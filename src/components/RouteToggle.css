@@ -8,7 +8,7 @@
   height: 50px;
   border-radius: var(--r-pill);
   background: var(--bg-white-0);
-  transition: grid-template-columns var(--dur-base) var(--ease-out);
+  transition: grid-template-columns var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out);
 }
 .route-toggle--on-light { background: var(--bg-weak-50); }
 .route-toggle[data-active="tracks"] { grid-template-columns: 1fr var(--thumb); }

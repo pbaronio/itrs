@@ -104,6 +104,7 @@
   mix-blend-mode: color;
 }
 .listing-card__map-route { position: absolute; left: -1px; top: 21.6px; }
+.listing-card__map-route--real { left: 0; top: 0; }
 .listing-card__body { display: flex; flex-direction: column; gap: var(--s-xs); }
 .listing-card__body h3 { color: var(--text-strong-950); }
 .listing-card__place { color: var(--text-sub-700); }

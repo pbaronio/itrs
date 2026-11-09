@@ -5,7 +5,11 @@
   border: 1px solid var(--stroke-soft-100);
   border-radius: var(--r-pill);
   background: var(--bg-white-0);
+  transition: background-color var(--dur-base) var(--ease-out);
 }
+/* Su pagine bianche (listing): fondo bg-weak-50, pulsante filtri più scuro per staccarsi */
+.searchbar--on-light { background: var(--bg-weak-50); }
+.searchbar--on-light .searchbar__filters { background: var(--bg-soft-100); }
 .searchbar__field {
   display: flex;
   align-items: center;
