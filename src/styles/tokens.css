@@ -1,0 +1,77 @@
+/*
+ * Token ITRS: copia esatta di ITRS_istruzioni.md §9.
+ * Non modificare a mano: se cambiano le istruzioni, ricopia il blocco.
+ * Unica eccezione: i nomi dei font sono sovrascritti in fonts.css.
+ */
+:root {
+  /* Foundation */
+  --gray-950:#0E0E0F; --gray-900:#242427; --gray-800:#2F2F31; --gray-700:#48484A;
+  --gray-600:#636366; --gray-500:#8E8E93; --gray-400:#AEAEB2; --gray-300:#C7C7CC;
+  --gray-200:#D1D1D6; --gray-100:#E9E9EA; --gray-50:#F4F5F5; --gray-0:#FFFFFF;
+  --blu-950:#102647; --blu-900:#1B4077; --blu-800:#21529A; --blu-700:#2D69C2;
+  --blu-600:#4385E5; --blu-500:#669FF6; --blu-400:#89B6F8; --blu-300:#ACCEFA;
+  --blu-200:#C9DFFC; --blu-100:#E5EFFD; --blu-50:#F2F7FE;
+  --sand-500:#F7F6F2; --sand-600:#E9E7DC;
+
+  /* Semantici: Light */
+  --brand-lighter:var(--blu-50); --brand-light:var(--blu-100); --brand-base:var(--blu-500);
+  --brand-dark:var(--blu-700); --brand-darker:var(--blu-800);
+  --brand-alpha-10:rgba(102,159,246,.10); --brand-alpha-15:rgba(102,159,246,.15); --brand-alpha-24:rgba(102,159,246,.24);
+  --gray-alpha-10:rgba(106,114,130,.10); --gray-alpha-15:rgba(106,114,130,.15); --gray-alpha-24:rgba(106,114,130,.24);
+  --bg-white-0:var(--gray-0); --bg-weak-50:var(--gray-50); --bg-soft-100:var(--gray-100);
+  --bg-sub-200:var(--gray-200); --bg-sub-300:var(--gray-300); --bg-surface-800:var(--gray-800);
+  --bg-strong-950:var(--gray-950); --sabbia-light:var(--sand-500); --sabbia-dark:var(--sand-600);
+  --text-strong-950:var(--gray-950); --text-sub-700:var(--gray-700); --text-soft-500:var(--gray-500);
+  --text-disabled-400:var(--gray-400); --text-white-0:var(--gray-0);
+  --stroke-soft-100:var(--gray-100); --stroke-sub-200:var(--gray-200);
+  --stroke-strong-950:var(--gray-950); --stroke-white-0:var(--gray-0);
+
+  /* Rating ITRS */
+  --itrs-green:#34A853; --itrs-blue:#4285F4; --itrs-red:#EA4335; --itrs-black:#000000; --itrs-orange:#DD894B;
+
+  /* Senza token in Figma */
+  --forest:#3C493E; --sand-button:#F2F1EB; --stroke-sand:#DBD9C9; --topo-line:rgba(102,159,246,.18);
+  --ttf-jump-bg:#0B1C37; --ttf-jump-accent:#669FF6;
+  --ttf-drop-bg:#331E09; --ttf-drop-accent:#A09AF8;
+  --ttf-skinny-bg:#355136; --ttf-skinny-accent:#B3F0DC;
+  --wild-blue:#D4E2F9; --wild-green:#E1F9D4;
+  --accent-stop:#F67966; --warning-soft:#FFF3AE;
+  --nav-dark:#0E0E0F; --nav-track:rgba(233,233,234,.30); --ios-blue:#007AFF;
+
+  /* Spazi */
+  --s-2xs:4px; --s-xs:8px; --s-s:12px; --s-m:16px; --s-l:20px; --s-xl:24px; --s-2xl:32px; --s-3xl:48px; --s-4xl:64px;
+
+  /* Raggi */
+  --r-thumb:6px; --r-bar:5px; --r-sm:12px; --r-img:14px; --r-card:16px; --r-sheet:24px; --r-pill:9999px;
+
+  /* Ombre */
+  --shadow-card:0 9px 10px -2px rgba(0,0,0,.03);
+
+  /* Font */
+  --font-text:'Inter',system-ui,sans-serif;
+  --font-display:'Mona Sans',system-ui,sans-serif;
+}
+
+/* Dark: token presenti in Figma, schermate non ancora disegnate */
+[data-theme="dark"] {
+  --brand-lighter:var(--blu-950); --brand-light:var(--blu-900); --brand-base:var(--blu-400);
+  --brand-dark:var(--blu-300); --brand-darker:var(--blu-200);
+  --bg-white-0:var(--gray-950); --bg-weak-50:var(--gray-900); --bg-soft-100:var(--gray-700);
+  --bg-sub-200:var(--gray-600); --bg-sub-300:var(--gray-500); --bg-surface-800:var(--gray-200);
+  --bg-strong-950:var(--gray-0);
+  --text-strong-950:var(--gray-0); --text-sub-700:var(--gray-300); --text-soft-500:var(--gray-400);
+  --text-disabled-400:var(--gray-600); --text-white-0:var(--gray-950);
+  --stroke-soft-100:var(--gray-900); --stroke-sub-200:var(--gray-700);
+  --stroke-strong-950:var(--gray-0); --stroke-white-0:var(--gray-950);
+}
+
+/* Testi */
+.t-2xl-em{font:600 24px/28px var(--font-text);letter-spacing:-.02em}
+.t-lg-em{font:600 18px/24px var(--font-text)}
+.t-md-em{font:600 16px/22px var(--font-text);letter-spacing:-.01em}
+.t-md{font:400 16px/22px var(--font-text);letter-spacing:-.015em}
+.t-sm-em{font:600 14px/20px var(--font-text);letter-spacing:-.01em}
+.t-sm{font:400 14px/20px var(--font-text);letter-spacing:-.01em}
+.t-xs-em{font:600 12px/16px var(--font-text)}
+.t-label{font:500 12px/18px var(--font-text);letter-spacing:-.01em;text-transform:uppercase;color:var(--text-soft-500)}
+.t-display{font-family:var(--font-display);font-weight:900;font-style:italic;text-transform:uppercase}

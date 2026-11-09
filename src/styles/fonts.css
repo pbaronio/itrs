@@ -1,0 +1,15 @@
+/*
+ * Font self-hosted (Fontsource, variabili): nessuna richiesta a Google Fonts.
+ * Fontsource registra le famiglie come "Inter Variable" e "Mona Sans Variable",
+ * quindi qui si sovrascrivono le due variabili font di tokens.css.
+ */
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/inter/wght-italic.css';
+@import '@fontsource-variable/mona-sans/wght-italic.css';
+
+:root {
+  --font-text: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-display: 'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif;
+  /* Font di sistema per gli avvisi iOS nativi (punto aperto 11) */
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+}

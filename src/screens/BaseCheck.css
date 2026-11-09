@@ -1,0 +1,92 @@
+.bc {
+  padding: calc(var(--safe-top) + var(--s-2xl)) var(--s-m) calc(var(--safe-bottom) + var(--s-3xl));
+}
+
+.bc-head { display: grid; gap: var(--s-xs); }
+.bc-title { font-size: 30px; line-height: 32px; }
+.bc-sub { color: var(--text-sub-700); }
+.bc-muted { color: var(--text-soft-500); }
+
+.bc-section {
+  padding-top: var(--s-2xl);
+  margin-top: var(--s-2xl);
+  border-top: 1px solid var(--stroke-soft-100);
+}
+.bc-section-title { margin-bottom: var(--s-l); }
+
+/* Font */
+.bc-fonts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-xs); }
+.bc-font {
+  display: grid;
+  align-content: start;
+  gap: var(--s-xs);
+  padding: var(--s-m);
+  background: var(--sabbia-light);
+  border-radius: var(--r-sm);
+}
+.bc-font-sample { font: 600 56px/60px var(--font-text); letter-spacing: -.02em; }
+.bc-font--display { background: var(--forest); color: var(--text-white-0); }
+.bc-font--display .t-label { color: rgba(255, 255, 255, .8); }
+.bc-font-big { font-size: 72px; line-height: 72px; }
+.bc-font-small { font-size: 16px; line-height: 20px; }
+
+/* Scala */
+.bc-type { display: grid; gap: var(--s-m); }
+.bc-type li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-s); }
+
+/* Livelli */
+.bc-levels { display: grid; gap: var(--s-xs); }
+.bc-level {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: var(--s-s);
+  padding: var(--s-xs);
+  background: var(--sabbia-light);
+  border-radius: var(--r-sm);
+}
+.bc-level-chip { width: 40px; height: 40px; border-radius: var(--r-bar); }
+.bc-level-name { display: inline-flex; align-items: center; gap: var(--s-xs); }
+.bc-mona-label { margin-top: var(--s-l); }
+.bc-mona12 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--s-2xs);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* Colori */
+.bc-swatch-group + .bc-swatch-group { margin-top: var(--s-l); }
+.bc-swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-s) var(--s-xs);
+  margin-top: var(--s-xs);
+}
+.bc-swatch { display: grid; gap: 6px; }
+.bc-swatch-chip {
+  height: 48px;
+  border-radius: var(--r-sm);
+  box-shadow: inset 0 0 0 1px var(--stroke-soft-100);
+}
+.bc-swatch-name { font: 500 11px/14px var(--font-text); color: var(--text-sub-700); word-break: break-word; }
+
+/* Raggi */
+.bc-radii { display: flex; justify-content: space-between; }
+.bc-radius { display: grid; justify-items: center; gap: 6px; }
+.bc-radius-box { width: 44px; height: 44px; background: var(--sabbia-dark); }
+
+/* Pulsanti (anteprima, non componenti definitivi) */
+.bc-buttons { display: grid; gap: var(--s-xs); margin-top: var(--s-xl); }
+.bc-btn {
+  height: 60px;
+  border-radius: var(--r-pill);
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+}
+.bc-btn:active { transform: scale(.98); opacity: .9; }
+.bc-btn--action { background: var(--bg-strong-950); color: var(--text-white-0); }
+.bc-btn--confirm { background: var(--brand-base); color: var(--text-strong-950); }
+.bc-btn--secondary { background: var(--bg-weak-50); color: var(--text-strong-950); }
+.bc-note { margin-top: var(--s-s); }
