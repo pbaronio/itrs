@@ -1,0 +1,79 @@
+/* Explore, mappa (istruzioni §6 "Mappa", "Navigazione", "Bottom sheet e overlay") */
+.explore {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--sabbia-light);
+}
+
+/* Cima schermo: blur di sfondo 8 su 216 (dal bordo superiore del frame) per leggere i controlli */
+.explore__veil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--safe-top) + 156px);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Searchbar a y 76, toggle a y 140, pulsanti tondi a y 205 (frame 402×874, status bar 60) */
+.explore__top {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--s-m));
+  left: var(--s-m);
+  right: var(--s-m);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+.explore__top > * { pointer-events: auto; }
+.explore__top .route-toggle { margin-top: 9px; }
+.explore__buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin-top: 15px;
+  align-self: flex-start;
+}
+
+/* Overlay in stato 1: handle e conteggio, Mona 16 maiuscolo centrato */
+.sheet.explore__overlay { z-index: 29; box-shadow: none; }
+.explore__overlay-title {
+  padding: 21px var(--s-m) 13px;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -.01em;
+  text-align: center;
+  color: var(--text-strong-950);
+}
+
+/* Errore: stile sobrio, testo md/default e una sola azione (§7) */
+.explore__error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-m);
+  padding: 0 var(--s-2xl) calc(var(--tab-bar-h) + 86px);
+  text-align: center;
+  color: var(--text-sub-700);
+}
+.explore__retry {
+  height: 44px;
+  padding: 0 var(--s-xl);
+  border-radius: var(--r-pill);
+  background: var(--bg-strong-950);
+  color: var(--text-white-0);
+}

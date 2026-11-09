@@ -127,6 +127,31 @@ const ICONS = {
     body: <path {...S} strokeWidth="1.125" strokeLinecap="square" d="M7.3125 1.6875H10.6875M9 9.75L6.75 7.5M15.1875 9.75C15.1875 13.1672 12.4172 15.9375 9 15.9375C5.58274 15.9375 2.8125 13.1672 2.8125 9.75C2.8125 6.33274 5.58274 3.5625 9 3.5625C12.4172 3.5625 15.1875 6.33274 15.1875 9.75Z" />,
   },
 
+  // Mappa (Searchbar 20, controlli 24): MagnifyingGlass, FadersHorizontal, IconLayersTwo, IconTarget2
+  search: {
+    box: 20,
+    body: (
+      <g {...S} strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M15 8.75C15 12.2018 12.2018 15 8.75 15C5.29822 15 2.5 12.2018 2.5 8.75C2.5 5.29822 5.29822 2.5 8.75 2.5C12.2018 2.5 15 5.29822 15 8.75Z" />
+        <path d="M13.1696 13.1695L17.5 17.5" />
+      </g>
+    ),
+  },
+  filters: {
+    box: 24,
+    body: (
+      <path {...S} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M17.25 7.5H20.25M3.75 7.5H14.25M11.25 16.5H20.25M3.75 16.5H8.25M14.25 5.25V9.75M8.25 14.25V18.75" />
+    ),
+  },
+  layers: {
+    box: 24,
+    body: <path {...S} strokeLinecap="square" d="M8 12.1118L2.5 15.1875L12 20.5L21.5 15.1875L16 12.1118M12 3.5L2.5 8.8125L8.2 12L12 14.125L15.8 12L21.5 8.8125L12 3.5Z" />,
+  },
+  target: {
+    box: 24,
+    body: <path {...S} strokeLinecap="square" d="M12 1.5V4.5M12 4.5V8.5M12 4.5C7.85786 4.5 4.5 7.85786 4.5 12M12 4.5C16.1421 4.5 19.5 7.85786 19.5 12M22.5 12H19.5M19.5 12H15.5M19.5 12C19.5 16.1421 16.1421 19.5 12 19.5M12 15.5V19.5M12 19.5V22.5M12 19.5C7.85786 19.5 4.5 16.1421 4.5 12M8.5 12H4.5M4.5 12H1.5" />,
+  },
+
   // FAB Map (32)
   compass: {
     box: 32,

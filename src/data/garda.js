@@ -1,0 +1,259 @@
+/*
+ * Route e track di prova sul Garda (Alto Garda, Valle di Ledro, Tremosine).
+ *
+ * Tracciati: generati con BRouter (profilo mtb) su dati OpenStreetMap, tra
+ * località reali; quota dal modello del terreno di BRouter. Vedi
+ * scripts/README-garda.md. Geometria in garda-geometry.json (polyline codificata
+ * lat, lon, quota; precisione 1e-5), più la ripartizione del fondo in metri.
+ *
+ * Nomi delle track, livelli ITRS e rating delle route: inventati ma verosimili,
+ * a scopo di test. La route 733 riprende la scheda ufficiale del cliente
+ * (ITRS_fonte_garda_733.md): Intermediate con tratti Advanced, esposizione Fatal.
+ * Malga Ciapa riprende nomi e livelli di ITRS_contesto.md §2.
+ */
+import GEOMETRY from './garda-geometry.json'
+
+// ---------- Track ----------
+// difficulty ed exposure: chiavi di LEVELS (data/itrs.js)
+const TRACK_META = {
+  // Riva, Ponale, Pregasina
+  P1:  { name: 'Strada del Ponale', place: 'Riva del Garda', difficulty: 'green', exposure: 'blue' },
+  P1b: { name: 'Ponale Alto', place: 'Ledro', difficulty: 'green', exposure: 'green' },
+  P2:  { name: 'Strada di Pregasina', place: 'Riva del Garda', difficulty: 'green', exposure: 'blue' },
+  // Valle di Ledro
+  VL1: { name: 'Sentiero di Prè', place: 'Ledro', difficulty: 'blue', exposure: 'green' },
+  LD1: { name: 'Lungolago di Ledro Nord', place: 'Ledro', difficulty: 'green', exposure: 'green' },
+  LD2: { name: 'Lungolago di Ledro Sud', place: 'Ledro', difficulty: 'green', exposure: 'green' },
+  VL2: { name: 'Ciclabile Valle di Ledro', place: 'Ledro', difficulty: 'green', exposure: 'green' },
+  CO1: { name: 'Valle di Concei', place: 'Ledro', difficulty: 'green', exposure: 'green' },
+  CO2: { name: 'Salita a Malga Trat', place: 'Ledro', difficulty: 'blue', exposure: 'green' },
+  CO3: { name: "Sentiero di Cima d'Oro", place: 'Ledro', difficulty: 'red', exposure: 'red' },
+  // Tremalzo e passi
+  TZ1: { name: 'Salita al Tremalzo', place: 'Ledro', difficulty: 'blue', exposure: 'green' },
+  TZ2: { name: 'Strada militare del Tremalzo', place: 'Ledro', difficulty: 'blue', exposure: 'black' },
+  FT1: { name: 'Passo Nota – Bocca dei Fortini', place: 'Tremosine sul Garda', difficulty: 'blue', exposure: 'blue' },
+  FT2: { name: 'Bocca dei Fortini – Passo Guil', place: 'Ledro', difficulty: 'blue', exposure: 'red' },
+  GU1: { name: 'Discesa di Pregasina', place: 'Riva del Garda', difficulty: 'red', exposure: 'blue' },
+  NT1: { name: 'Valle di Bondo', place: 'Tremosine sul Garda', difficulty: 'blue', exposure: 'blue' },
+  LM1: { name: 'Discesa su Limone', place: 'Limone sul Garda', difficulty: 'black', exposure: 'red' },
+  // Tremosine (Malga Ciapa, nomi da ITRS_contesto.md §2)
+  MCa: { name: 'Accesso Malga Ciapa', place: 'Tremosine sul Garda', difficulty: 'green', exposure: 'green' },
+  MCb: { name: 'Bosco di Tremosine', place: 'Tremosine sul Garda', difficulty: 'green', exposure: 'green' },
+  MCc: { name: 'Traverso Panorama Garda', place: 'Tremosine sul Garda', difficulty: 'blue', exposure: 'blue' },
+  MCd: { name: 'Salita Rocchetta', place: 'Tremosine sul Garda', difficulty: 'blue', exposure: 'green' },
+  // Monte Brione, Torbole, Nago
+  MB1: { name: 'Salita del Brione', place: 'Riva del Garda', difficulty: 'blue', exposure: 'blue' },
+  MB2: { name: 'Discesa Forte Garda', place: 'Riva del Garda', difficulty: 'red', exposure: 'blue' },
+  MB3: { name: 'Lungolago Torbole – Riva', place: 'Nago-Torbole', difficulty: 'green', exposure: 'green' },
+  NG1: { name: 'Salita di Nago', place: 'Nago-Torbole', difficulty: 'green', exposure: 'green' },
+  NG2: { name: 'Marmitte dei Giganti', place: 'Nago-Torbole', difficulty: 'blue', exposure: 'blue' },
+  NG3: { name: 'Discesa delle Busatte', place: 'Nago-Torbole', difficulty: 'blue', exposure: 'green' },
+  // Tenno, Arco, Sarca
+  TN1: { name: 'Ciclabile del Varone', place: 'Riva del Garda', difficulty: 'green', exposure: 'green' },
+  TN2: { name: 'Salita di Tenno', place: 'Tenno', difficulty: 'blue', exposure: 'green' },
+  TN3: { name: 'Borgo di Canale', place: 'Tenno', difficulty: 'green', exposure: 'green' },
+  TN4: { name: 'Discesa di Campi', place: 'Riva del Garda', difficulty: 'blue', exposure: 'blue' },
+  CA:  { name: 'Ciclabile Riva – Arco', place: 'Arco', difficulty: 'green', exposure: 'green' },
+  AR1: { name: 'Salita di Laghel', place: 'Arco', difficulty: 'blue', exposure: 'green' },
+  AR2: { name: 'Ritorno su Arco', place: 'Arco', difficulty: 'blue', exposure: 'green' },
+  CT:  { name: 'Ciclabile del Sarca', place: 'Nago-Torbole', difficulty: 'green', exposure: 'green' },
+}
+
+// ---------- Route ----------
+// tracks: in ordine di percorrenza; '-' davanti = track percorsa al contrario
+const ROUTE_DEFS = [
+  {
+    id: 'tremalzo-xxl', ref: '733', name: 'Tremalzo Garda XXL Tour', place: 'Riva del Garda, Trentino, Italy',
+    tracks: ['P1', 'P1b', 'VL1', 'LD1', 'VL2', 'TZ1', 'TZ2', 'FT1', 'FT2', 'GU1', 'P2', '-P1'],
+    ratings: { difficulty: 'blue', fitness: 'black', exposure: 'black', wilderness: 'red' },
+  },
+  {
+    id: 'malga-ciapa', ref: '761', name: 'Malga Ciapa, Tremosine sul Garda', place: 'Brescia, Lombardy, Italy',
+    tracks: ['MCa', 'MCb', 'MCc', 'MCd'],
+    ratings: { difficulty: 'green', fitness: 'blue', exposure: 'green', wilderness: 'blue' },
+  },
+  {
+    id: 'passo-nota-limone', ref: '764', name: 'Passo Nota e Limone', place: 'Brescia, Lombardy, Italy',
+    tracks: ['NT1', 'FT1', 'LM1'],
+    ratings: { difficulty: 'black', fitness: 'red', exposure: 'black', wilderness: 'red' },
+  },
+  {
+    id: 'monte-brione', ref: '741', name: 'Monte Brione', place: 'Riva del Garda, Trentino, Italy',
+    tracks: ['MB1', 'MB2', 'MB3'],
+    ratings: { difficulty: 'red', fitness: 'green', exposure: 'blue', wilderness: 'green' },
+  },
+  {
+    id: 'lago-di-tenno', ref: '711', name: 'Lago di Tenno e Canale', place: 'Riva del Garda, Trentino, Italy',
+    tracks: ['TN1', 'TN2', 'TN3', 'TN4'],
+    ratings: { difficulty: 'blue', fitness: 'blue', exposure: 'blue', wilderness: 'green' },
+  },
+  {
+    id: 'arco-laghel', ref: '702', name: 'Arco e Laghel dal Lago', place: 'Riva del Garda, Trentino, Italy',
+    tracks: ['CA', 'AR1', 'AR2', 'CT', 'MB3'],
+    ratings: { difficulty: 'green', fitness: 'green', exposure: 'green', wilderness: 'green' },
+  },
+  {
+    id: 'nago-busatte', ref: '745', name: 'Nago e Busatte', place: 'Nago-Torbole, Trentino, Italy',
+    tracks: ['NG1', 'NG2', 'NG3'],
+    ratings: { difficulty: 'blue', fitness: 'green', exposure: 'blue', wilderness: 'green' },
+  },
+  {
+    id: 'lago-di-ledro', ref: '720', name: 'Giro del Lago di Ledro', place: 'Ledro, Trentino, Italy',
+    tracks: ['LD1', 'LD2'],
+    ratings: { difficulty: 'green', fitness: 'green', exposure: 'green', wilderness: 'green' },
+  },
+  {
+    id: 'concei-cima-oro', ref: '725', name: "Valle di Concei e Cima d'Oro", place: 'Ledro, Trentino, Italy',
+    tracks: ['LD1', 'CO1', 'CO2', 'CO3'],
+    ratings: { difficulty: 'red', fitness: 'red', exposure: 'red', wilderness: 'blue' },
+  },
+]
+
+// Posizione dell'utente simulata: lungolago di Riva del Garda.
+// I tester sono altrove: la posizione vera porterebbe la mappa fuori dall'area.
+export const USER_POSITION = [10.8430, 45.8836]
+
+// ---------- Calcoli ----------
+function decode(str) {
+  const out = []
+  let i = 0, lat = 0, lon = 0, ele = 0
+  const next = () => {
+    let r = 0, sh = 0, b
+    do { b = str.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5 } while (b >= 0x20)
+    return r & 1 ? ~(r >> 1) : r >> 1
+  }
+  while (i < str.length) {
+    lat += next(); lon += next(); ele += next()
+    out.push([lon / 1e5, lat / 1e5, ele])
+  }
+  return out
+}
+
+function meters(a, b) {
+  const R = 6371000, toRad = Math.PI / 180
+  const dLat = (b[1] - a[1]) * toRad, dLon = (b[0] - a[0]) * toRad
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[1] * toRad) * Math.cos(b[1] * toRad) * Math.sin(dLon / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(h))
+}
+
+// Dislivello: quota media mobile su 250 m (il modello del terreno è rumoroso
+// lungo le pareti, es. Ponale) e isteresi di 5 m
+function climbOf(points) {
+  const dist = [0]
+  for (let i = 1; i < points.length; i++) dist.push(dist[i - 1] + meters(points[i - 1], points[i]))
+  const smooth = points.map((_, i) => {
+    let sum = 0, n = 0
+    for (let j = i; j >= 0 && dist[i] - dist[j] <= 125; j--) { sum += points[j][2]; n++ }
+    for (let j = i + 1; j < points.length && dist[j] - dist[i] <= 125; j++) { sum += points[j][2]; n++ }
+    return sum / n
+  })
+  let up = 0, down = 0, ref = smooth[0]
+  for (const e of smooth) {
+    const d = e - ref
+    if (d >= 5) { up += d; ref = e } else if (d <= -5) { down -= d; ref = e }
+  }
+  return { up: Math.round(up), down: Math.round(down) }
+}
+
+function bboxOf(points) {
+  let w = 180, s = 90, e = -180, n = -90
+  for (const [x, y] of points) { if (x < w) w = x; if (x > e) e = x; if (y < s) s = y; if (y > n) n = y }
+  return [[w, s], [e, n]]
+}
+
+function pointAtHalf(points) {
+  const total = points.reduce((acc, p, i) => (i ? acc + meters(points[i - 1], p) : 0), 0)
+  let acc = 0
+  for (let i = 1; i < points.length; i++) {
+    const d = meters(points[i - 1], points[i])
+    if (acc + d >= total / 2) {
+      const t = d ? (total / 2 - acc) / d : 0
+      const [a, b] = [points[i - 1], points[i]]
+      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]
+    }
+    acc += d
+  }
+  return points[0].slice(0, 2)
+}
+
+// Tempo stimato in MTB: 14 km/h in piano più 1 h ogni 600 m di salita
+function durationMin(km, up) {
+  return Math.round(((km / 14) + (up / 600)) * 60 / 5) * 5
+}
+
+function surfaceShare(s) {
+  const tot = s.road + s.gravel + s.single || 1
+  return { road: s.road / tot, gravel: s.gravel / tot, single: s.single / tot }
+}
+
+export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
+  const g = GEOMETRY[id]
+  const points = decode(g.line)
+  const { up, down } = climbOf(points)
+  const km = g.len / 1000
+  return {
+    id,
+    kind: 'track',
+    ...meta,
+    level: meta.difficulty,
+    points,                                  // [lon, lat, quota]
+    km,
+    climb: up,
+    descent: down,
+    minutes: durationMin(km, up),
+    surface: surfaceShare(g.surface),
+    bbox: bboxOf(points),
+    pin: pointAtHalf(points),                // il pin della track sta a metà percorso
+  }
+})
+
+const TRACK_BY_ID = Object.fromEntries(TRACKS.map((t) => [t.id, t]))
+
+export const ROUTES = ROUTE_DEFS.map((def) => {
+  const legs = def.tracks.map((key) => {
+    const reverse = key.startsWith('-')
+    const track = TRACK_BY_ID[key.replace('-', '')]
+    return { track, reverse, points: reverse ? [...track.points].reverse() : track.points }
+  })
+  const points = legs.flatMap((leg, i) => (i ? leg.points.slice(1) : leg.points))
+  const km = legs.reduce((acc, leg) => acc + leg.track.km, 0)
+  const { up, down } = climbOf(points)
+  const surf = legs.reduce((acc, leg) => {
+    const s = GEOMETRY[leg.track.id].surface
+    return { road: acc.road + s.road, gravel: acc.gravel + s.gravel, single: acc.single + s.single }
+  }, { road: 0, gravel: 0, single: 0 })
+  return {
+    id: def.id,
+    kind: 'route',
+    ref: def.ref,
+    name: def.name,
+    place: def.place,
+    ratings: def.ratings,
+    level: def.ratings.difficulty,
+    legs: legs.map(({ track, reverse }) => ({ trackId: track.id, reverse })),
+    points,
+    km,
+    climb: up,
+    descent: down,
+    minutes: durationMin(km, up),
+    surface: surfaceShare(surf),
+    bbox: bboxOf(points),
+    pin: points[0].slice(0, 2),              // il pin della route sta alla partenza
+  }
+})
+
+// Area di tutti i percorsi, per la vista iniziale
+export const ALL_BOUNDS = bboxOf(ROUTES.flatMap((r) => r.points))
+
+// ---------- Formati (istruzioni §8) ----------
+export function fmtKm(km) {
+  return `${km < 20 ? km.toFixed(2) : km.toFixed(1)} km`
+}
+export function fmtClimb(m) {
+  return `+${m} m`
+}
+export function fmtDuration(min) {
+  const h = Math.floor(min / 60), m = min % 60
+  if (!h) return `~${m}m`
+  return m ? `~${h}h ${m}m` : `~${h}h`
+}

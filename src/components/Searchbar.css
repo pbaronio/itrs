@@ -1,0 +1,36 @@
+.searchbar {
+  position: relative;
+  width: 100%;
+  height: 55px;
+  border: 1px solid var(--stroke-soft-100);
+  border-radius: var(--r-pill);
+  background: var(--bg-white-0);
+}
+.searchbar__field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  padding: 0 60px 0 18px;
+  border-radius: var(--r-pill);
+  color: var(--text-sub-700);
+  text-align: left;
+}
+.searchbar__field span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.searchbar__filters {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-pill);
+  background: var(--bg-weak-50);
+  color: var(--text-sub-700);
+  transform: translateY(-50%);
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+}
+.searchbar__filters::after { content: ''; position: absolute; inset: -2px; }  /* area di tocco 46 */
+.searchbar__filters:active { transform: translateY(-50%) scale(.98); opacity: .85; }

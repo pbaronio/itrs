@@ -1,0 +1,88 @@
+/* Mappa a tutto schermo (istruzioni §6 "Mappa") */
+.map-view {
+  position: absolute;
+  inset: 0;
+  background: var(--sabbia-light);   /* mentre carica */
+}
+
+/* Vista generale: desaturata con nero al 40% in fusione Color (Figma).
+   Con un percorso la mappa torna a colori: saturazione -25% (istruzioni §6). */
+.map-view__tint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gray-950);
+  mix-blend-mode: color;
+  opacity: .4;
+  pointer-events: none;
+  transition: opacity var(--dur-map) var(--ease-out);
+}
+.map-view.has-selection .map-view__tint { opacity: .25; }
+.map-view.is-satellite .map-view__tint { opacity: 0; }
+
+/* ---------- Marker ---------- */
+.map-marker {
+  display: grid;
+  place-items: center;
+  width: 44px;                 /* area di tocco */
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.map-marker:focus-visible { outline: 2px solid var(--brand-base); outline-offset: -4px; border-radius: var(--r-pill); }
+.map-marker > * { transition: transform var(--dur-fast) var(--ease-out); }
+.map-marker:active > * { transform: scale(.92); }
+
+/* Elemento singolo: 28, colore difficoltà, bordo bianco, IconSend 16 */
+.map-pin__shape { width: 28px; height: 28px; overflow: visible; }
+.map-pin__fill { fill: var(--pin-color); stroke: var(--stroke-white-0); }
+.map-pin__icon { fill: var(--gray-0); }
+
+/* Cluster: 28, nero, bordo bianco, numero sm/emphasized bianco */
+.map-cluster__dot {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1.31px solid var(--stroke-white-0);
+  border-radius: var(--r-pill);
+  background: var(--gray-950);
+  color: var(--gray-0);
+}
+
+/* Posizione utente: punto 19 + alone 39 */
+.map-user { width: 39px; height: 39px; pointer-events: none; }
+.map-user svg { width: 100%; height: 100%; }
+.map-user__halo { fill: var(--brand-alpha-24); }
+.map-user__dot { fill: var(--brand-base); stroke: var(--gray-0); }
+
+/* Partenza e arrivo: 28 nero, bordo bianco 3 */
+.map-endpoint {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--gray-0);
+  border-radius: var(--r-pill);
+  background: var(--gray-950);
+  box-shadow: var(--shadow-route);
+  pointer-events: none;
+}
+.map-endpoint svg { position: absolute; inset: -3px; width: 28px; height: 28px; }
+.map-endpoint__fill-icon { fill: var(--gray-0); }
+.map-endpoint__stroke-icon { fill: none; stroke: var(--gray-0); }
+
+/* Attribuzione MapTiler / OpenStreetMap: compatta, sopra l'overlay */
+.map-view .maplibregl-ctrl-bottom-right {
+  bottom: calc(var(--tab-bar-h) + 86px + var(--s-xs));
+}
+.map-view .maplibregl-ctrl-attrib.maplibregl-compact {
+  margin: 0 var(--s-xs) 0 0;
+  background: var(--bg-white-0);
+}
+.map-view .maplibregl-ctrl-attrib-inner { font: 400 11px/16px var(--font-text); }

@@ -3,6 +3,7 @@ import { isPreview, isStandalone } from './pwa.js'
 import InstallGuide from './screens/InstallGuide.jsx'
 import BaseCheck from './screens/BaseCheck.jsx'
 import Components from './screens/Components.jsx'
+import Explore from './screens/Explore.jsx'
 import TabBar from './components/TabBar.jsx'
 
 /*
@@ -30,18 +31,28 @@ export default function App() {
   )
 }
 
-/* Passo 0.3: galleria dei componenti nella tab Explore */
+/*
+ * Explore: mappa (passo 1.1). Record e Profile non sono progettati.
+ * La galleria dei componenti (passo 0.3) resta raggiungibile da Profile, per le revisioni.
+ */
 function Prototype() {
   const [tab, setTab] = useState('explore')
-  const [baseCheck, setBaseCheck] = useState(false)
+  const [page, setPage] = useState(null)   // null | 'components' | 'base'
+
+  const open = (next) => { setPage(next); window.scrollTo(0, 0) }
+
+  // La mappa resta montata anche nelle altre tab: non si ricaricano le tile
+  let content = null
+  if (tab === 'record') content = <NotDesigned />
+  else if (page === 'components') content = <Components onBaseCheck={() => open('base')} />
+  else if (page === 'base') content = <BaseCheckPage onBack={() => open('components')} />
+  else if (tab === 'profile') content = <NotDesigned onGallery={() => open('components')} />
 
   return (
     <>
-      {tab === 'explore' && (baseCheck
-        ? <BaseCheckPage onBack={() => setBaseCheck(false)} />
-        : <Components onBaseCheck={() => { setBaseCheck(true); window.scrollTo(0, 0) }} />)}
-      {tab !== 'explore' && <NotDesigned />}
-      <TabBar active={tab} onChange={setTab} />
+      <div hidden={tab !== 'explore'}><Explore /></div>
+      {content}
+      <TabBar active={tab} onChange={(t) => { setTab(t); setPage(null) }} />
     </>
   )
 }
@@ -56,10 +67,15 @@ function BaseCheckPage({ onBack }) {
 }
 
 // Record e Profile non sono progettati (contesto §7, punto 7)
-function NotDesigned() {
+function NotDesigned({ onGallery }) {
   return (
     <main className="empty-state">
-      <p className="t-md">Not designed yet.</p>
+      <div className="empty-state__body">
+        <p className="t-md">Not designed yet.</p>
+        {onGallery && (
+          <button type="button" className="back-link t-sm-em" onClick={onGallery}>Component gallery</button>
+        )}
+      </div>
     </main>
   )
 }
