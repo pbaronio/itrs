@@ -50,7 +50,6 @@ function Prototype() {
 
   return (
     <>
-      <div className="status-scrim" aria-hidden="true" />
       <div hidden={tab !== 'explore'}><Explore /></div>
       {content}
       <TabBar active={tab} onChange={(t) => { setTab(t); setPage(null) }} />
