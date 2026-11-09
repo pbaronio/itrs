@@ -12,7 +12,7 @@ import './Explore.css'
  * Explore: mappa e overlay a 3 stati (passi 1.1 e 1.2).
  * - Stato 1 (86): handle e conteggio.
  * - Stato 2 (226): carosello delle route/track dell'area visibile; scorrendo, la mappa segue la card.
- * - Stato 3: listing a tutta pagina; il FAB Map torna allo stato di prima.
+ * - Stato 3: listing a tutta pagina, senza maniglia: si esce solo col FAB Map, che torna allo stato di prima.
  * Tap su un pin: percorso sulla mappa e overlay in stato 2 con la sua card.
  * Ricerca e filtri: passo 1.4.
  */
@@ -152,10 +152,8 @@ export default function Explore() {
         bottom={insets.tabH}
         className="explore__overlay"
         label={title}
+        lockTop
         header={<p className="t-display explore__overlay-title" aria-live="polite">{title}</p>}
-        footer={listing && (
-          <div className="explore__fab"><FabMap onClick={() => changeSnap(prevSnap.current === 2 ? 0 : prevSnap.current)} /></div>
-        )}
       >
         {listing ? (
           <Listing items={list} onPick={(id) => { select(id); changeSnap(1) }} />
@@ -163,6 +161,14 @@ export default function Explore() {
           <Carousel items={list} mode={mode} selectedId={selectedId} onPick={select} hidden={snap === 0} />
         )}
       </BottomSheet>
+
+      {/* Fuori dal foglio: 24 sopra la tab bar (Figma 3625:17579), qualunque sia la safe area */}
+      <div className={`explore__fab${listing ? ' is-visible' : ''}`} aria-hidden={!listing}>
+        <FabMap
+          tabIndex={listing ? undefined : -1}
+          onClick={() => changeSnap(prevSnap.current === 2 ? 0 : prevSnap.current)}
+        />
+      </div>
     </div>
   )
 }
@@ -281,8 +287,19 @@ function useInsets() {
       setInsets((p) => (p.tabH === tabH && p.safeTop === safeTop && p.vh === vh ? p : { tabH, safeTop, vh }))
     }
     measure()
+    // Su iOS la safe area arriva dopo il primo disegno: si rimisura quando cambia la tab bar
+    const bar = document.querySelector('.tab-bar')
+    const ro = bar && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
+    if (ro) ro.observe(bar)
+    const late = setTimeout(measure, 500)
     window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
+    window.visualViewport?.addEventListener('resize', measure)
+    return () => {
+      ro?.disconnect()
+      clearTimeout(late)
+      window.removeEventListener('resize', measure)
+      window.visualViewport?.removeEventListener('resize', measure)
+    }
   }, [])
   return insets
 }

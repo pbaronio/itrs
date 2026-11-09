@@ -10,6 +10,8 @@ import './BottomSheet.css'
  *   della lista il foglio scende.
  * - Al rilascio si aggancia allo stato più vicino tenendo conto della velocità.
  * - dismissible: trascinando sotto lo stato più basso si chiude (onClose).
+ * - lockTop: allo stato più alto il foglio non si trascina e la maniglia sparisce;
+ *   si esce solo con un comando (es. FAB Map nel listing).
  */
 export default function BottomSheet({
   open = true,
@@ -25,6 +27,7 @@ export default function BottomSheet({
   children,
   className = '',
   label,
+  lockTop = false,
 }) {
   const sheetRef = useRef(null)
   const scrollRef = useRef(null)
@@ -36,6 +39,9 @@ export default function BottomSheet({
   const drag = useRef(null)
   const heightRef = useRef(height)
   heightRef.current = height
+  const locked = lockTop && index === snaps.length - 1
+  const lockedRef = useRef(locked)
+  lockedRef.current = locked
 
   // Stato controllato dall'esterno (es. FAB Map → stato 1)
   useEffect(() => {
@@ -77,7 +83,7 @@ export default function BottomSheet({
       startY: y,
       startX: x,
       startH: heightRef.current,
-      mode: fromHeader ? 'sheet' : 'pending',
+      mode: lockedRef.current ? 'scroll' : fromHeader ? 'sheet' : 'pending',
       samples: [{ y, t: performance.now() }],
     }
   }, [])
@@ -177,7 +183,7 @@ export default function BottomSheet({
       )}
       <section
         ref={sheetRef}
-        className={`sheet${dragging ? ' is-dragging' : ''}${expanded ? ' is-expanded' : ''} ${className}`}
+        className={`sheet${dragging ? ' is-dragging' : ''}${expanded ? ' is-expanded' : ''}${locked ? ' is-locked' : ''} ${className}`}
         style={{
           height: maxH,
           bottom,
@@ -188,7 +194,7 @@ export default function BottomSheet({
         aria-modal={scrim || undefined}
         aria-label={label}
       >
-        <div className="sheet__head" data-sheet-handle>
+        <div className="sheet__head" data-sheet-handle={locked ? undefined : ''}>
           <span className="sheet__handle" aria-hidden="true" />
           {header}
         </div>

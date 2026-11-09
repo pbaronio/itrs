@@ -49,6 +49,13 @@
 
 /* Overlay in stato 1: handle e conteggio, Mona 16 maiuscolo centrato */
 .sheet.explore__overlay { z-index: 29; box-shadow: none; }
+/* Testata 56 (handle + titolo); nel listing si chiude: la lista parte sotto il toggle */
+.explore__overlay .sheet__head {
+  height: 56px;
+  overflow: hidden;
+  transition: height var(--dur-base) var(--ease-out);
+}
+.explore.is-listing .explore__overlay .sheet__head { height: 0; min-height: 0; }
 .explore__overlay-title {
   padding: 21px var(--s-m) 13px;
   font-size: 16px;
@@ -85,14 +92,19 @@
   display: flex;
   flex-direction: column;
   gap: var(--s-2xl);
-  padding: var(--s-xs) var(--s-m) 120px;
+  padding: var(--s-m) var(--s-m) calc(70px + var(--s-xl) * 2);
 }
 .explore__fab {
   position: absolute;
   left: 50%;
-  bottom: var(--s-xl);
-  transform: translateX(-50%);
+  bottom: calc(var(--tab-bar-h) + var(--s-xl));
+  z-index: 31;
+  transform: translate(-50%, var(--s-xs)) scale(.9);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
+.explore__fab.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 .explore.is-listing .explore__overlay-title { opacity: 0; }
 .explore__overlay-title { transition: opacity var(--dur-base) var(--ease-out); }
 
