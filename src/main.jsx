@@ -1,3 +1,4 @@
+import './pwa.js'   // prima di tutto: cattura il prompt di installazione di Chrome
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/tokens.css'

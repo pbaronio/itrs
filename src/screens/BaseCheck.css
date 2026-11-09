@@ -90,3 +90,23 @@
 .bc-btn--confirm { background: var(--brand-base); color: var(--text-strong-950); }
 .bc-btn--secondary { background: var(--bg-weak-50); color: var(--text-strong-950); }
 .bc-note { margin-top: var(--s-s); }
+
+/* Installazione (passo 0.2) */
+.bc-install {
+  margin-top: var(--s-xl);
+  padding: var(--s-m);
+  background: var(--sabbia-light);
+  border-radius: var(--r-card);
+}
+.bc-probe {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+.bc-install-state { margin-bottom: var(--s-s); color: var(--text-sub-700); }
+.bc-install-state.is-ok { color: var(--text-strong-950); }
+.bc-install-rows { display: grid; gap: var(--s-2xs); margin: 0; }
+.bc-install-rows div { display: flex; justify-content: space-between; gap: var(--s-s); }
+.bc-install-rows dd { margin: 0; }

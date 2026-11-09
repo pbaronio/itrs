@@ -17,11 +17,15 @@ Se istruzioni e Figma divergono, valgono le istruzioni.
 - In arrivo: MapLibre GL + MapTiler (chiave in `VITE_MAPTILER_KEY`, vedi `.env.example`).
 - `npm install` · `npm run dev` (aperto in LAN per provare sul telefono) · `npm run build`.
 - Pubblicazione: Netlify, build da `main` (`netlify.toml`).
+- **Installazione (PWA):** aperta nel browser l'app mostra solo la guida all'installazione; dall'icona sulla Home mostra l'app. Per vederla nel browser senza installarla: aggiungi `?preview` all'indirizzo (vale per la scheda; `?preview=0` la toglie).
 
 ## Struttura
 
 ```
+public/manifest.webmanifest   manifest PWA (standalone, verticale, fondo bianco)
+public/icons/                 icone generate da scripts/make-icons.mjs (icona provvisoria)
 src/
+  pwa.js              modalità di apertura, piattaforma, prompt di installazione Android, ?preview
   styles/tokens.css   token §9 delle istruzioni, copia esatta: non modificare a mano
   styles/fonts.css    font e override dei nomi famiglia Fontsource
   styles/base.css     reset, comportamento da app, safe area, durate di movimento

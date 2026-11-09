@@ -1,9 +1,11 @@
+import { useEffect, useRef, useState } from 'react'
 import LevelShape from '../components/LevelShape.jsx'
 import { FACTORS, LEVEL_KEYS, LEVELS } from '../data/itrs.js'
+import { displayMode, isStandalone } from '../pwa.js'
 import './BaseCheck.css'
 
 /*
- * Schermata di controllo del passo 0.1: token, font, livelli ITRS.
+ * Schermata di controllo dei passi 0.1 e 0.2: installazione, token, font, livelli ITRS.
  * Serve solo a verificare la resa sul telefono; verrà sostituita dall'app.
  */
 
@@ -33,12 +35,14 @@ export default function BaseCheck() {
   return (
     <main className="bc">
       <header className="bc-head">
-        <p className="t-label">Step 0.1 · Tokens & fonts</p>
+        <p className="t-label">Step 0.2 · Installed app</p>
         <h1 className="t-display bc-title">ITRS base check</h1>
         <p className="t-md bc-sub">
           Open this page on your phone and check that fonts, colours and levels match Figma.
         </p>
       </header>
+
+      <InstallCheck />
 
       <Section title="Fonts">
         <div className="bc-fonts">
@@ -120,6 +124,56 @@ export default function BaseCheck() {
         </p>
       </Section>
     </main>
+  )
+}
+
+/* Stato dell'installazione: modalità di apertura e margini sicuri misurati */
+function InstallCheck() {
+  const probe = useRef(null)
+  const [info, setInfo] = useState(null)
+
+  useEffect(() => {
+    function measure() {
+      const cs = getComputedStyle(probe.current)
+      setInfo({
+        mode: displayMode(),
+        standalone: isStandalone(),
+        top: Math.round(parseFloat(cs.paddingTop)),
+        bottom: Math.round(parseFloat(cs.paddingBottom)),
+        size: `${window.innerWidth} × ${window.innerHeight}`,
+      })
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  const rows = info && [
+    ['Opened as', info.mode],
+    ['Safe area top', `${info.top} px`],
+    ['Safe area bottom', `${info.bottom} px`],
+    ['Viewport', info.size],
+  ]
+
+  return (
+    <div className="bc-install">
+      <span ref={probe} className="bc-probe" aria-hidden="true" />
+      {info && (
+        <>
+          <p className={`t-md-em bc-install-state${info.standalone ? ' is-ok' : ''}`}>
+            {info.standalone ? 'Full screen app ✓' : 'Browser preview, not installed'}
+          </p>
+          <dl className="bc-install-rows">
+            {rows.map(([k, v]) => (
+              <div key={k}>
+                <dt className="t-sm bc-muted">{k}</dt>
+                <dd className="t-sm-em">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      )}
+    </div>
   )
 }
 
