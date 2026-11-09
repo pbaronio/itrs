@@ -23,7 +23,8 @@ Se istruzioni e Figma divergono, valgono le istruzioni.
 
 ```
 public/manifest.webmanifest   manifest PWA (standalone, verticale, fondo bianco)
-public/icons/                 icone generate da scripts/make-icons.mjs (icona provvisoria)
+assets/icon/                  icona sorgente fornita da Paolo (256 px)
+public/icons/                 icone generate da scripts/make_icons.py (python3 + Pillow)
 src/
   pwa.js              modalità di apertura, piattaforma, prompt di installazione Android, ?preview
   styles/tokens.css   token §9 delle istruzioni, copia esatta: non modificare a mano
