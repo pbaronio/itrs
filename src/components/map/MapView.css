@@ -73,7 +73,8 @@
   box-shadow: var(--shadow-route);
   pointer-events: none;
 }
-.map-endpoint svg { position: absolute; inset: -3px; width: 28px; height: 28px; }
+/* L'icona copre tutto il cerchio 28 (bordo compreso): niente max-width, altrimenti si stringe a 22 e va a sinistra */
+.map-endpoint svg { position: absolute; top: -3px; left: -3px; width: 28px; height: 28px; max-width: none; }
 .map-endpoint__fill-icon { fill: var(--gray-0); }
 .map-endpoint__stroke-icon { fill: none; stroke: var(--gray-0); }
 
