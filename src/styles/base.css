@@ -29,6 +29,9 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* iOS, app dalla Home con barra di stato trasparente: la finestra risulta più corta
+     dell'altezza della barra e resta una fascia vuota sotto la tab bar. Si allunga di quella altezza. */
+  min-height: calc(100% + env(safe-area-inset-top, 0px));
 }
 
 html, body {
@@ -47,6 +50,11 @@ body {
   -webkit-user-select: none;
   user-select: none;
   touch-action: manipulation;       /* niente zoom col doppio tap */
+}
+
+/* Sul telefono il fondo è bianco come l'app (il grigio serve solo attorno alla colonna su desktop) */
+@media (max-width: 500px) {
+  html, body { background: var(--bg-white-0); }
 }
 
 /* Il testo resta selezionabile solo nei campi */
