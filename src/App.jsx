@@ -11,7 +11,7 @@ import Splash from './components/Splash.jsx'
  * Aperta dall'icona (standalone) → app.
  * Aperta nel browser → guida all'installazione, salvo anteprima (?preview).
  * Dall'anteprima, Indietro del browser torna alla guida.
- * All'avvio dall'icona: splash di 2 secondi sopra l'app, che intanto carica la mappa.
+ * All'avvio dall'icona: splash di 3 secondi sopra l'app, che intanto carica la mappa.
  */
 export default function App() {
   const [preview, setPreview] = useState(() => isPreview())

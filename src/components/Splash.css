@@ -7,9 +7,19 @@
   align-items: center;
   justify-content: center;
   background: var(--splash-bg);
-  transition: opacity var(--dur-base) var(--ease-out);
+  /* Uscita: il logo sfuma e si allontana appena, poi il fondo si dissolve sulla mappa */
+  transition: opacity 700ms cubic-bezier(.4, 0, .2, 1) 150ms;
 }
 .splash.is-leaving { opacity: 0; pointer-events: none; }
+.splash__lockup {
+  transition: opacity 500ms var(--ease-out), transform 800ms var(--ease-out);
+}
+.splash.is-leaving .splash__lockup { opacity: 0; transform: scale(.96); }
+
+@media (prefers-reduced-motion: reduce) {
+  .splash, .splash__lockup { transition: opacity 1ms; }
+  .splash.is-leaving .splash__lockup { transform: none; }
+}
 
 .splash__lockup {
   display: flex;

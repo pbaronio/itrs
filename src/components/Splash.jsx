@@ -4,10 +4,10 @@ import './Splash.css'
 
 /*
  * Splash screen (Figma 3746:31865): fondo scuro, logo e scritta al centro.
- * Compare solo all'avvio dell'app installata, resta 2 secondi e poi sfuma.
+ * Compare solo all'avvio dell'app installata, resta 3 secondi e poi sfuma.
  * L'app è già montata sotto: la mappa carica mentre lo splash è visibile.
  */
-const SHOW_MS = 2000
+const SHOW_MS = 3000
 
 export default function Splash({ onDone }) {
   const [leaving, setLeaving] = useState(false)
@@ -15,7 +15,7 @@ export default function Splash({ onDone }) {
   useEffect(() => {
     document.documentElement.classList.add('booted')   // fine del fondo scuro messo da index.html
     const t1 = setTimeout(() => setLeaving(true), SHOW_MS)
-    const t2 = setTimeout(() => onDone?.(), SHOW_MS + 700) // dopo la dissolvenza (anche con Riduci movimento)
+    const t2 = setTimeout(() => onDone?.(), SHOW_MS + 1000) // dopo la dissolvenza (anche con Riduci movimento)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
