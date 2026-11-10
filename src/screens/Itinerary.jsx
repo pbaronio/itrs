@@ -6,6 +6,7 @@ import Icon from '../components/Icon.jsx'
 import { ActionBar } from '../components/Button.jsx'
 import { FACTORS } from '../data/itrs.js'
 import { fmtKm } from '../data/garda.js'
+import { useEntered } from '../useEntered.js'
 
 /*
  * Itinerary List (Figma 3691:26252): si apre dal pannello Route details espanso.
@@ -16,6 +17,7 @@ import { fmtKm } from '../data/garda.js'
 export default function Itinerary({ route, open, onClose, onOpenLeg, saved, onSave }) {
   const [mounted, setMounted] = useState(open)
   const [scrub, setScrub] = useState(null)
+  const entered = useEntered(open)
 
   useEffect(() => {
     if (open) { setMounted(true); setScrub(null); return }
@@ -25,7 +27,7 @@ export default function Itinerary({ route, open, onClose, onOpenLeg, saved, onSa
 
   if (!mounted) return null
   return (
-    <div className={`itinerary${open ? ' is-open' : ''}`} role="dialog" aria-modal="true" aria-label={`${route.name}, itinerary`}>
+    <div className={`itinerary${entered ? ' is-open' : ''}`} role="dialog" aria-modal="true" aria-label={`${route.name}, itinerary`}>
       <div className="itinerary__scroll">
         <div className="itinerary__top">
           <button type="button" className="btn-flow-close" aria-label="Close the itinerary" onClick={onClose}>

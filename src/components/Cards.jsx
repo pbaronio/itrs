@@ -216,7 +216,7 @@ export function Pentagon({ factor, level, size = 47 }) {
 
 /* ---------- Riga rating (route) ---------- */
 
-export function RatingRow({ factor, level, onClick }) {
+export function RatingRow({ factor, level, description, onClick }) {
   const label = factor === 'difficulty' ? 'Difficulty level' : FACTORS[factor].label
   return (
     <button type="button" className="rating-row" onClick={onClick}>
@@ -224,6 +224,7 @@ export function RatingRow({ factor, level, onClick }) {
       <span className="rating-row__text">
         <span className="t-label">{label}</span>
         <span className="t-md-em rating-row__value">{FACTORS[factor].names[level]}</span>
+        {description && <span className="t-sm rating-row__desc">{description}</span>}
       </span>
       <Icon name="chevronRight" size={24} className="rating-row__chevron" />
     </button>

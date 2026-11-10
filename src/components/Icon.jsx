@@ -92,6 +92,26 @@ const ICONS = {
       </g>
     ),
   },
+  // Riga track (Figma 3768:35330): IconPlan = distanza, TrendUp = salita
+  plan: {
+    box: 16,
+    body: (
+      <g {...S} strokeOpacity=".7">
+        <path d="M9.99993 4.33301H5.87535C4.66885 4.33301 4.25596 5.94049 5.31311 6.52193L10.6867 9.47741C11.7439 10.0589 11.331 11.6663 10.1245 11.6663H5.99993" />
+        <path d="M9.83333 6.16667V2.5H13.5V6.16667H9.83333Z" />
+        <path d="M2.5 13.4997V9.83301H6.16667V13.4997H2.5Z" />
+      </g>
+    ),
+  },
+  trendUp: {
+    box: 16,
+    body: (
+      <g {...S} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14.5 3.5L8.5 9.5L6 7L1.5 11.5" />
+        <path d="M14.5 7.5V3.5H10.5" />
+      </g>
+    ),
+  },
   // IconListBullets (pannello Route details espanso, Figma 3680:8742)
   listBullets: {
     box: 24,

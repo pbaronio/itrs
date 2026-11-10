@@ -138,12 +138,11 @@
   max-width: 430px;
   margin: 0 auto;
   background: var(--sabbia-light);
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  transform: translateY(100%);
+  transition: transform var(--dur-base) var(--ease-out);
   pointer-events: none;
 }
-.route-map-page.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.route-map-page.is-open { transform: none; pointer-events: auto; }
 .route-map-page__left,
 .route-map-page__right {
   position: absolute;

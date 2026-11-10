@@ -145,6 +145,7 @@
 }
 .rating-row__text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .rating-row__value { color: var(--text-sub-700); }
+.rating-row__desc { margin-top: var(--s-2xs); color: var(--text-sub-700); }
 .rating-row__chevron { color: var(--text-strong-950); flex-shrink: 0; }
 .rating-rows { display: flex; flex-direction: column; gap: 19px; }
 .rating-rows > hr { margin: 0; border: 0; border-top: 1px solid var(--stroke-sand); }

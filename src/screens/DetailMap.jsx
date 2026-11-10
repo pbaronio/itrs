@@ -8,6 +8,7 @@ import { ActionBar, RoundButton } from '../components/Button.jsx'
 import { FACTORS } from '../data/itrs.js'
 import { fmtKm } from '../data/garda.js'
 import { levelInfo } from '../data/levelInfo.js'
+import { useEntered } from '../useEntered.js'
 
 /*
  * Mappa a tutto schermo di una route o di una track (Figma 3680:8568, 3680:8742).
@@ -33,6 +34,7 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
   const [snap, setSnap] = useState(0)
   const pageRef = useRef(null)
   const mapRef = useRef(null)
+  const entered = useEntered(open)
 
   useEffect(() => {
     if (open) { setMounted(true); setError(null); setScrub(null); setSnap(0); return }
@@ -75,7 +77,7 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
   return (
     <div
       ref={pageRef}
-      className={`route-map-page${open ? ' is-open' : ''} ${className}`}
+      className={`route-map-page${entered ? ' is-open' : ''} ${className}`}
       role="dialog"
       aria-modal="true"
       aria-label={`${route.name}, map`}

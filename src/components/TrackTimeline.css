@@ -98,3 +98,24 @@
   border-radius: var(--r-sm);
   object-fit: cover;
 }
+
+/* ---------- Lista track nella pagina route (Figma 3768:35330) ---------- */
+.track-list { display: flex; flex-direction: column; gap: var(--s-m); margin: 0; padding: 0; list-style: none; }
+.track-list__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-xs);
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.track-list__row:active { opacity: .7; transform: scale(.98); }
+.track-list__thumb { flex-shrink: 0; width: 70px; height: 70px; border-radius: var(--r-thumb); object-fit: cover; }
+.track-list__text { display: flex; flex-direction: column; gap: var(--s-xs); flex: 1; min-width: 0; }
+.track-list__title { overflow: hidden; color: var(--text-strong-950); white-space: nowrap; text-overflow: ellipsis; }
+.track-list__meta { display: flex; align-items: center; gap: var(--s-2xs); overflow: hidden; color: var(--text-sub-700); white-space: nowrap; }
+.track-list__item { display: inline-flex; align-items: center; gap: var(--s-2xs); }
+.track-list__item svg { flex-shrink: 0; }
+.track-list__dot { color: var(--text-soft-500); }

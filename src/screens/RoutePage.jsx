@@ -3,16 +3,18 @@ import RouteMap from '../components/map/RouteMap.jsx'
 import InfoSheet from '../components/InfoSheet.jsx'
 import ItrsCircle from '../components/ItrsCircle.jsx'
 import LevelShape from '../components/LevelShape.jsx'
-import TrackTimeline from '../components/TrackTimeline.jsx'
+import { TrackList } from '../components/TrackTimeline.jsx'
 import { Datum, Surface } from '../components/DetailParts.jsx'
 import { ActionBar, MapButton, RoundButton } from '../components/Button.jsx'
 import { MiniMap, PhotoGallery, RatingRow } from '../components/Cards.jsx'
 import { FACTORS } from '../data/itrs.js'
 import { legsOf } from '../data/garda.js'
 import { levelInfo } from '../data/levelInfo.js'
+import { ratingReason } from '../data/ratingReasons.js'
 import DetailMap from './DetailMap.jsx'
 import Itinerary from './Itinerary.jsx'
 import { TrackSheet } from './TrackDetail.jsx'
+import { useEntered } from '../useEntered.js'
 import './RoutePage.css'
 
 /*
@@ -34,6 +36,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
   const [saved, setSaved] = useState(() => new Set())
   const [info, setInfo] = useState(null)           // fattore del bottom sheet informativo
   const scrollRef = useRef(null)
+  const entered = useEntered(open && Boolean(route))
 
   useEffect(() => {
     if (route) { setShown(route); return }
@@ -71,7 +74,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
   const openLeg = (leg) => nav.push({ t: 'leg', n: leg.n })
 
   return (
-    <div className={`route-page${open ? ' is-open' : ''}`} role="dialog" aria-modal="true" aria-label={r.name} aria-hidden={!open}>
+    <div className={`route-page${entered ? ' is-open' : ''}`} role="dialog" aria-modal="true" aria-label={r.name} aria-hidden={!open}>
       <div ref={scrollRef} className="route-page__scroll">
         <div className="route-page__hero">
           <PhotoGallery key={r.id} photos={r.photos ?? [r]} label={r.name} className="route-page__gallery" />
@@ -112,7 +115,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
               {RATING_ORDER.map((f, i) => (
                 <div key={f} className="itrs-card__row">
                   {i > 0 && <hr />}
-                  <RatingRow factor={f} level={r.ratings[f]} onClick={() => setInfo(f)} />
+                  <RatingRow factor={f} level={r.ratings[f]} description={ratingReason(r.id, f)} onClick={() => setInfo(f)} />
                 </div>
               ))}
             </div>
@@ -121,7 +124,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
           {/* Lista track a timeline (passo 2.3): tap su una track → bottom sheet */}
           <section className="route-page__tracks" aria-labelledby="tracks-title">
             <h2 id="tracks-title" className="t-2xl-em">Tracks in this route</h2>
-            <TrackTimeline route={r} onOpen={openLeg} />
+            <TrackList route={r} onOpen={openLeg} />
           </section>
 
           <section className="route-page__map">

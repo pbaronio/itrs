@@ -1,4 +1,5 @@
 import LevelShape from './LevelShape.jsx'
+import Icon from './Icon.jsx'
 import { PLAY, FLAG } from './map/markers.js'
 import { FACTORS, LEVELS } from '../data/itrs.js'
 import { fmtClimb, fmtKm, legsOf } from '../data/garda.js'
@@ -85,5 +86,45 @@ function Rail({ end }) {
       </span>
       {end === 'start' && <span className="timeline__connector timeline__connector--start" />}
     </span>
+  )
+}
+
+/*
+ * Lista track nella pagina route (Figma "Track in this route" 3768:35330; istruzioni §6 "Riga track"):
+ * foto 70 raggio 6, titolo con numero (`1- Accesso Malga Ciapa`), meta con distanza, salita e livello.
+ * Tap su una riga: track in bottom sheet. La timeline resta nella Itinerary List.
+ */
+export function TrackList({ route, onOpen }) {
+  return (
+    <ul className="track-list" aria-label={`Tracks of ${route.name}`}>
+      {legsOf(route).map((leg) => {
+        const climb = leg.reverse ? leg.track.descent : leg.track.climb
+        const name = FACTORS.difficulty.names[leg.level]
+        return (
+          <li key={leg.n}>
+            <button type="button" className="track-list__row" onClick={() => onOpen?.(leg)}>
+              <img
+                className="track-list__thumb"
+                src={leg.track.photo}
+                style={{ objectPosition: leg.track.photoPosition }}
+                alt=""
+                draggable="false"
+                loading="lazy"
+              />
+              <span className="track-list__text">
+                <span className="t-md track-list__title">{`${leg.n}- ${leg.track.name}`}</span>
+                <span className="t-sm track-list__meta">
+                  <span className="track-list__item"><Icon name="plan" size={16} />{fmtKm(leg.km)}</span>
+                  <span className="track-list__dot" aria-hidden="true">•</span>
+                  <span className="track-list__item"><Icon name="trendUp" size={16} />{fmtClimb(climb)}</span>
+                  <span className="track-list__dot" aria-hidden="true">•</span>
+                  <span className="track-list__item"><LevelShape level={leg.level} size={12} />{name}</span>
+                </span>
+              </span>
+            </button>
+          </li>
+        )
+      })}
+    </ul>
   )
 }

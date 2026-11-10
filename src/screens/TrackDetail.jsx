@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import RouteMap from '../components/map/RouteMap.jsx'
-import BottomSheet from '../components/BottomSheet.jsx'
 import InfoSheet from '../components/InfoSheet.jsx'
 import LevelShape from '../components/LevelShape.jsx'
 import Icon from '../components/Icon.jsx'
@@ -11,11 +10,13 @@ import { FACTORS } from '../data/itrs.js'
 import { legsOf, routesWithTrack, trackAsRoute } from '../data/garda.js'
 import { levelInfo } from '../data/levelInfo.js'
 import DetailMap from './DetailMap.jsx'
+import { useEntered } from '../useEntered.js'
 import './TrackDetail.css'
 
 /*
  * Le due versioni della track (passo 2.3, contesto §4.7).
- * - TrackSheet: track dentro una route, bottom sheet sopra la pagina route (Figma 3677:5090).
+ * - TrackSheet: track dentro una route, pagina che sale dal basso sopra la route (Figma 3677:5090),
+ *   col chevron giù per chiudere.
  *   Selettore `TRACK N°1 OF ROUTE` per passare alle altre track della route.
  * - TrackPage: track dalla mappa, pagina intera (Figma 3677:6229), con la sezione
  *   `Routes featuring this track`.
@@ -142,6 +143,7 @@ export function TrackPage({ track: raw, open, layers = [], nav, onOpenRoute }) {
   const scrollRef = useRef(null)
   const track = shown ? trackAsRoute(shown) : null
   const [setInfo, infoSheet] = useInfo(track)
+  const entered = useEntered(open && Boolean(raw))
 
   useEffect(() => {
     if (raw) { setShown(raw); return }
@@ -155,7 +157,7 @@ export function TrackPage({ track: raw, open, layers = [], nav, onOpenRoute }) {
   if (!track) return null
   const isSaved = saved.has(track.id)
   return (
-    <div className={`route-page track-page${open ? ' is-open' : ''}`} role="dialog" aria-modal="true" aria-label={track.name} aria-hidden={!open}>
+    <div className={`route-page track-page${entered ? ' is-open' : ''}`} role="dialog" aria-modal="true" aria-label={track.name} aria-hidden={!open}>
       <div ref={scrollRef} className="route-page__scroll">
         <TrackBody
           track={track}
@@ -186,7 +188,7 @@ export function TrackPage({ track: raw, open, layers = [], nav, onOpenRoute }) {
   )
 }
 
-/* ---------- Track dentro una route: bottom sheet sopra la pagina route (Figma 3677:5090) ---------- */
+/* ---------- Track dentro una route: pagina che sale dal basso sopra la route (Figma 3677:5090) ---------- */
 export function TrackSheet({ route, n, open, mapOpen, onClose, onPick, onOpenMap, onCloseMap }) {
   const legs = legsOf(route)
   const leg = legs.find((l) => l.n === n) ?? legs[0]
@@ -194,34 +196,16 @@ export function TrackSheet({ route, n, open, mapOpen, onClose, onPick, onOpenMap
   const [saved, toggleSave] = useSaved()
   const [setInfo, infoSheet] = useInfo(track)
   const [choosing, setChoosing] = useState(false)
-  const [height, setHeight] = useState(() => window.innerHeight)
-  const [safeTop, setSafeTop] = useState(0)
-  const sheetRef = useRef(null)
-
-  // Altezza: tutto lo schermo meno la barra di stato e 12, così si vede la route dietro [P]
-  useLayoutEffect(() => {
-    const measure = () => {
-      const probe = document.createElement('div')
-      probe.style.cssText = 'position:absolute;visibility:hidden;padding-top:var(--safe-top)'
-      document.body.appendChild(probe)
-      setSafeTop(parseFloat(getComputedStyle(probe).paddingTop) || 0)
-      probe.remove()
-      setHeight(window.innerHeight)
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [])
+  const scrollRef = useRef(null)
+  const entered = useEntered(open)
 
   // Nuova track dal selettore: selettore chiuso, si riparte dall'alto
   useLayoutEffect(() => {
     setChoosing(false)
-    const scroller = sheetRef.current?.querySelector('.sheet__content')
-    if (scroller) scroller.scrollTop = 0
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
   }, [n])
 
   const isSaved = saved.has(track.id)
-  const sheetH = Math.max(320, height - safeTop - 12)
 
   const selector = (
     <div className={`track-selector${choosing ? ' is-open' : ''}`}>
@@ -258,23 +242,21 @@ export function TrackSheet({ route, n, open, mapOpen, onClose, onPick, onOpenMap
   )
 
   return (
-    <>
-      <div ref={sheetRef}>
-        <BottomSheet
-          open={open}
-          snaps={[sheetH]}
-          dismissible
-          scrim
-          onClose={onClose}
-          className="track-sheet"
-          label={`${leg.track.name}, track ${leg.n} of ${route.name}`}
-          header={<div className="track-sheet__close"><RoundButton icon="chevronDown" label="Close the track" onClick={onClose} /></div>}
-          footer={<ActionBar startLabel="Start the track" saved={isSaved} onSave={() => toggleSave(track.id)} />}
-        >
-          <TrackBody track={track} inRoute onOpenMap={onOpenMap} onInfo={setInfo} selector={selector} />
-        </BottomSheet>
+    <div
+      className={`route-page track-sheet${entered ? ' is-open' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${leg.track.name}, track ${leg.n} of ${route.name}`}
+      aria-hidden={!open}
+    >
+      <div ref={scrollRef} className="route-page__scroll">
+        <TrackBody track={track} inRoute onOpenMap={onOpenMap} onInfo={setInfo} selector={selector} />
       </div>
-      <div className="track-sheet__info">{infoSheet}</div>
+      <div className="route-page__top">
+        <RoundButton icon="chevronDown" label="Close the track" onClick={onClose} />
+      </div>
+      <ActionBar startLabel="Start the track" saved={isSaved} onSave={() => toggleSave(track.id)} />
+      {infoSheet}
       <DetailMap
         key={track.id}
         route={track}
@@ -283,8 +265,7 @@ export function TrackSheet({ route, n, open, mapOpen, onClose, onPick, onOpenMap
         saved={isSaved}
         onSave={() => toggleSave(track.id)}
         startLabel="Start the track"
-        className="track-sheet__map"
       />
-    </>
+    </div>
   )
 }
