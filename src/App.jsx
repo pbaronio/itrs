@@ -5,14 +5,18 @@ import BaseCheck from './screens/BaseCheck.jsx'
 import Components from './screens/Components.jsx'
 import Explore from './screens/Explore.jsx'
 import TabBar from './components/TabBar.jsx'
+import Splash from './components/Splash.jsx'
 
 /*
  * Aperta dall'icona (standalone) → app.
  * Aperta nel browser → guida all'installazione, salvo anteprima (?preview).
  * Dall'anteprima, Indietro del browser torna alla guida.
+ * All'avvio dall'icona: splash di 2 secondi sopra l'app, che intanto carica la mappa.
  */
 export default function App() {
   const [preview, setPreview] = useState(() => isPreview())
+  // Splash solo all'avvio dell'app installata (non nella guida né nell'anteprima nel browser)
+  const [splash, setSplash] = useState(() => isStandalone())
   const showApp = isStandalone() || preview
 
   useEffect(() => {
@@ -27,6 +31,7 @@ export default function App() {
   return (
     <div className="app">
       {showApp ? <Prototype /> : <InstallGuide onPreview={() => setPreview(true)} />}
+      {splash && <Splash onDone={() => setSplash(false)} />}
     </div>
   )
 }

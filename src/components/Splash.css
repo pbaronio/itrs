@@ -1,0 +1,36 @@
+/* Splash screen (Figma 3746:31865): misure del gruppo logo + scritta riprese 1:1 */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;                     /* sopra tab bar e fogli */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--splash-bg);
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.splash.is-leaving { opacity: 0; pointer-events: none; }
+
+.splash__lockup {
+  display: flex;
+  align-items: center;
+  gap: 8.73px;
+}
+.splash__mark {
+  display: flex;
+  justify-content: center;
+  width: 99.54px;
+}
+.splash__mark img { display: block; }
+.splash__name {
+  padding-top: 2.91px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: normal;
+  font-size: 19.708px;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--gray-0);
+}

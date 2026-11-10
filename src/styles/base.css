@@ -17,6 +17,7 @@
   --scrim: rgba(14, 14, 15, .32);                   /* velo sotto i bottom sheet informativi */
   --glass: rgba(255, 255, 255, .3);                 /* salva sulla foto della card listing */
   --shadow-route: 0 2px 8px rgba(0, 0, 0, .28);     /* percorso sulla mappa e marker di partenza/arrivo (§6) */
+  --splash-bg: #01181B;                             /* fondo dello splash screen (Figma 3746:31865), come l'icona dell'app */
 
   color-scheme: light;
 }

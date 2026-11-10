@@ -6,6 +6,7 @@
 @import '@fontsource-variable/inter/wght.css';
 @import '@fontsource-variable/inter/wght-italic.css';
 @import '@fontsource-variable/mona-sans/wght-italic.css';
+@import '@fontsource-variable/mona-sans/wght.css';   /* Semi Bold dritto: solo la scritta del logo nello splash */
 
 :root {
   --font-text: 'Inter Variable', 'Inter', system-ui, sans-serif;

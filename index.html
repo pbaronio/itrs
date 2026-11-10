@@ -19,6 +19,11 @@
 
     <link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon-64.png" />
     <title>ITRS</title>
+    <!-- App dalla Home: fondo dello splash già prima che parta il JavaScript (niente lampo bianco).
+         Lo splash aggiunge .booted all'avvio, e da lì vale il fondo normale -->
+    <style>
+      @media (display-mode: standalone) { html:not(.booted) { background: #01181B; } }
+    </style>
   </head>
   <body>
     <div id="root"></div>
