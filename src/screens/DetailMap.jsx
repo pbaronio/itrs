@@ -153,7 +153,7 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
         )}
       </BottomSheet>
 
-      <ActionBar startLabel={startLabel} saved={saved} onSave={onSave} />
+      <ActionBar item={route} startLabel={startLabel} saved={saved} onSave={onSave} />
     </div>
   )
 }

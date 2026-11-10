@@ -12,6 +12,9 @@ import Search from './Search.jsx'
 import Filters from './Filters.jsx'
 import RoutePage from './RoutePage.jsx'
 import { TrackPage } from './TrackDetail.jsx'
+import Ride from './Ride.jsx'
+import { RideContext } from '../rideContext.js'
+import { rideIdOf, rideItem } from '../data/ride.js'
 import './Explore.css'
 
 /*
@@ -143,6 +146,9 @@ export default function Explore() {
   }), [])
   const openRoute = useCallback((id) => nav.push({ t: 'route', id }), [nav])
   const openTrack = useCallback((id) => nav.push({ t: 'track', id }), [nav])
+  // Navigazione (passo 3.1): giro sopra tutte le pagine, voce della cronologia
+  const startRide = useCallback((it) => nav.push({ t: 'ride', id: rideIdOf(it) }), [nav])
+  const rideLayer = layers.find((l) => l.t === 'ride')
   const openItem = useCallback((it) => (it.kind === 'route' ? openRoute(it.id) : openTrack(it.id)), [openRoute, openTrack])
   // La pagina route può aprirsi sopra una pagina track (Routes featuring this track)
   const routeAt = layers.findIndex((l) => l.t === 'route')
@@ -308,7 +314,7 @@ export default function Explore() {
       </div>
 
       {/* Fuori da .explore (che crea un contesto di sovrapposizione): sopra la tab bar */}
-      {createPortal(<>
+      {createPortal(<RideContext.Provider value={startRide}>
       <Search
         ref={searchRef}
         open={overlay === 'search'}
@@ -341,7 +347,8 @@ export default function Explore() {
         layers={routeLayers}
         nav={nav}
       />
-      </>, document.body)}
+      <Ride item={rideLayer ? rideItem(rideLayer.id) : null} open={Boolean(rideLayer)} onClose={nav.back} />
+      </RideContext.Provider>, document.body)}
     </div>
   )
 }

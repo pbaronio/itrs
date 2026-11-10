@@ -263,6 +263,25 @@ const ICONS = {
     ),
   },
 
+  // Navigazione (32): pausa del pulsante tondo 90 (disegnata sul modello del Figma 3691:27462)
+  pause: {
+    box: 32,
+    body: (
+      <g fill="currentColor">
+        <rect x="8" y="6" width="5.5" height="20" rx="1.5" />
+        <rect x="18.5" y="6" width="5.5" height="20" rx="1.5" />
+      </g>
+    ),
+  },
+  stop: {
+    box: 32,
+    body: <rect fill="currentColor" x="8" y="8" width="16" height="16" rx="2.5" />,
+  },
+  play: {
+    box: 32,
+    body: <path fill="currentColor" d="M10 7.2v17.6c0 1.1 1.2 1.8 2.2 1.2l14-8.8a1.4 1.4 0 0 0 0-2.4l-14-8.8c-1-.6-2.2.1-2.2 1.2Z" />,
+  },
+
   // FAB Map (32)
   compass: {
     box: 32,

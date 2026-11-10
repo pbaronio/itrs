@@ -95,3 +95,37 @@ export function setRouteLegs(map, legs) {
     })),
   })
 }
+
+/*
+ * Navigazione (passo 3.1, istruzioni §6 "Percorso sulla mappa"): il tratto già percorso è
+ * `text-soft-500` al 70%, con lo stesso contorno bianco, senza frecce. Il tratto da fare resta
+ * nella sorgente del percorso (colori per track e frecce).
+ */
+const DONE = 'itrs-ride-done'
+export function ensureRideLayers(map) {
+  ensureRouteLayers(map)
+  if (map.getSource(DONE)) return
+  map.addSource(DONE, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+  const round = { 'line-cap': 'round', 'line-join': 'round' }
+  map.addLayer({
+    id: 'itrs-done-casing', type: 'line', source: DONE, layout: round,
+    paint: { 'line-color': token('--gray-0'), 'line-width': 10 },
+  }, 'itrs-sel-arrows')
+  map.addLayer({
+    id: 'itrs-done-line', type: 'line', source: DONE, layout: round,
+    paint: { 'line-color': token('--text-soft-500'), 'line-opacity': 0.7, 'line-width': 6 },
+  }, 'itrs-sel-arrows')
+}
+
+// done: [[lng, lat], …]; todo: [{ coords, hex }] una per track
+export function setRideLines(map, done, todo) {
+  map.getSource(DONE)?.setData({
+    type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: done },
+  })
+  map.getSource(SOURCE)?.setData({
+    type: 'FeatureCollection',
+    features: todo.map((leg) => ({
+      type: 'Feature', properties: { color: leg.hex }, geometry: { type: 'LineString', coordinates: leg.coords },
+    })),
+  })
+}

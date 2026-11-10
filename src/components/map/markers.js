@@ -77,3 +77,25 @@ export function cursorElement() {
   el.setAttribute('aria-hidden', 'true')
   return el
 }
+
+// Navigazione (passo 3.1, contesto §4.11): posizione dell'utente col cono di direzione.
+// Punto 19 e alone 39 come la posizione normale; il cono (brand-base che sfuma) ruota con
+// la direzione di marcia (--cone, gradi rispetto all'alto dello schermo).
+export function rideUserElement() {
+  const el = document.createElement('div')
+  el.className = 'map-ride-user'
+  el.setAttribute('role', 'img')
+  el.setAttribute('aria-label', 'Your position')
+  el.innerHTML = `<svg class="map-ride-user__cone" viewBox="0 0 120 120" aria-hidden="true">
+    <defs><radialGradient id="ride-cone" cx="60" cy="60" r="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" style="stop-color:var(--brand-base);stop-opacity:.55"/>
+      <stop offset="1" style="stop-color:var(--brand-base);stop-opacity:0"/>
+    </radialGradient></defs>
+    <path d="M60 60 L32 8 A56 56 0 0 1 88 8 Z" fill="url(#ride-cone)"/>
+  </svg>
+  <svg class="map-ride-user__dot" viewBox="0 0 38.67 38.67" aria-hidden="true">
+    <circle class="map-user__halo" cx="19.33" cy="19.33" r="19.33"/>
+    <circle class="map-user__dot" cx="19.33" cy="19.33" r="8.45" stroke-width="2.42"/>
+  </svg>`
+  return el
+}

@@ -1,0 +1,185 @@
+/* Navigazione, pagina mappa (passo 3.1, Figma 3691:27462, istruzioni §6 "Navigazione") */
+.ride {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--sabbia-light);
+  opacity: 0;
+  transition: opacity var(--dur-page) var(--ease-out);
+}
+.ride.is-open { opacity: 1; }
+.ride[aria-hidden="true"] { pointer-events: none; }
+
+.ride__error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--s-xl);
+  color: var(--text-sub-700);
+  text-align: center;
+}
+
+/* Attribuzione in alto a destra, sotto il pulsante della velocità */
+.ride-map .maplibregl-ctrl-top-right { top: calc(var(--safe-top) + 64px); }
+.ride-map .maplibregl-ctrl-attrib.maplibregl-compact { margin: 0 var(--s-m) 0 0; background: var(--bg-white-0); }
+.ride-map .maplibregl-ctrl-attrib-inner { font: 400 11px/16px var(--font-text); }
+
+/* Cima schermo: blur di sfondo (Figma: 4 su 130 dal bordo del frame) */
+.ride__blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: calc(var(--safe-top) + 70px);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  pointer-events: none;
+}
+
+/* Controlli a sinistra: pulsanti tondi 46, spazio 5 (Nav/Map Controls) */
+.ride__controls {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--s-m));
+  left: var(--s-m);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.btn-round.ride__report { background: var(--warning-soft); color: var(--text-strong-950); }
+
+/* Bussola: ago rosso verso il nord + N, ruota con la mappa */
+.ride__compass { color: var(--text-strong-950); }
+.ride__needle-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform var(--dur-fast) linear;
+}
+.ride__needle { width: 12px; height: 8px; fill: var(--itrs-red); }
+
+/* Velocità della simulazione (solo prototipo) */
+.btn-map.ride__speed {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--s-m) + 5px);
+  right: var(--s-m);
+  z-index: 2;
+  min-width: 52px;
+  padding: 0 var(--s-s);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pulsanti tondi grandi 90 sopra il pannello */
+.ride__actions {
+  position: absolute;
+  right: var(--s-m);
+  bottom: calc(245px + var(--safe-bottom-panel) + 10px);
+  z-index: 3;
+  display: flex;
+  gap: var(--s-xs);
+}
+.ride__round {
+  display: grid;
+  place-items: center;
+  width: 90px;
+  height: 90px;
+  border-radius: var(--r-pill);
+  background: var(--bg-strong-950);
+  color: var(--text-white-0);
+  transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+}
+.ride__round:active { transform: scale(.96); }
+.ride__round--stop { background: var(--bg-surface-800); }
+.ride__round--resume { background: var(--blu-600); color: var(--gray-0); }
+
+/* Pannello scuro (Nav/Ride Sheet): 245 + indicatore Home */
+.ride {
+  --safe-bottom-panel: max(var(--safe-bottom), var(--s-m));
+}
+.ride__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  height: calc(245px + var(--safe-bottom-panel));
+  padding: 26px var(--s-m) var(--safe-bottom-panel);
+  background: var(--nav-dark);
+  color: var(--text-white-0);
+  box-shadow: var(--shadow-bar);
+}
+.ride__label.t-label { color: var(--text-disabled-400); }
+.ride__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ride__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-xl);
+  margin-top: 15px;
+}
+.ride-stat__label { color: var(--text-white-0); }
+.ride-stat__value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  height: 40px;
+  margin-top: 12px;
+}
+.ride-stat__num {
+  font-size: 60px;
+  line-height: 40px;
+  letter-spacing: -.03em;
+  /* Mona Sans Black Italic: il corsivo sporge a destra */
+  padding-right: 4px;
+}
+.ride-stat__unit {
+  font: italic 900 16px/22px var(--font-display);
+  color: var(--text-disabled-400);
+}
+.ride-stat__bar {
+  height: 6px;
+  margin-top: 17px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--nav-track);
+}
+.ride-stat__bar span {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--brand-base);
+  transform-origin: left center;
+  transition: transform 200ms linear;
+}
+
+/* 3 pallini delle pagine (3.2: dati e controlli) */
+.ride__dots {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-bottom-panel) + 12px);
+  display: flex;
+  gap: 7px;
+  transform: translateX(-50%);
+}
+.ride__dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--gray-600);
+}
+.ride__dots span.is-active { background: var(--gray-0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ride-stat__bar span, .ride__needle-wrap { transition: none; }
+}

@@ -51,7 +51,7 @@ export default function Itinerary({ route, open, onClose, onOpenLeg, saved, onSa
         </div>
         <TrackTimeline route={route} onOpen={onOpenLeg} />
       </div>
-      <ActionBar saved={saved} onSave={onSave} />
+      <ActionBar item={route} saved={saved} onSave={onSave} />
     </div>
   )
 }

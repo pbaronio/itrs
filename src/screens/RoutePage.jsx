@@ -149,7 +149,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
         <RoundButton icon="dots" label="More options" />
       </div>
 
-      <ActionBar saved={isSaved} onSave={toggleSave} />
+      <ActionBar item={r} saved={isSaved} onSave={toggleSave} />
 
       <InfoSheet
         open={Boolean(info)}

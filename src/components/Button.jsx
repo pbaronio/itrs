@@ -1,4 +1,5 @@
 import Icon from './Icon.jsx'
+import { useStartRide } from '../rideContext.js'
 import './Button.css'
 
 /*
@@ -69,14 +70,17 @@ export function FabMap(props) {
 }
 
 // Barra azioni fissa, uguale in route e track: Salva + Download + Start
-export function ActionBar({ startLabel = 'Start the route', saved, onSave, onDownload, onStart, inline }) {
+// item: route o track da percorrere; Start apre la navigazione (passo 3.1) se non c'è onStart
+export function ActionBar({ startLabel = 'Start the route', saved, onSave, onDownload, onStart, item, inline }) {
+  const startRide = useStartRide()
+  const start = onStart ?? (item && startRide ? () => startRide(item) : undefined)
   return (
     <div className={`action-bar${inline ? ' action-bar--inline' : ''}`}>
       <div className="action-bar__secondary">
         <IconButton icon="bookmark" label={saved ? 'Saved' : 'Save'} active={saved} onClick={onSave} />
         <IconButton icon="download" label="Download" onClick={onDownload} />
       </div>
-      <Button variant="action" className="action-bar__start" onClick={onStart}>{startLabel}</Button>
+      <Button variant="action" className="action-bar__start" onClick={start}>{startLabel}</Button>
     </div>
   )
 }

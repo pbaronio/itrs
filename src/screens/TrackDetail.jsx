@@ -172,7 +172,7 @@ export function TrackPage({ track: raw, open, layers = [], nav, onOpenRoute }) {
         <RoundButton icon="dots" label="More options" />
       </div>
 
-      <ActionBar startLabel="Start the track" saved={isSaved} onSave={() => toggleSave(track.id)} />
+      <ActionBar item={track} startLabel="Start the track" saved={isSaved} onSave={() => toggleSave(track.id)} />
       {infoSheet}
 
       <DetailMap
@@ -255,7 +255,7 @@ export function TrackSheet({ route, n, open, mapOpen, onClose, onPick, onOpenMap
       <div className="route-page__top">
         <RoundButton icon="chevronDown" label="Close the track" onClick={onClose} />
       </div>
-      <ActionBar startLabel="Start the track" saved={isSaved} onSave={() => toggleSave(track.id)} />
+      <ActionBar item={track} startLabel="Start the track" saved={isSaved} onSave={() => toggleSave(track.id)} />
       {infoSheet}
       <DetailMap
         key={track.id}

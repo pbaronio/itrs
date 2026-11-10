@@ -112,3 +112,15 @@
   box-shadow: var(--shadow-route);
   pointer-events: none;
 }
+
+/* Navigazione: posizione col cono di direzione (passo 3.1) */
+.map-ride-user { position: relative; width: 120px; height: 120px; pointer-events: none; }
+.map-ride-user__cone {
+  position: absolute;
+  inset: 0;
+  width: 120px;
+  height: 120px;
+  max-width: none;
+  transform: rotate(var(--cone, 0deg));
+}
+.map-ride-user__dot { position: absolute; top: 40.5px; left: 40.5px; width: 39px; height: 39px; }
