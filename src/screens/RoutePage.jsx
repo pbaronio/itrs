@@ -83,7 +83,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
         </div>
 
         <div className="route-page__body">
-          <MiniMap route={r} className="route-page__minimap" />
+          <MiniMap route={r} className="route-page__minimap" label="Explore the route on the map" onClick={() => nav.push({ t: 'routeMap' })} />
 
           <section className="route-page__title">
             <h1 className="t-2xl-em">{r.name}</h1>

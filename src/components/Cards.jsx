@@ -147,9 +147,14 @@ function GalleryDots({ count, index }) {
 }
 
 /* Mini-mappa 76 con il tracciato (card listing, pagina route) */
-export function MiniMap({ route, className = '' }) {
+// onClick (pagina route e track): il cerchio apre la mappa intera, come `Explore Route/Track`
+export function MiniMap({ route, className = '', onClick, label }) {
+  const Tag = onClick ? 'button' : 'span'
+  const props = onClick
+    ? { type: 'button', onClick, 'aria-label': label, className: `listing-card__map listing-card__map--button ${className}` }
+    : { 'aria-hidden': true, className: `listing-card__map ${className}` }
   return (
-    <span className={`listing-card__map ${className}`} aria-hidden="true">
+    <Tag {...props}>
       <img src={minimapImg} alt="" draggable="false" />
       <span className="listing-card__map-tint" />
       {route.points ? <MiniRoute points={route.points} level={route.level} /> : (
@@ -158,7 +163,7 @@ export function MiniMap({ route, className = '' }) {
           <circle cx="33.8993" cy="18.3788" r="2.83996" fill="var(--text-strong-950)" />
         </svg>
       )}
-    </span>
+    </Tag>
   )
 }
 

@@ -37,7 +37,7 @@ function TrackBody({ track, inRoute, onOpenMap, onInfo, onOpenRoute, selector })
       </div>
 
       <div className={`route-page__body${inRoute ? ' track-page__body--sheet' : ''}`}>
-        {!inRoute && <MiniMap route={track} className="route-page__minimap" />}
+        {!inRoute && <MiniMap route={track} className="route-page__minimap" label="Explore the track on the map" onClick={onOpenMap} />}
 
         <section className="route-page__title">
           <h1 className="t-2xl-em">{track.name}</h1>

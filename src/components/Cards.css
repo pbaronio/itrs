@@ -117,6 +117,8 @@
   overflow: hidden;
   pointer-events: none;
 }
+.listing-card__map--button { display: block; padding: 0; pointer-events: auto; cursor: pointer; transition: transform var(--dur-fast) var(--ease-out); }
+.listing-card__map--button:active { transform: scale(.96); }
 .listing-card__map img { width: 100%; height: 100%; object-fit: cover; }
 .listing-card__map-tint {
   position: absolute;
