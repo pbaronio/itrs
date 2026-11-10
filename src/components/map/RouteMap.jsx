@@ -3,7 +3,7 @@ import * as maplibregl from 'maplibre-gl'
 import { KEY, STYLES } from './MapView.jsx'
 import { LEVELS } from '../../data/itrs.js'
 import { USER_POSITION, legsOf, midpointOf } from '../../data/garda.js'
-import { userElement, endpointElement, trackNumberElement } from './markers.js'
+import { userElement, endpointElement, trackNumberElement, cursorElement } from './markers.js'
 import { ensureRouteLayers, setRouteLegs } from './routeLayers.js'
 import './MapView.css'
 
@@ -13,6 +13,8 @@ import './MapView.css'
  * (cerchio bianco 24 a metà track), partenza e arrivo neri, mappa a colori -25%.
  * - interactive=false: anteprima nella pagina route (ferma, il tocco apre la mappa intera).
  * - interactive=true: mappa a tutto schermo, si sposta e si zooma.
+ * - setCursor([lng, lat] | null): punto nero del grafico altimetrico (passo 2.2). Se il punto esce
+ *   dalla parte visibile (fuori dai margini di `padding`), la mappa lo segue.
  */
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -20,6 +22,7 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const state = useRef({})
+  const cursorRef = useRef(null)
   state.current = { padding, onError }
 
   useImperativeHandle(ref, () => ({
@@ -27,6 +30,24 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
       const map = mapRef.current
       if (!map) return
       map.easeTo({ center: USER_POSITION, zoom: Math.max(map.getZoom(), 13), duration: reducedMotion() ? 0 : 500 })
+    },
+    setCursor(lngLat) {
+      const map = mapRef.current
+      if (!map) return
+      if (!lngLat) { cursorRef.current?.remove(); cursorRef.current = null; return }
+      if (!cursorRef.current) cursorRef.current = new maplibregl.Marker({ element: cursorElement() }).setLngLat(lngLat).addTo(map)
+      else cursorRef.current.setLngLat(lngLat)
+      // Segue il punto se esce dall'area libera sopra il pannello
+      const p = map.project(lngLat)
+      const { clientWidth: w, clientHeight: h } = map.getContainer()
+      const pad = state.current.padding || {}
+      const m = 12
+      const out = p.x < (pad.left ?? 0) - m || p.x > w - (pad.right ?? 0) + m
+        || p.y < (pad.top ?? 0) - m || p.y > h - (pad.bottom ?? 0) + m
+      if (out && !map.isMoving()) {
+        const offset = [((pad.left ?? 0) - (pad.right ?? 0)) / 2, ((pad.top ?? 0) - (pad.bottom ?? 0)) / 2]
+        map.easeTo({ center: lngLat, offset, duration: reducedMotion() ? 0 : 300 })
+      }
     },
     fit() {
       mapRef.current?.fitBounds(route.bbox, { padding: state.current.padding, duration: reducedMotion() ? 0 : 500 })
@@ -90,6 +111,7 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
     ro.observe(containerRef.current)
     return () => {
       ro.disconnect()
+      cursorRef.current = null
       map.remove()
       mapRef.current = null
     }

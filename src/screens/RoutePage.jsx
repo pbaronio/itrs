@@ -3,7 +3,7 @@ import RouteMap from '../components/map/RouteMap.jsx'
 import BottomSheet from '../components/BottomSheet.jsx'
 import InfoSheet from '../components/InfoSheet.jsx'
 import ItrsCircle from '../components/ItrsCircle.jsx'
-import ElevationProfile from '../components/ElevationProfile.jsx'
+import ElevationProfile, { fmtEle, fmtGrade } from '../components/ElevationProfile.jsx'
 import LevelShape from '../components/LevelShape.jsx'
 import { ActionBar, MapButton, RoundButton } from '../components/Button.jsx'
 import { MiniMap, PhotoGallery, RatingRow } from '../components/Cards.jsx'
@@ -18,7 +18,8 @@ import './RoutePage.css'
  * rating (→ bottom sheet informativo), anteprima della mappa con `Explore Route`, tipo di fondo,
  * barra azioni fissa.
  * Mappa della route (Figma 3680:8568): a tutto schermo, percorso colorato per track e numerato,
- * pannello `Route details` col riepilogo e il grafico altimetrico (solo lettura fino al passo 2.2).
+ * pannello `Route details` col riepilogo e il grafico altimetrico. Trascinando il grafico (passo 2.2)
+ * il riepilogo lascia il posto ai valori del punto e un punto nero si muove sulla mappa.
  * Pagina e mappa sono voci della cronologia (Explore): Indietro le chiude.
  * Non ancora in questo passo: lista track (2.3), Notebook (2.4), Technical trail features,
  * Wilderness Details, Recommended routes.
@@ -182,11 +183,12 @@ function RouteMapPage({ route, open, onClose, saved, onSave }) {
   const [barH, setBarH] = useState(114)
   const [safeTop, setSafeTop] = useState(0)
   const [error, setError] = useState(null)
+  const [scrub, setScrub] = useState(null)        // punto del grafico sotto il dito
   const pageRef = useRef(null)
   const mapRef = useRef(null)
 
   useEffect(() => {
-    if (open) { setMounted(true); setError(null); return }
+    if (open) { setMounted(true); setError(null); setScrub(null); return }
     const t = setTimeout(() => setMounted(false), 400)
     return () => clearTimeout(t)
   }, [open])
@@ -208,6 +210,11 @@ function RouteMapPage({ route, open, onClose, saved, onSave }) {
     ro?.observe(bar)
     return () => ro?.disconnect()
   }, [mounted])
+
+  const onScrub = (s) => {
+    setScrub(s)
+    mapRef.current?.setCursor(s ? s.lngLat : null)
+  }
 
   if (!mounted) return null
   const padding = { top: safeTop + 16 + 46 + 24, bottom: barH + PANEL_H + 32, left: 40, right: 72 }
@@ -251,14 +258,27 @@ function RouteMapPage({ route, open, onClose, saved, onSave }) {
         header={
           <div className="route-details__head">
             <h2 className="t-lg-em">Route details</h2>
-            <p className="t-sm route-details__summary">
-              {route.distance}<span aria-hidden="true"> • </span>{route.climbLabel}<span aria-hidden="true"> • </span>{route.duration}
-            </p>
+            {scrub ? (
+              <p className="t-sm route-details__summary route-details__scrub" aria-hidden="true">
+                <span className="route-details__values">
+                  {fmtKm(scrub.km)}<span> • </span>{fmtEle(scrub.ele)}<span> • </span>{fmtGrade(scrub.grade)}
+                </span>
+                <span className="route-details__track">
+                  <span className="t-sm-em">TRACK {scrub.leg.n}</span>
+                  <LevelShape level={scrub.leg.level} size={14} />
+                  {FACTORS.difficulty.names[scrub.leg.level]}
+                </span>
+              </p>
+            ) : (
+              <p className="t-sm route-details__summary">
+                {route.distance}<span aria-hidden="true"> • </span>{route.climbLabel}<span aria-hidden="true"> • </span>{route.duration}
+              </p>
+            )}
           </div>
         }
       >
         <div className="route-details__chart">
-          <ElevationProfile route={route} />
+          <ElevationProfile route={route} onScrub={onScrub} />
         </div>
       </BottomSheet>
 

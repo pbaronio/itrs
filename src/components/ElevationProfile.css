@@ -18,3 +18,12 @@
   stroke-width: 3px;
   stroke-linejoin: round;
 }
+
+/* Trascinamento (variante Scrubbing): il grafico tiene il gesto, niente scroll né selezione */
+.elevation { outline: none; border-radius: var(--r-bar); }
+.elevation:focus-visible { box-shadow: 0 0 0 2px var(--brand-base); }
+.elevation svg { touch-action: none; cursor: ew-resize; -webkit-tap-highlight-color: transparent; }
+.elevation__cursor { pointer-events: none; }
+.elevation__cursor-line { stroke: var(--text-strong-950); stroke-width: 1.5; }
+.elevation__cursor-dot { fill: var(--bg-strong-950); stroke: var(--bg-white-0); stroke-width: 2; }
+.elevation__cursor-handle { fill: var(--bg-strong-950); }

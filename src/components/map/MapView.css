@@ -101,3 +101,14 @@
   box-shadow: var(--shadow-route);
   pointer-events: none;
 }
+
+/* Cursore del grafico altimetrico (§6): punto nero 16, bordo bianco, ombra del percorso */
+.map-cursor {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--gray-0);
+  border-radius: var(--r-pill);
+  background: var(--gray-950);
+  box-shadow: var(--shadow-route);
+  pointer-events: none;
+}

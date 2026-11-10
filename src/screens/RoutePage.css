@@ -171,6 +171,11 @@
 .route-details__head h2 { margin: 0; color: var(--text-strong-950); }
 .route-details__summary { margin: 7px 0 0; color: var(--text-sub-700); white-space: nowrap; }
 .route-details__chart { padding: 23px var(--s-m) 0; }
+/* Riga dei valori durante il trascinamento: distanza • quota • pendenza a sinistra, track e livello a destra */
+.route-details__scrub { display: flex; justify-content: space-between; gap: var(--s-xs); }
+.route-details__values { color: var(--text-strong-950); font-variant-numeric: tabular-nums; }
+.route-details__track { display: inline-flex; align-items: center; gap: var(--s-2xs); }
+.route-details__track .t-sm-em { margin-right: var(--s-2xs); color: var(--text-strong-950); }
 
 /* Attribuzione della mappa: sopra il pannello (mappa intera) o in basso a sinistra (anteprima) */
 .map-view.route-map .maplibregl-ctrl-bottom-right { bottom: var(--attrib-bottom, 0px); }

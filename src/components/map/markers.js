@@ -69,3 +69,11 @@ export function trackNumberElement(n) {
   el.textContent = String(n)
   return el
 }
+
+// Cursore del grafico altimetrico: punto nero 16 con bordo bianco, diverso dal punto blu della posizione
+export function cursorElement() {
+  const el = document.createElement('div')
+  el.className = 'map-cursor'
+  el.setAttribute('aria-hidden', 'true')
+  return el
+}
