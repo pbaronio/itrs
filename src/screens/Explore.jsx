@@ -15,6 +15,7 @@ import { TrackPage } from './TrackDetail.jsx'
 import Ride from './Ride.jsx'
 import { RideContext } from '../rideContext.js'
 import { rideIdOf, rideItem } from '../data/ride.js'
+import { ALL_BOUNDS } from '../data/garda.js'
 import './Explore.css'
 
 /*
@@ -143,7 +144,24 @@ export default function Explore() {
       setLayers(next)
     },
     back() { history.back() },
+    // Torna alla mappa togliendo tutte le pagine (fine giro: Go to the map)
+    home() {
+      const n = history.state?.layers?.length ?? 0
+      if (n) history.go(-n)
+    },
   }), [])
+  // Fine giro → mappa come all'avvio dopo lo splash: niente pagine, niente selezione né filtri,
+  // vista Routes, overlay in stato 1, mappa su tutto il Garda (richiesta di Paolo)
+  const goHome = useCallback(() => {
+    nav.home()
+    setSelectedId(null)
+    setFrozen(null)
+    setMode('routes')
+    setFilters(emptyFilters())
+    setSnap(0)
+    setStyleKind('topo')
+    mapRef.current?.fitTo(ALL_BOUNDS, 22)
+  }, [nav])
   const openRoute = useCallback((id) => nav.push({ t: 'route', id }), [nav])
   const openTrack = useCallback((id) => nav.push({ t: 'track', id }), [nav])
   // Navigazione (passo 3.1): giro sopra tutte le pagine, voce della cronologia
@@ -347,7 +365,7 @@ export default function Explore() {
         layers={routeLayers}
         nav={nav}
       />
-      <Ride item={rideLayer ? rideItem(rideLayer.id) : null} open={Boolean(rideLayer)} onClose={nav.back} />
+      <Ride item={rideLayer ? rideItem(rideLayer.id) : null} open={Boolean(rideLayer)} onClose={nav.back} onHome={goHome} />
       </RideContext.Provider>, document.body)}
     </div>
   )

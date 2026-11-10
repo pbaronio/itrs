@@ -296,9 +296,9 @@
 
 /* ---------- Avviso iOS ---------- */
 .ios-alert__dim {
-  position: absolute;
+  position: fixed;              /* copre anche la barra in fondo, come nel Figma */
   inset: 0;
-  z-index: 30;
+  z-index: 50;
   display: grid;
   place-items: center;
   background: var(--scrim);
@@ -315,14 +315,25 @@
   letter-spacing: -.01em;
 }
 .ios-alert__content { padding: 19px var(--s-m) var(--s-m); }
-.ios-alert__title { font-size: 17px; line-height: 22px; font-weight: 600; }
-.ios-alert__msg { margin-top: 2px; font-size: 13px; line-height: 18px; }
-.ios-alert__buttons { display: flex; border-top: 1px solid var(--stroke-sub-200); }
-.ios-alert__buttons button { flex: 1; height: 44px; font-size: 17px; color: var(--ios-blue); }
-.ios-alert__buttons button + button { border-left: 1px solid var(--stroke-sub-200); }
+/* Figma 3720:2436: titolo 17/22 Semi Bold, messaggio 13/18, pulsanti alti 44 (testo 17/22) */
+.ios-alert__title { font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; }
+.ios-alert__msg { margin-top: 2px; font-size: 13px; line-height: 18px; letter-spacing: -.005em; }
+.ios-alert__buttons { display: flex; border-top: .5px solid var(--stroke-sub-200); }
+.ios-alert__buttons button {
+  flex: 1 0 auto;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 var(--s-xs);
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -.02em;
+  color: var(--ios-blue);
+}
+.ios-alert__buttons button + button { border-left: .5px solid var(--stroke-sub-200); }
 .ios-alert__buttons button.is-bold { font-weight: 600; }
 .ios-alert__buttons.is-stacked { flex-direction: column; }
-.ios-alert__buttons.is-stacked button + button { border-left: 0; border-top: 1px solid var(--stroke-sub-200); }
+.ios-alert__buttons.is-stacked button { flex: 0 0 44px; }
+.ios-alert__buttons.is-stacked button + button { border-left: 0; border-top: .5px solid var(--stroke-sub-200); }
 
 @media (prefers-reduced-motion: reduce) {
   .flow, .ios-alert__dim { animation: none; }

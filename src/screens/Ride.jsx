@@ -31,7 +31,7 @@ import './Ride.css'
 const PANEL_H = 245          // pannello del Figma (279) senza l'indicatore Home (34)
 const DOT_ABOVE_PANEL = 106  // punto blu a ~106 px sopra il pannello (Figma: y 488 su 874)
 
-export default function Ride({ item, open, onClose }) {
+export default function Ride({ item, open, onClose, onHome }) {
   const ride = useMemo(() => (item ? buildRide(item) : null), [item])
   const [shown, setShown] = useState(ride)
   useEffect(() => {
@@ -41,12 +41,12 @@ export default function Ride({ item, open, onClose }) {
   }, [ride])
   const entered = useEntered(open && Boolean(ride))
   if (!shown) return null
-  return <RideScreen key={shown.item.id} ride={shown} entered={entered} active={open} onClose={onClose} />
+  return <RideScreen key={shown.item.id} ride={shown} entered={entered} active={open} onClose={onClose} onHome={onHome ?? onClose} />
 }
 
 const COUNT_FROM = 3
 
-function RideScreen({ ride, entered, active, onClose }) {
+function RideScreen({ ride, entered, active, onClose, onHome }) {
   const [state, setState] = useState(() => rideAt(ride, 0))
   const [speedAt, setSpeedAt] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -319,7 +319,7 @@ function RideScreen({ ride, entered, active, onClose }) {
       </div>
 
       {end && <RideComplete ride={ride} end={end} onRate={() => setReview(true)} onClose={onClose} />}
-      {end && review && <Review onClose={() => setReview(false)} onDone={onClose} />}
+      {end && review && <Review onClose={() => setReview(false)} onDone={onHome} />}
       {report && <Report ride={ride} at={report} onClose={() => setReport(null)} />}
 
       <div className={`ride-countdown${count === 0 ? ' is-done' : ''}`} aria-hidden={count === 0}>
