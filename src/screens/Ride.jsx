@@ -8,6 +8,9 @@ import './Ride.css'
 
 /*
  * Navigazione, pagina 1: mappa (passo 3.1, contesto §4.11, Figma 3691:27462).
+ * - Countdown (Figma 3773:35449, richiesta di Paolo): dopo Start compare in dissolvenza un fondo
+ *   blu con 3, 2, 1 in Mona Sans; poi sfuma e scopre la mappa, e solo allora il giro parte.
+ *   Intanto sotto la mappa carica.
  * - Giro simulato: il punto blu avanza da solo lungo il tracciato (data/ride.js); il pulsante
  *   in alto a destra accelera la simulazione (1×, 5×, 20×). Non è nel design: serve ai test [P].
  * - Mappa che segue il ciclista con la direzione di marcia in alto; tratto fatto in grigio.
@@ -35,6 +38,8 @@ export default function Ride({ item, open, onClose }) {
   return <RideScreen key={shown.item.id} ride={shown} entered={entered} active={open} onClose={onClose} />
 }
 
+const COUNT_FROM = 3
+
 function RideScreen({ ride, entered, active, onClose }) {
   const [state, setState] = useState(() => rideAt(ride, 0))
   const [speedAt, setSpeedAt] = useState(0)
@@ -44,13 +49,22 @@ function RideScreen({ ride, entered, active, onClose }) {
   const [styleKind, setStyleKind] = useState('topo')
   const [error, setError] = useState(null)
   const [topPad, setTopPad] = useState(0)
+  const [count, setCount] = useState(COUNT_FROM)      // 3, 2, 1, poi 0 = via
   const pageRef = useRef(null)
   const panelRef = useRef(null)
   const mapRef = useRef(null)
   const needleRef = useRef(null)
   const sim = useRef({ t: 0, speed: SPEEDS[0], running: true })
   sim.current.speed = SPEEDS[speedAt]
-  sim.current.running = active && !paused
+  sim.current.running = active && !paused && count === 0
+
+  // Countdown: un numero al secondo, si parte solo quando il fondo blu è sparito.
+  // Parte quando la pagina è entrata, così il 3 si vede per intero.
+  useEffect(() => {
+    if (!entered || count === 0) return
+    const t = setTimeout(() => setCount((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [entered, count])
 
   // Punto blu sopra il pannello, come nel Figma: margine in alto per spostare il centro della mappa
   useLayoutEffect(() => {
@@ -182,6 +196,12 @@ function RideScreen({ ride, entered, active, onClose }) {
           <span className="is-active" /><span /><span />
         </div>
       </section>
+
+      <div className={`ride-countdown${count === 0 ? ' is-done' : ''}`} aria-hidden={count === 0}>
+        {count > 0 && (
+          <span key={count} className="t-display ride-countdown__num" role="timer" aria-live="assertive">{count}</span>
+        )}
+      </div>
     </div>
   )
 }

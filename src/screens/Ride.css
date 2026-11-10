@@ -184,3 +184,39 @@
 @media (prefers-reduced-motion: reduce) {
   .ride-stat__bar span, .ride__needle-wrap { transition: none; }
 }
+
+/* Countdown prima della partenza (Figma 3773:35449): fondo brand-base, numero Mona Sans
+   Black Italic 187 scuro (sul blu il testo è sempre scuro). Entra con la pagina (dissolvenza
+   di .ride) e alla fine sfuma sulla mappa. */
+.ride-countdown {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: var(--brand-base);
+  color: var(--text-strong-950);
+  transition: opacity var(--dur-page) var(--ease-out), visibility 0s linear 0s;
+}
+.ride-countdown.is-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--dur-page) var(--ease-out), visibility 0s linear var(--dur-page);
+}
+.ride-countdown__num {
+  font-size: 187px;
+  line-height: 208px;
+  letter-spacing: -.03em;
+  padding-right: .06em;              /* il corsivo sporge a destra: centro ottico */
+  animation: ride-count 1000ms var(--ease-out) both;
+}
+@keyframes ride-count {
+  0%   { opacity: 0; transform: scale(1.25); }
+  25%  { opacity: 1; transform: scale(1); }
+  80%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.92); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ride-countdown__num { animation: none; }
+}
