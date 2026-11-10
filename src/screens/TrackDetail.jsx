@@ -147,7 +147,7 @@ export function TrackPage({ track: raw, open, layers = [], nav, onOpenRoute }) {
 
   useEffect(() => {
     if (raw) { setShown(raw); return }
-    const t = setTimeout(() => setShown(null), 400)
+    const t = setTimeout(() => setShown(null), 550)
     return () => clearTimeout(t)
   }, [raw])
   useLayoutEffect(() => {

@@ -8,7 +8,7 @@
   margin: 0 auto;
   background: var(--bg-white-0);
   transform: translateX(100%);
-  transition: transform var(--dur-base) var(--ease-out);
+  transition: transform var(--dur-page) var(--ease-out);
   pointer-events: none;
 }
 .route-page.is-open { transform: none; pointer-events: auto; }
@@ -139,7 +139,7 @@
   margin: 0 auto;
   background: var(--sabbia-light);
   transform: translateY(100%);
-  transition: transform var(--dur-base) var(--ease-out);
+  transition: transform var(--dur-page) var(--ease-out);
   pointer-events: none;
 }
 .route-map-page.is-open { transform: none; pointer-events: auto; }
@@ -215,7 +215,7 @@
   margin: 0 auto;
   background: var(--bg-white-0);
   transform: translateY(100%);
-  transition: transform var(--dur-base) var(--ease-out);
+  transition: transform var(--dur-page) var(--ease-out);
   pointer-events: none;
 }
 .itinerary.is-open { transform: none; pointer-events: auto; }

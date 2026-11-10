@@ -21,7 +21,7 @@ export default function Itinerary({ route, open, onClose, onOpenLeg, saved, onSa
 
   useEffect(() => {
     if (open) { setMounted(true); setScrub(null); return }
-    const t = setTimeout(() => setMounted(false), 400)
+    const t = setTimeout(() => setMounted(false), 550)
     return () => clearTimeout(t)
   }, [open])
 

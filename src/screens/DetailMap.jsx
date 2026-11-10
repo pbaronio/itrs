@@ -38,7 +38,7 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
 
   useEffect(() => {
     if (open) { setMounted(true); setError(null); setScrub(null); setSnap(0); return }
-    const t = setTimeout(() => setMounted(false), 400)
+    const t = setTimeout(() => setMounted(false), 550)
     return () => clearTimeout(t)
   }, [open])
 

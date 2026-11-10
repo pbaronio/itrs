@@ -12,19 +12,53 @@
  * Malga Ciapa riprende nomi e livelli di ITRS_contesto.md §2.
  */
 import GEOMETRY from './garda-geometry.json'
-import riders from '../assets/photos/riders.webp'
-import trail from '../assets/photos/trail-thumb.webp'
+// Foto delle route e delle track (pacchetto di Paolo, 10 nov 2026): verticali 499×828 in
+// src/assets/photos/garda/NN.webp. Nei riquadri orizzontali si ritaglia una fascia: `y` è la
+// posizione verticale del soggetto (object-position).
+const FILES = import.meta.glob('../assets/photos/garda/*.webp', { eager: true, import: 'default' })
+const FOCUS = {
+  1: 45, 2: 40, 3: 65, 4: 55, 5: 60, 6: 50, 7: 62, 8: 38, 9: 78, 10: 60, 11: 85,
+  12: 55, 13: 68, 14: 68, 15: 55, 16: 66, 17: 62, 18: 72, 19: 75, 20: 74, 21: 50, 22: 72,
+}
+const PHOTO = Object.fromEntries(Object.entries(FILES).map(([path, src]) => {
+  const n = Number(path.match(/(\d+)\.webp$/)[1])
+  return [n, { photo: src, photoPosition: `50% ${FOCUS[n] ?? 50}%` }]
+}))
+const ALL_PHOTOS = Object.keys(PHOTO).map(Number).sort((x, y) => x - y)
 
-// Foto di esempio: la prima di ogni galleria è la copertina (card, carosello, ricerca).
-// Per ora due foto dal Figma; con altre foto basta aggiungerle qui e in GALLERY_SIZE.
-const PHOTOS = [
-  { photo: riders, photoPosition: '50% 62%' },
-  { photo: trail, photoPosition: '50% 40%' },
-]
-// Località della track → provincia e regione, come nelle card del Figma
+// Copertina di ogni route, scelta per carattere del percorso
+const ROUTE_COVER = {
+  'tremalzo-xxl': 10, 'malga-ciapa': 4, 'passo-nota-limone': 3, 'monte-brione': 15, 'lago-di-tenno': 13,
+  'arco-laghel': 22, 'nago-busatte': 8, 'lago-di-ledro': 16, 'concei-cima-oro': 12,
+}
+// Track: foto per tipo (ciclabile e lungolago, salita, discesa, sentiero), a rotazione
+const TRACK_KIND_PHOTOS = {
+  path: [18, 14, 22, 16, 13, 6],
+  climb: [9, 21, 11, 10, 5, 7, 19],
+  descent: [8, 20, 3, 1, 15],
+  trail: [12, 17, 2, 4, 16, 14],
+}
+function trackKind(name) {
+  if (/Ciclabile|Lungolago|Strada del Ponale|Strada di Pregasina|Borgo/.test(name)) return 'path'
+  if (/Salita|Accesso|Ponale Alto|Strada militare|Passo|Bocca/.test(name)) return 'climb'
+  if (/Discesa|Ritorno/.test(name)) return 'descent'
+  return 'trail'
+}
+const kindCount = {}
+function trackCover(name) {
+  const kind = trackKind(name)
+  const list = TRACK_KIND_PHOTOS[kind]
+  const i = kindCount[kind] = (kindCount[kind] ?? -1) + 1
+  return list[i % list.length]
+}
+
+// Galleria: la copertina e le 4 foto successive dell'elenco, senza ripetizioni
 const GALLERY_SIZE = 5
-// Galleria di un elemento: parte dalla sua copertina e prosegue con le altre foto, senza ripetizioni
-const galleryFrom = (start) => Array.from({ length: Math.min(GALLERY_SIZE, PHOTOS.length) }, (_, k) => PHOTOS[(start + k) % PHOTOS.length])
+const galleryFrom = (cover) => {
+  const start = ALL_PHOTOS.indexOf(cover)
+  return Array.from({ length: Math.min(GALLERY_SIZE, ALL_PHOTOS.length) }, (_, k) => PHOTO[ALL_PHOTOS[(start + k * 3) % ALL_PHOTOS.length]])
+}
+// Località della track → provincia e regione, come nelle card del Figma
 const REGION = {
   'Tremosine sul Garda': 'Brescia, Lombardy, Italy',
   'Limone sul Garda': 'Brescia, Lombardy, Italy',
@@ -233,7 +267,8 @@ function surfaceShare(s) {
   return { road: s.road / tot, gravel: s.gravel / tot, single: s.single / tot }
 }
 
-export const TRACKS = Object.entries(TRACK_META).map(([id, meta], i) => {
+const covers = Object.fromEntries(Object.entries(TRACK_META).map(([id, meta]) => [id, trackCover(meta.name)]))
+export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
   const g = GEOMETRY[id]
   const points = decode(g.line)
   const { up, down } = climbOf(points)
@@ -244,8 +279,8 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta], i) => {
     ...meta,
     place: placeOf(meta.place),
     level: meta.difficulty,
-    ...PHOTOS[(i + 1) % PHOTOS.length],
-    photos: galleryFrom(i + 1),
+    ...PHOTO[covers[id]],
+    photos: galleryFrom(covers[id]),
     points,                                  // [lon, lat, quota]
     km,
     climb: up,
@@ -263,7 +298,7 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta], i) => {
 
 const TRACK_BY_ID = Object.fromEntries(TRACKS.map((t) => [t.id, t]))
 
-export const ROUTES = ROUTE_DEFS.map((def, i) => {
+export const ROUTES = ROUTE_DEFS.map((def) => {
   const legs = def.tracks.map((key) => {
     const reverse = key.startsWith('-')
     const track = TRACK_BY_ID[key.replace('-', '')]
@@ -287,8 +322,8 @@ export const ROUTES = ROUTE_DEFS.map((def, i) => {
     place: def.place,
     ratings: def.ratings,
     level: def.ratings.difficulty,
-    ...PHOTOS[i % PHOTOS.length],
-    photos: galleryFrom(i),
+    ...PHOTO[ROUTE_COVER[def.id]],
+    photos: galleryFrom(ROUTE_COVER[def.id]),
     legs: legs.map(({ track, reverse }) => ({ trackId: track.id, reverse })),
     points,
     km,

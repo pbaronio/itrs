@@ -40,7 +40,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
 
   useEffect(() => {
     if (route) { setShown(route); return }
-    const t = setTimeout(() => setShown(null), 400)
+    const t = setTimeout(() => setShown(null), 550)
     return () => clearTimeout(t)
   }, [route])
 
@@ -55,7 +55,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
   const [legN, setLegN] = useState(legLayer?.n ?? null)
   useEffect(() => {
     if (legLayer) { setLegN(legLayer.n); return }
-    const t = setTimeout(() => setLegN(null), 400)
+    const t = setTimeout(() => setLegN(null), 550)
     return () => clearTimeout(t)
   }, [legLayer?.n]) // eslint-disable-line react-hooks/exhaustive-deps
 

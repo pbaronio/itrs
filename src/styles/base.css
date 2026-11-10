@@ -11,6 +11,7 @@
   --dur-fast: 150ms;
   --dur-base: 300ms;
   --dur-map: 500ms;
+  --dur-page: 450ms;                                /* entrata e uscita delle pagine (rev. 2.3: più lente) */
 
   /* Valori del Figma senza token (non sono colori nuovi: nero e bianco con opacità) */
   --shadow-bar: 0 4px 24px 0 rgba(0, 0, 0, .06);   /* barra azioni fissa (§4) */
@@ -102,6 +103,7 @@ button {
     --dur-fast: 1ms;
     --dur-base: 1ms;
     --dur-map: 1ms;
+    --dur-page: 1ms;
   }
 }
 
