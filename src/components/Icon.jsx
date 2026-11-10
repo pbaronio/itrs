@@ -76,6 +76,22 @@ const ICONS = {
     box: 24,
     body: <path {...S} strokeWidth="1.5" strokeLinecap="square" d="M10 5.75L3.75 12L10 18.25M4.5 12H20.25" />,
   },
+  chevronDown: {
+    box: 24,
+    body: <path {...S} strokeWidth="1.5" strokeLinecap="square" d="M5.75 9.5L12 15.75L18.25 9.5" />,
+  },
+  // IconExpand45 (18): Explore Route / Explore Track
+  expand: {
+    box: 18,
+    body: (
+      <g {...S} strokeWidth="1.125" strokeLinecap="square">
+        <path d="M10.3125 2.8125H15.1875V7.6875" />
+        <path d="M2.81299 10.3115V15.1865H7.68799" />
+        <path d="M14.6074 3.39239L10.3125 7.68731" />
+        <path d="M7.6875 10.3115L3.39258 14.6065" />
+      </g>
+    ),
+  },
   chevronRight: {
     box: 24,
     body: <path {...S} strokeWidth="1.5" strokeLinecap="square" d="M10 16L14 12L10 8" />,

@@ -87,3 +87,17 @@
   background: var(--bg-white-0);
 }
 .map-view .maplibregl-ctrl-attrib-inner { font: 400 11px/16px var(--font-text); }
+
+/* Numero della track: cerchio bianco 24, bordo brand-base 1.5, ombra leggera, mai l'alone */
+.map-track-number {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--brand-base);
+  border-radius: var(--r-pill);
+  background: var(--bg-white-0);
+  color: var(--text-strong-950);
+  box-shadow: var(--shadow-route);
+  pointer-events: none;
+}

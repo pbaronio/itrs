@@ -10,6 +10,7 @@ import { ROUTES, TRACKS, unionBox } from '../data/garda.js'
 import { activeCount, emptyFilters, matches } from '../data/filters.js'
 import Search from './Search.jsx'
 import Filters from './Filters.jsx'
+import RoutePage from './RoutePage.jsx'
 import './Explore.css'
 
 /*
@@ -22,6 +23,8 @@ import './Explore.css'
  *   overlay con `No routes in this area` e la CTA blu `See N tracks`, che passa alla vista Tracks.
  * Ricerca e filtri (passo 1.4): pagine sopra la mappa, ognuna è una voce della cronologia
  *   (Indietro le chiude). I filtri valgono per mappa, conteggi, carosello, listing e ricerca.
+ * Pagina route (passo 2.1): tap sulla card di una route (carosello o listing). La pagina e la
+ *   mappa della route sono voci della cronologia: Indietro le chiude e torna alla route selezionata.
  */
 const SNAP_PEEK = 86
 const SNAP_HALF = 226
@@ -40,6 +43,7 @@ export default function Explore() {
   const [filters, setFilters] = useState(emptyFilters)
   const [overlay, setOverlay] = useState(null)     // null | 'search' | 'filters'
   const [pending, setPending] = useState(null)     // selezione dopo un cambio di vista (ricerca)
+  const [page, setPage] = useState({ route: null, map: false })   // pagina route (passo 2.1)
   const insets = useInsets()
   const mapRef = useRef(null)
   const searchRef = useRef(null)
@@ -99,11 +103,16 @@ export default function Explore() {
   // ---- Ricerca e filtri: pagine sopra la mappa, chiuse anche da Indietro ----
   // Lo stato della cronologia mantiene { preview: true } (anteprima nel browser, pwa.js)
   useEffect(() => {
-    if (history.state?.overlay) {
-      const { overlay: _, ...rest } = history.state
+    // Al primo avvio nessuna pagina sopra la mappa (es. dopo un ricaricamento)
+    const st = history.state
+    if (st && (st.overlay || st.route || st.routeMap)) {
+      const { overlay: _o, route: _r, routeMap: _m, ...rest } = st
       history.replaceState(Object.keys(rest).length ? rest : null, '')
     }
-    const onPop = () => setOverlay(history.state?.overlay ?? null)
+    const onPop = () => {
+      setOverlay(history.state?.overlay ?? null)
+      setPage({ route: history.state?.route ?? null, map: Boolean(history.state?.routeMap) })
+    }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
@@ -113,6 +122,17 @@ export default function Explore() {
     flushSync(() => setOverlay(name))
     if (name === 'search') searchRef.current?.focus()
   }, [])
+  // Pagina route e mappa della route: voci della cronologia sopra la mappa
+  const openRoute = useCallback((id) => {
+    history.pushState({ ...(history.state ?? {}), route: id, routeMap: false }, '')
+    setPage({ route: id, map: false })
+  }, [])
+  const openRouteMap = useCallback(() => {
+    history.pushState({ ...(history.state ?? {}), routeMap: true }, '')
+    setPage((p) => ({ ...p, map: true }))
+  }, [])
+  const goBack = useCallback(() => history.back(), [])
+
   const closeOverlay = useCallback(() => {
     if (history.state?.overlay) history.back()
     else setOverlay(null)
@@ -252,9 +272,13 @@ export default function Explore() {
             </Button>
           </div>
         ) : listing ? (
-          <Listing items={list} onPick={(id) => { select(id); changeSnap(1) }} />
+          <Listing items={list} onPick={(id) => {
+            select(id)
+            changeSnap(1)
+            if (mode === 'routes') openRoute(id)
+          }} />
         ) : (
-          <Carousel items={list} mode={mode} selectedId={selectedId} onPick={select} hidden={snap === 0} />
+          <Carousel items={list} mode={mode} selectedId={selectedId} onPick={select} onOpen={(id) => { select(id); openRoute(id) }} hidden={snap === 0} />
         )}
       </BottomSheet>
 
@@ -287,6 +311,14 @@ export default function Explore() {
         onApply={applyFilters}
         onCancel={closeOverlay}
       />
+      <RoutePage
+        route={page.route ? ROUTES.find((r) => r.id === page.route) : null}
+        open={Boolean(page.route)}
+        mapOpen={page.map}
+        onBack={goBack}
+        onOpenMap={openRouteMap}
+        onCloseMap={goBack}
+      />
       </>, document.body)}
     </div>
   )
@@ -294,7 +326,7 @@ export default function Explore() {
 
 
 /* ---------- Stato 2: carosello, la mappa segue la card ---------- */
-function Carousel({ items, mode, selectedId, onPick, hidden }) {
+function Carousel({ items, mode, selectedId, onPick, onOpen, hidden }) {
   const ref = useRef(null)
   const programmatic = useRef(false)
   const timer = useRef(0)
@@ -349,7 +381,8 @@ function Carousel({ items, mode, selectedId, onPick, hidden }) {
     <div ref={ref} className={`explore__carousel${hidden ? ' is-hidden' : ''}`} onScroll={onScroll}>
       {items.map((it) => (
         <div key={it.id} data-id={it.id} className="explore__slide">
-          <RouteCard route={it} active={it.id === selectedId} onClick={() => onPick(it.id)} />
+          {/* Tap sulla card di una route: pagina route (2.1). Le track restano selezionate sulla mappa fino al 2.3 */}
+          <RouteCard route={it} active={it.id === selectedId} onClick={() => (it.kind === 'route' ? onOpen(it.id) : onPick(it.id))} />
         </div>
       ))}
     </div>

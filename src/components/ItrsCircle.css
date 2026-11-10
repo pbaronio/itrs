@@ -1,0 +1,8 @@
+/* Cerchio ITRS 262 nella card sabbia (Figma 3625:18874) */
+.itrs-circle { display: block; width: 100%; height: auto; max-width: 370px; overflow: visible; }
+.itrs-circle__divider { stroke: var(--sabbia-light); stroke-width: 1; }
+.itrs-circle__label {
+  font: 500 14px/18px var(--font-text);
+  letter-spacing: -.01em;
+  fill: var(--text-soft-500);
+}

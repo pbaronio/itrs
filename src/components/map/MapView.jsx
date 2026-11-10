@@ -22,8 +22,8 @@ import './MapView.css'
 // Il worker di MapLibre va servito come file a parte (Vite lo copia in dist/assets)
 maplibregl.setWorkerUrl(workerUrl)
 
-const KEY = import.meta.env.VITE_MAPTILER_KEY
-const STYLES = {
+export const KEY = import.meta.env.VITE_MAPTILER_KEY
+export const STYLES = {
   topo: (key) => `https://api.maptiler.com/maps/topo-v2/style.json?key=${key}`,
   satellite: (key) => `https://api.maptiler.com/maps/hybrid/style.json?key=${key}`,
 }

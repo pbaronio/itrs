@@ -328,3 +328,40 @@ export function fmtDuration(min) {
   if (!h) return `~${m}m`
   return m ? `~${h}h ${m}m` : `~${h}h`
 }
+
+// ---------- Track di una route, in ordine di percorrenza (pagina route, passo 2.1) ----------
+// n: numero mostrato su mappa e grafico; points già nel verso di percorrenza;
+// startKm / endKm: posizione lungo la route (per il grafico altimetrico).
+const LEGS_CACHE = new Map()
+export function legsOf(route) {
+  if (LEGS_CACHE.has(route.id)) return LEGS_CACHE.get(route.id)
+  let at = 0
+  const legs = route.legs.map(({ trackId, reverse }, i) => {
+    const track = TRACK_BY_ID[trackId]
+    const points = reverse ? [...track.points].reverse() : track.points
+    const leg = { n: i + 1, track, reverse, points, level: track.difficulty, km: track.km, startKm: at, endKm: at + track.km }
+    at += track.km
+    return leg
+  })
+  LEGS_CACHE.set(route.id, legs)
+  return legs
+}
+
+// Punto a metà di una linea [lon, lat, …] (numero della track sulla mappa)
+export function midpointOf(points) {
+  return pointAtHalf(points)
+}
+
+// Profilo altimetrico: [km, quota] lungo una linea, quota media mobile su ±60 m.
+// Le distanze si scalano sulla lunghezza ufficiale della track (km), come nel resto dell'app.
+export function profileOf(points, startKm = 0, km) {
+  const dist = [0]
+  for (let i = 1; i < points.length; i++) dist.push(dist[i - 1] + meters(points[i - 1], points[i]))
+  return points.map((_, i) => {
+    let sum = 0, n = 0
+    for (let j = i; j >= 0 && dist[i] - dist[j] <= 60; j--) { sum += points[j][2]; n++ }
+    for (let j = i + 1; j < points.length && dist[j] - dist[i] <= 60; j++) { sum += points[j][2]; n++ }
+    const total = dist[dist.length - 1] || 1
+    return [startKm + (km != null ? (dist[i] / total) * km : dist[i] / 1000), sum / n]
+  })
+}

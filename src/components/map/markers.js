@@ -59,3 +59,13 @@ export function endpointElement(type) {
     : `<svg viewBox="0 0 28 28" aria-hidden="true"><path class="map-endpoint__stroke-icon" d="${FLAG}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
   return el
 }
+
+// Numero della track sul percorso: cerchio bianco 24, bordo brand-base 1.5, numero xs/emphasized
+export function trackNumberElement(n) {
+  const el = document.createElement('div')
+  el.className = 'map-track-number t-xs-em'
+  el.setAttribute('role', 'img')
+  el.setAttribute('aria-label', `Track ${n}`)
+  el.textContent = String(n)
+  return el
+}

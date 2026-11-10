@@ -1,0 +1,187 @@
+/* ---------- Pagina route (Figma 3625:18792) ---------- */
+.route-page {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--bg-white-0);
+  transform: translateX(100%);
+  transition: transform var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+.route-page.is-open { transform: none; pointer-events: auto; }
+
+.route-page__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Foto: 336 visibili sotto la barra di stato, il foglio bianco la copre di 24 */
+.route-page__hero {
+  position: relative;
+  height: calc(var(--safe-top) + 360px);
+  background: var(--sabbia-dark);
+  overflow: hidden;
+}
+.route-page__hero img { width: 100%; height: 100%; object-fit: cover; }
+.route-page__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 44px;
+  transform: translateX(-50%);
+  fill: var(--text-white-0);
+  line-height: 0;
+}
+
+/* Header fisso: Back e menu, tondi 46 a y 68 (8 sotto la barra di stato) */
+.route-page__top {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--s-xs));
+  left: var(--s-m);
+  right: var(--s-m);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.route-page__top > * { pointer-events: auto; }
+
+/* Contenuto su foglio bianco, angoli 24 */
+.route-page__body {
+  position: relative;
+  margin-top: calc(-1 * var(--s-xl));
+  padding: 56px var(--s-m) calc(114px + var(--safe-bottom) + var(--s-2xl));
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  background: var(--bg-white-0);
+}
+.listing-card__map.route-page__minimap { top: -38px; left: var(--s-m); right: auto; bottom: auto; }
+
+.route-page__title { display: flex; flex-direction: column; gap: var(--s-s); }
+.route-page__title h1 { margin: 0; color: var(--text-strong-950); }
+.route-page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2xs);
+  margin: 0;
+  color: var(--text-strong-950);
+}
+.route-page__dot { color: var(--text-sub-700); }
+.route-page__level { display: inline-flex; align-items: center; gap: var(--s-2xs); }
+
+.route-page__divider {
+  margin: var(--s-2xl) 0;
+  border: 0;
+  border-top: 1px solid var(--stroke-soft-100);
+}
+
+/* Dati: griglia a colonne con divisori verticali (linee a x 139 e 255 nel Figma) */
+.route-data {
+  display: grid;
+  grid-template-columns: 139px 116px 1fr;
+  row-gap: var(--s-xl);
+  margin: 0;
+}
+.route-data__item { display: flex; flex-direction: column; gap: var(--s-2xs); min-width: 0; }
+.route-data__item:not(:nth-child(3n + 1)) {
+  padding-left: var(--s-s);
+  border-left: 1px solid var(--stroke-soft-100);
+}
+.route-data dt { color: var(--text-soft-500); }
+.route-data dd { margin: 0; color: var(--text-sub-700); white-space: nowrap; }
+
+/* Card ITRS: sabbia, raggio 16, cerchio in alto e righe rating sotto */
+.itrs-card {
+  border-radius: var(--r-card);
+  background: var(--sabbia-light);
+  overflow: hidden;
+  padding-bottom: var(--s-xl);
+}
+.itrs-card__rows { padding: var(--s-xs) 15px 0; }
+.itrs-card__row { display: flex; flex-direction: column; gap: 19px; }
+.itrs-card__row > hr { margin: 0; border: 0; border-top: 1px solid var(--stroke-sand); }
+
+/* Anteprima della mappa 370×418 con Explore Route */
+.route-page__map {
+  position: relative;
+  height: 418px;
+  margin-top: var(--s-2xl);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--bg-weak-50);
+  isolation: isolate;
+}
+.route-page__map-hit { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; }
+.route-page__map-btn.btn-map { position: absolute; right: var(--s-s); bottom: var(--s-s); z-index: 3; padding: 0 14px 0 var(--s-s); }
+
+/* Tipo di fondo */
+.surface h2 { margin: 0; color: var(--text-strong-950); }
+.surface__bar { display: flex; gap: var(--s-2xs); height: 40px; margin-top: var(--s-l); }
+.surface__seg { min-width: 4px; border-radius: var(--r-bar); }
+.surface__seg--single { background: var(--forest); }
+.surface__seg--gravel { background: color-mix(in srgb, var(--forest) 45%, var(--sabbia-dark)); }   /* [P] tono intermedio */
+.surface__seg--road { background: var(--sabbia-dark); }
+.surface__legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2xl);
+  margin: var(--s-2xl) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.surface__legend li { display: flex; align-items: center; gap: var(--s-xs); color: var(--text-strong-950); }
+.surface__swatch { width: 18px; height: 18px; flex-shrink: 0; }
+.surface__value { margin-left: auto; white-space: nowrap; }
+
+/* ---------- Mappa della route a tutto schermo (Figma 3680:8568) ---------- */
+.route-map-page {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--sabbia-light);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+.route-map-page.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.route-map-page__left,
+.route-map-page__right {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--s-m));
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.route-map-page__left { left: var(--s-m); }
+.route-map-page__right { right: var(--s-m); }
+.route-map-page__error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--s-xl);
+  color: var(--text-sub-700);
+  text-align: center;
+}
+
+/* Pannello Route details sopra la barra azioni */
+.route-details { box-shadow: var(--shadow-bar); }
+.route-details__head { padding: 20px var(--s-m) 0; }
+.route-details__head h2 { margin: 0; color: var(--text-strong-950); }
+.route-details__summary { margin: 7px 0 0; color: var(--text-sub-700); white-space: nowrap; }
+.route-details__chart { padding: 23px var(--s-m) 0; }
+
+/* Attribuzione della mappa: sopra il pannello (mappa intera) o in basso a sinistra (anteprima) */
+.map-view.route-map .maplibregl-ctrl-bottom-right { bottom: var(--attrib-bottom, 0px); }
+.route-map.is-static .maplibregl-ctrl-bottom-left { bottom: 0; }
+.route-map.is-static .maplibregl-ctrl-attrib.maplibregl-compact { margin: 0 0 var(--s-xs) var(--s-xs); background: var(--bg-white-0); }
+.route-map.is-static .maplibregl-ctrl-bottom-left { z-index: 4; }

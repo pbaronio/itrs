@@ -40,9 +40,9 @@ export function RoundButton({ icon, label, iconSize = 24, ...props }) {
 }
 
 // Su mappa: bianco h 36, raggio 26, icona 18 (Explore Route / Explore Track)
-export function MapButton({ icon, children, ...props }) {
+export function MapButton({ icon, children, className = '', ...props }) {
   return (
-    <button type="button" className="btn-map t-sm-em" {...props}>
+    <button type="button" className={`btn-map t-sm-em ${className}`} {...props}>
       {icon && <Icon name={icon} size={18} />}
       {children}
     </button>

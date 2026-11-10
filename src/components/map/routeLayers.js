@@ -80,3 +80,18 @@ export function setRouteSelection(map, item, levelHex) {
       }
     : { type: 'FeatureCollection', features: [] })
 }
+
+// Percorso della route nella pagina route: un tratto per track, ognuno col colore
+// di difficoltà della sua track (istruzioni §6: "colorato per segmento nella mappa di dettaglio")
+export function setRouteLegs(map, legs) {
+  const source = map.getSource(SOURCE)
+  if (!source) return
+  source.setData({
+    type: 'FeatureCollection',
+    features: legs.map((leg) => ({
+      type: 'Feature',
+      properties: { color: leg.hex },
+      geometry: { type: 'LineString', coordinates: leg.points.map((p) => [p[0], p[1]]) },
+    })),
+  })
+}
