@@ -14,6 +14,7 @@ import { ratingReason } from '../data/ratingReasons.js'
 import DetailMap from './DetailMap.jsx'
 import Itinerary from './Itinerary.jsx'
 import { TrackSheet } from './TrackDetail.jsx'
+import Notebook from '../components/Notebook.jsx'
 import { useEntered } from '../useEntered.js'
 import './RoutePage.css'
 
@@ -27,7 +28,8 @@ import './RoutePage.css'
  * - itinerary: Itinerary List (Figma 3691:26252), dal pannello espanso;
  * - leg: track in bottom sheet (Figma 3677:5090), da una riga della timeline;
  * - legMap: mappa della track, da `Explore Track` nel bottom sheet.
- * Non ancora: Notebook (2.4), Technical trail features, Wilderness Details, Recommended routes.
+ * ITRS Notebook (passo 2.4): storie dentro la card sotto l'anteprima della mappa.
+ * Non ancora: Technical trail features, Wilderness Details, Recommended routes.
  */
 const RATING_ORDER = ['difficulty', 'exposure', 'fitness', 'wilderness']   // ordine del Figma (contesto §7.4)
 
@@ -132,6 +134,9 @@ export default function RoutePage({ route, open, layers = [], nav }) {
             <button type="button" className="route-page__map-hit" aria-label="Explore the route on the map" onClick={() => nav.push({ t: 'routeMap' })} />
             <MapButton icon="expand" className="route-page__map-btn" onClick={() => nav.push({ t: 'routeMap' })} tabIndex={-1}>Explore Route</MapButton>
           </section>
+
+          {/* ITRS Notebook (passo 2.4, Figma 3625:18950): 32 sotto l'anteprima della mappa */}
+          <Notebook key={r.id} route={r} />
 
           <hr className="route-page__divider" />
 

@@ -1,0 +1,73 @@
+/* ---------- ITRS Notebook (passo 2.4, Figma 3625:18950): storie dentro la card ---------- */
+.nb-card {
+  position: relative;
+  height: 428px;
+  margin-top: var(--s-2xl);
+  padding: 42px 21px 0;
+  border-radius: var(--r-card);
+  background: var(--forest);
+  color: var(--gray-0);
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.nb-card:focus-visible { outline: 2px solid var(--brand-base); outline-offset: 2px; }
+
+/* Pentagono grande appena più chiaro (Figma "Polygon 10"), tagliato dalla card */
+.nb-card__shape {
+  position: absolute;
+  inset: 0;
+  background: var(--nb-shape);
+  clip-path: polygon(148px 254px, 100% 276px, 100% 100%, 70px 100%);
+  pointer-events: none;
+}
+
+/* Barre: 4 px, gap 5, bianche per le storie viste, bianche al 30% per le altre */
+.nb-bars { position: relative; display: flex; gap: 5px; }
+.nb-bars__bar {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: var(--r-bar);
+  background: var(--nb-bar);
+  overflow: hidden;
+}
+.nb-bars__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--gray-0);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.nb-bars__fill.is-done { transform: none; }
+.nb-bars__fill.is-running { animation: nb-fill linear forwards; }
+@keyframes nb-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* `ITRS Notebook` a y 70 */
+.nb-card__label { position: relative; margin: 24px 0 0; }
+
+/* Storia: titolo Mona Sans 36/40 maiuscolo a y 136, testo 18/24 sotto */
+.nb-card__story {
+  position: relative;
+  margin-top: 44px;
+  animation: nb-in var(--dur-base) var(--ease-out);
+}
+.nb-card__title {
+  margin: 0;
+  font-size: 36px;
+  line-height: 40px;
+  letter-spacing: -.01em;
+}
+.nb-card__text {
+  margin: var(--s-xs) 0 0;
+  font: 400 18px/24px var(--font-text);
+}
+@keyframes nb-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .nb-card__story { animation: none; }
+}
