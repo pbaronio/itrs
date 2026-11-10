@@ -77,28 +77,29 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Pulsanti tondi grandi 90 sopra il pannello */
+/* Pulsanti tondi sopra il pannello, 10 px sopra */
 .ride__actions {
   position: absolute;
   right: var(--s-m);
   bottom: calc(245px + var(--safe-bottom-panel) + 10px);
   z-index: 3;
   display: flex;
-  gap: var(--s-xs);
+  gap: 6px;
 }
+/* Pulsanti tondi 80 (Figma 3691:27462, 3711:28250) */
 .ride__round {
   display: grid;
   place-items: center;
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   border-radius: var(--r-pill);
   background: var(--bg-strong-950);
   color: var(--text-white-0);
   transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
 }
 .ride__round:active { transform: scale(.96); }
-.ride__round--stop { background: var(--bg-surface-800); }
-.ride__round--resume { background: var(--blu-600); color: var(--gray-0); }
+.ride__round--stop { background: var(--bg-strong-950); color: var(--text-white-0); }
+.ride__round--resume { background: var(--blu-600); color: var(--text-strong-950); }
 
 /* Pannello scuro (Nav/Ride Sheet): 245 + indicatore Home */
 .ride {

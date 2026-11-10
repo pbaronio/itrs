@@ -15,8 +15,8 @@ import './Ride.css'
  *   segnalazione (giallo; il flusso arriva al passo 4.2).
  * - Pannello scuro: `TRACK 2 OF 4`, nome della track, distanza e salita che mancano alla fine
  *   della track, con le barre di avanzamento. I pallini delle 3 pagine (dati e controlli al 3.2).
- * - Pausa (provvisoria fino al 3.3): ferma la simulazione e mostra stop grigio scuro + riprendi
- *   blu (istruzioni §6, Figma 3711:28250); lo stop per ora chiude subito il giro, al 3.3 diventa stop tenendo
+ * - Pausa (provvisoria fino al 3.3): ferma la simulazione e mostra stop nero (quadrato
+ *   bianco) + riprendi blu (play scuro), Figma 3711:28250; lo stop per ora chiude subito il giro, al 3.3 diventa stop tenendo
  *   premuto 4 secondi. Anche Indietro chiude il giro.
  */
 const PANEL_H = 245          // pannello del Figma (279) senza l'indicatore Home (34)

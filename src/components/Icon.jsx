@@ -275,7 +275,7 @@ const ICONS = {
   },
   stop: {
     box: 32,
-    body: <rect fill="currentColor" x="8" y="8" width="16" height="16" rx="2.5" />,
+    body: <rect fill="currentColor" x="7" y="7" width="18" height="18" rx="2" />,
   },
   play: {
     box: 32,
