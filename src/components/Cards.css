@@ -167,3 +167,5 @@
 .rating-card:active { transform: scale(.98); }
 .rating-card__badge { display: block; width: 89px; height: 84px; margin-bottom: 21px; }
 .rating-card__value { color: var(--text-sub-700); }
+.listing-card__body.is-clickable { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity var(--dur-fast) var(--ease-out); }
+.listing-card__body.is-clickable:active { opacity: .7; }

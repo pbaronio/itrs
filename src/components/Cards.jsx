@@ -68,7 +68,17 @@ export function ListingCard({ route, saved, onSave, onClick }) {
         </button>
         <MiniMap route={route} />
       </div>
-      <div className="listing-card__body">
+      {/* Tutta la card porta al dettaglio, non solo la foto (rev. 2.3) */}
+      <div
+        className={`listing-card__body${onClick ? ' is-clickable' : ''}`}
+        {...(onClick ? {
+          role: 'button',
+          tabIndex: 0,
+          'aria-label': route.name,
+          onClick,
+          onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } },
+        } : {})}
+      >
         <h3 className="t-md-em">{route.name}</h3>
         <p className="t-sm listing-card__place">{route.place}</p>
         <Meta level={route.level} distance={route.distance} climb={route.climbLabel ?? route.climb} duration={route.duration} />

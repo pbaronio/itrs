@@ -103,7 +103,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
             <Datum label="Climb" value={`${r.climb} m`} />
             <Datum label="Descent" value={`${r.descent} m`} />
             <Datum label="Duration" value={r.duration} />
-            <Datum label="Type" value={r.loop ? 'Loop' : 'Point to point'} />
+            <Datum label="Type" value={r.loop ? 'Loop' : 'Point to p.'} />
             <Datum label="Tracks" value={String(legs.length)} />
           </dl>
 
