@@ -74,7 +74,11 @@ export function buildRide(item) {
       pts.push({ lngLat: [p[0], p[1]], km, ele, t, n: leg.n, legKm: km - leg.startKm, legUp: (ups[i] / upTot) * climb })
     })
   }
-  const ride = { item, legs, pts, totalKm: legs[legs.length - 1].endKm, totalSec: t }
+  // salita delle track già finite, per i metri saliti di tutto il giro (pagina dati, 3.2)
+  const upBefore = []
+  let up = 0
+  for (const leg of legs) { upBefore.push(up); up += leg.reverse ? leg.track.descent : leg.track.climb }
+  const ride = { item, legs, pts, upBefore, totalUp: up, totalKm: legs[legs.length - 1].endKm, totalSec: t }
   CACHE.set(item.id, ride)
   return ride
 }
@@ -125,6 +129,8 @@ export function rideAt(ride, t) {
     legKmFrac: leg.km ? Math.min(1, legKm / leg.km) : 1,
     legLeftUp: Math.max(0, climb - legUp),
     legUpFrac: climb ? Math.min(1, legUp / climb) : 1,
+    upDone: ride.upBefore[leg.n - 1] + Math.min(climb, legUp),   // metri saliti dalla partenza
+    legEndLeftKm: Math.max(0, leg.endKm - km),                   // all'inizio della track dopo
   }
 }
 

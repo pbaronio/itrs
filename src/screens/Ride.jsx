@@ -4,6 +4,8 @@ import Icon from '../components/Icon.jsx'
 import { MapButton, RoundButton } from '../components/Button.jsx'
 import { SPEEDS, buildRide, rideAt } from '../data/ride.js'
 import { useEntered } from '../useEntered.js'
+import { haptic } from '../haptic.js'
+import { ALERT_M, ControlsPage, DataPage, NextTrackAlert, PageDots, RideActions } from './RidePages.jsx'
 import './Ride.css'
 
 /*
@@ -18,9 +20,12 @@ import './Ride.css'
  *   segnalazione (giallo; il flusso arriva al passo 4.2).
  * - Pannello scuro: `TRACK 2 OF 4`, nome della track, distanza e salita che mancano alla fine
  *   della track, con le barre di avanzamento. I pallini delle 3 pagine (dati e controlli al 3.2).
- * - Pausa (provvisoria fino al 3.3): ferma la simulazione e mostra stop nero (quadrato
- *   bianco) + riprendi blu (play scuro), Figma 3711:28250; lo stop per ora chiude subito il giro, al 3.3 diventa stop tenendo
- *   premuto 4 secondi. Anche Indietro chiude il giro.
+ * - Pausa: ferma la simulazione e mostra stop + riprendi (Figma 3711:28250). Lo stop chiude il
+ *   giro solo tenendolo premuto 4 secondi (3.3, RidePages.jsx). Anche Indietro chiude il giro.
+ * - 3 pagine che scorrono in orizzontale (3.2): mappa, dati (scura), controlli (bianca).
+ *   Scroll-snap nativo: sulla pagina mappa si scorre dal pannello (la mappa tiene il dito per
+ *   spostarsi); sulle altre da tutta la pagina. I pallini sono toccabili.
+ * - Avviso della track successiva sulla mappa (3.3, Figma 3711:29806).
  */
 const PANEL_H = 245          // pannello del Figma (279) senza l'indicatore Home (34)
 const DOT_ABOVE_PANEL = 106  // punto blu a ~106 px sopra il pannello (Figma: y 488 su 874)
@@ -50,6 +55,8 @@ function RideScreen({ ride, entered, active, onClose }) {
   const [error, setError] = useState(null)
   const [topPad, setTopPad] = useState(0)
   const [count, setCount] = useState(COUNT_FROM)      // 3, 2, 1, poi 0 = via
+  const [page, setPage] = useState(0)                 // 0 mappa, 1 dati, 2 controlli
+  const pagerRef = useRef(null)
   const pageRef = useRef(null)
   const panelRef = useRef(null)
   const mapRef = useRef(null)
@@ -99,6 +106,38 @@ function RideScreen({ ride, entered, active, onClose }) {
     return () => cancelAnimationFrame(raf)
   }, [ride])
 
+  // Pagina visibile dallo scorrimento; i pallini e la pillola ci portano con scrollTo
+  const onPagerScroll = () => {
+    const el = pagerRef.current
+    if (!el) return
+    const i = Math.round(el.scrollLeft / (el.clientWidth || 1))
+    if (i !== page) setPage(i)
+  }
+  const goTo = (i) => {
+    const el = pagerRef.current
+    if (!el) return
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollTo({ left: i * el.clientWidth, behavior: smooth ? 'smooth' : 'auto' })
+  }
+
+  // Android: barra di sistema scura sulla pagina dati, chiara altrove
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (!meta) return
+    const prev = meta.content
+    if (active && page === 1) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--nav-dark').trim() || prev
+    return () => { meta.content = prev }
+  }, [active, page])
+
+  // Track successiva: negli ultimi ALERT_M metri della track; vibrazione quando compare
+  const nextLeg = !state.finished && state.legEndLeftKm * 1000 <= ALERT_M ? ride.legs[state.leg.n] ?? null : null
+  const alertN = nextLeg?.n ?? 0
+  useEffect(() => { if (alertN) haptic() }, [alertN])
+
+  const pause = () => setPaused(true)
+  const resume = () => setPaused(false)
+  const actionProps = { paused, onPause: pause, onResume: resume, onEnd: onClose }
+
   const many = ride.legs.length > 1
   const label = many ? `Track ${state.leg.n} of ${ride.legs.length}` : 'Track'
   const speed = SPEEDS[speedAt]
@@ -112,90 +151,96 @@ function RideScreen({ ride, entered, active, onClose }) {
       aria-label={`Navigation, ${ride.item.name}`}
       aria-hidden={!active}
     >
-      {error ? (
-        <div className="ride__error">
-          <p className="t-md">{error === 'key' ? 'The map is not available right now.' : 'Can’t load the map. Check your connection.'}</p>
-        </div>
-      ) : (
-        <RideMap
-          ref={mapRef}
-          ride={ride}
-          styleKind={styleKind}
-          topPad={topPad}
-          onError={setError}
-          onFollowChange={setFollow}
-          needleRef={needleRef}
-        />
-      )}
+      <div ref={pagerRef} className="ride__pager" onScroll={onPagerScroll}>
+        {/* Pagina 1: mappa */}
+        <section className="ride-page ride-page--map" aria-label="Map" aria-hidden={page !== 0}>
+          {error ? (
+            <div className="ride__error">
+              <p className="t-md">{error === 'key' ? 'The map is not available right now.' : 'Can’t load the map. Check your connection.'}</p>
+            </div>
+          ) : (
+            <RideMap
+              ref={mapRef}
+              ride={ride}
+              styleKind={styleKind}
+              topPad={topPad}
+              onError={setError}
+              onFollowChange={setFollow}
+              needleRef={needleRef}
+            />
+          )}
 
-      <div className="ride__blur" aria-hidden="true" />
+          <div className="ride__blur" aria-hidden="true" />
 
-      <div className="ride__controls">
-        <button
-          type="button"
-          className="btn-round ride__compass"
-          aria-label={north ? 'North up. Show direction of travel up' : 'Direction of travel up. Show north up'}
-          aria-pressed={north}
-          onClick={() => setNorth(mapRef.current?.toggleNorth() ?? false)}
-        >
-          <span ref={needleRef} className="ride__needle-wrap" aria-hidden="true">
-            <svg className="ride__needle" viewBox="0 0 12 8"><path d="M6 0 12 8H0Z" /></svg>
-            <span className="t-xs-em">N</span>
-          </span>
-        </button>
-        <RoundButton
-          icon="layers"
-          label={styleKind === 'topo' ? 'Show satellite map' : 'Show topographic map'}
-          aria-pressed={styleKind === 'satellite'}
-          onClick={() => setStyleKind((k) => (k === 'topo' ? 'satellite' : 'topo'))}
-        />
-        <RoundButton
-          icon="target"
-          label={follow ? 'Following your position' : 'Recenter on your position'}
-          aria-pressed={follow}
-          onClick={() => mapRef.current?.recenter()}
-        />
-        <button type="button" className="btn-round ride__report" aria-label="Report a hazard">
-          <Icon name="warning" size={24} />
-        </button>
-      </div>
+          <NextTrackAlert leg={nextLeg} metersLeft={state.legEndLeftKm * 1000} />
 
-      <MapButton
-        className="ride__speed"
-        aria-label={`Simulation speed ${speed}×. Tap to change`}
-        onClick={() => setSpeedAt((i) => (i + 1) % SPEEDS.length)}
-      >
-        <span aria-hidden="true">{speed}×</span>
-      </MapButton>
-
-      <div className="ride__actions">
-        {paused ? (
-          <>
-            <button type="button" className="ride__round ride__round--stop" aria-label="End the ride" onClick={onClose}>
-              <Icon name="stop" size={32} />
+          <div className={`ride__controls${nextLeg ? ' is-pushed' : ''}`}>
+            <button
+              type="button"
+              className="btn-round ride__compass"
+              aria-label={north ? 'North up. Show direction of travel up' : 'Direction of travel up. Show north up'}
+              aria-pressed={north}
+              onClick={() => setNorth(mapRef.current?.toggleNorth() ?? false)}
+            >
+              <span ref={needleRef} className="ride__needle-wrap" aria-hidden="true">
+                <svg className="ride__needle" viewBox="0 0 12 8"><path d="M6 0 12 8H0Z" /></svg>
+                <span className="t-xs-em">N</span>
+              </span>
             </button>
-            <button type="button" className="ride__round ride__round--resume" aria-label="Resume" onClick={() => setPaused(false)}>
-              <Icon name="play" size={32} />
+            <RoundButton
+              icon="layers"
+              label={styleKind === 'topo' ? 'Show satellite map' : 'Show topographic map'}
+              aria-pressed={styleKind === 'satellite'}
+              onClick={() => setStyleKind((k) => (k === 'topo' ? 'satellite' : 'topo'))}
+            />
+            <RoundButton
+              icon="target"
+              label={follow ? 'Following your position' : 'Recenter on your position'}
+              aria-pressed={follow}
+              onClick={() => mapRef.current?.recenter()}
+            />
+            <button type="button" className="btn-round ride__report" aria-label="Report a hazard">
+              <Icon name="warning" size={24} />
             </button>
-          </>
-        ) : (
-          <button type="button" className="ride__round" aria-label="Pause" onClick={() => setPaused(true)}>
-            <Icon name="pause" size={32} />
-          </button>
-        )}
-      </div>
+          </div>
 
-      <section ref={panelRef} className="ride__panel" aria-label="Current track">
-        <p className="t-label ride__label">{label}</p>
-        <h2 className="t-2xl-em ride__name">{state.leg.track.name}</h2>
-        <div className="ride__stats">
-          <Stat label="Distance" value={state.legLeftKm.toFixed(1)} unit="km" frac={state.legKmFrac} spoken={`${state.legLeftKm.toFixed(1)} kilometres to the end of the track`} />
-          <Stat label="Climb" value={String(Math.round(state.legLeftUp))} unit="m" frac={state.legUpFrac} spoken={`${Math.round(state.legLeftUp)} metres of climbing left in the track`} />
-        </div>
-        <div className="ride__dots" aria-label="Page 1 of 3: map">
-          <span className="is-active" /><span /><span />
-        </div>
-      </section>
+          <MapButton
+            className={`ride__speed${nextLeg ? ' is-hidden' : ''}`}
+            aria-label={`Simulation speed ${speed}×. Tap to change`}
+            onClick={() => setSpeedAt((i) => (i + 1) % SPEEDS.length)}
+          >
+            <span aria-hidden="true">{speed}×</span>
+          </MapButton>
+
+          <RideActions {...actionProps} size={80} className="ride__actions" />
+
+          <section ref={panelRef} className="ride__panel" aria-label="Current track">
+            <p className="t-label ride__label">{label}</p>
+            <h2 className="t-2xl-em ride__name">{state.leg.track.name}</h2>
+            <div className="ride__stats">
+              <Stat label="Distance" value={state.legLeftKm.toFixed(1)} unit="km" frac={state.legKmFrac} spoken={`${state.legLeftKm.toFixed(1)} kilometres to the end of the track`} />
+              <Stat label="Climb" value={String(Math.round(state.legLeftUp))} unit="m" frac={state.legUpFrac} spoken={`${Math.round(state.legLeftUp)} metres of climbing left in the track`} />
+            </div>
+            <PageDots page={page} onGo={goTo} className="ride__dots" />
+          </section>
+        </section>
+
+        {/* Pagina 2: dati */}
+        <section className="ride-page ride-page--data" aria-label="Ride data" aria-hidden={page !== 1}>
+          <DataPage
+            ride={ride}
+            state={state}
+            paused={paused}
+            actions={<RideActions {...actionProps} size={90} light className="ride-data__actions" />}
+            dots={<PageDots page={page} onGo={goTo} className="ride-data__dots" />}
+          />
+        </section>
+
+        {/* Pagina 3: controlli */}
+        <section className="ride-page ride-page--controls" aria-label="Controls" aria-hidden={page !== 2}>
+          <ControlsPage elapsed={state.t} onBack={() => goTo(0)} />
+        </section>
+      </div>
 
       <div className={`ride-countdown${count === 0 ? ' is-done' : ''}`} aria-hidden={count === 0}>
         {count > 0 && (
