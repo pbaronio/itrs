@@ -49,6 +49,12 @@ const MapView = forwardRef(function MapView(
       if (!map) return
       map.easeTo({ center: USER_POSITION, zoom: Math.max(map.getZoom(), 13), duration: reducedMotion() ? 0 : 500 })
     },
+    // Inquadra un riquadro [[w, s], [e, n]] (località della ricerca, risultati dei filtri)
+    fitTo(bbox, maxZoom = 14) {
+      const map = mapRef.current
+      if (!map) return
+      map.fitBounds(bbox, { padding: state.current.padding, maxZoom, duration: reducedMotion() ? 0 : 500 })
+    },
   }), [])
 
   // --- Creazione della mappa (una volta) ---

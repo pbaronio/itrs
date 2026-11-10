@@ -82,11 +82,11 @@ export function ActionBar({ startLabel = 'Start the route', saved, onSave, onDow
 }
 
 // Barra filtri: Clear filters + conferma blu, 176 ciascuno
-export function FilterBar({ count, unit = 'Routes', onClear, onConfirm }) {
+export function FilterBar({ count, unit = 'Routes', disabled, onClear, onConfirm }) {
   return (
     <div className="filter-bar">
       <Button variant="secondary" onClick={onClear}>Clear filters</Button>
-      <Button variant="confirm" onClick={onConfirm}>See {count} {unit}</Button>
+      <Button variant="confirm" disabled={disabled} onClick={onConfirm}>See {count} {unit}</Button>
     </div>
   )
 }

@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal, flushSync } from 'react-dom'
 import MapView from '../components/map/MapView.jsx'
 import Searchbar from '../components/Searchbar.jsx'
 import RouteToggle from '../components/RouteToggle.jsx'
 import BottomSheet from '../components/BottomSheet.jsx'
 import { Button, RoundButton, FabMap } from '../components/Button.jsx'
 import { RouteCard, ListingCard } from '../components/Cards.jsx'
-import { ROUTES, TRACKS } from '../data/garda.js'
+import { ROUTES, TRACKS, unionBox } from '../data/garda.js'
+import { activeCount, emptyFilters, matches } from '../data/filters.js'
+import Search from './Search.jsx'
+import Filters from './Filters.jsx'
 import './Explore.css'
 
 /*
@@ -16,7 +20,8 @@ import './Explore.css'
  * Tap su un pin: percorso sulla mappa e overlay in stato 2 con la sua card (passo 1.3).
  * Caso limite (passo 1.3, contesto §4.4): nessuna route ma track nell'area visibile →
  *   overlay con `No routes in this area` e la CTA blu `See N tracks`, che passa alla vista Tracks.
- * Ricerca e filtri: passo 1.4.
+ * Ricerca e filtri (passo 1.4): pagine sopra la mappa, ognuna è una voce della cronologia
+ *   (Indietro le chiude). I filtri valgono per mappa, conteggi, carosello, listing e ricerca.
  */
 const SNAP_PEEK = 86
 const SNAP_HALF = 226
@@ -32,11 +37,18 @@ export default function Explore() {
   const [styleKind, setStyleKind] = useState('topo')
   const [error, setError] = useState(null)
   const [errorKey, setErrorKey] = useState(0)
+  const [filters, setFilters] = useState(emptyFilters)
+  const [overlay, setOverlay] = useState(null)     // null | 'search' | 'filters'
+  const [pending, setPending] = useState(null)     // selezione dopo un cambio di vista (ricerca)
   const insets = useInsets()
   const mapRef = useRef(null)
+  const searchRef = useRef(null)
   const prevSnap = useRef(0)
 
-  const items = mode === 'routes' ? ROUTES : TRACKS
+  // Elementi che passano i filtri: valgono per mappa, conteggi e liste
+  const routes = useMemo(() => ROUTES.filter((it) => matches(it, filters, 'routes')), [filters])
+  const tracks = useMemo(() => TRACKS.filter((it) => matches(it, filters, 'tracks')), [filters])
+  const items = mode === 'routes' ? routes : tracks
 
   // Elementi nell'area visibile, dal più vicino al centro
   const visible = useMemo(() => {
@@ -50,8 +62,8 @@ export default function Explore() {
   // Conteggi dell'area visibile: stesso numero nel toggle e nell'overlay (contesto §7.3)
   const liveCounts = useMemo(() => {
     const inView = (list) => (bounds ? list.filter((it) => bounds.contains(it.pin)).length : list.length)
-    return { routes: inView(ROUTES), tracks: inView(TRACKS) }
-  }, [bounds])
+    return { routes: inView(routes), tracks: inView(tracks) }
+  }, [bounds, routes, tracks])
 
   const list = frozen ? frozen.ids.map((id) => items.find((it) => it.id === id)) : visible
   const counts = frozen ? frozen.counts : liveCounts
@@ -83,6 +95,67 @@ export default function Explore() {
       return i
     })
   }, [])
+
+  // ---- Ricerca e filtri: pagine sopra la mappa, chiuse anche da Indietro ----
+  // Lo stato della cronologia mantiene { preview: true } (anteprima nel browser, pwa.js)
+  useEffect(() => {
+    if (history.state?.overlay) {
+      const { overlay: _, ...rest } = history.state
+      history.replaceState(Object.keys(rest).length ? rest : null, '')
+    }
+    const onPop = () => setOverlay(history.state?.overlay ?? null)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+  const openOverlay = useCallback((name) => {
+    history.pushState({ ...(history.state ?? {}), overlay: name }, '')
+    // Sincrono: la ricerca mette a fuoco il campo nello stesso tocco (tastiera su iOS)
+    flushSync(() => setOverlay(name))
+    if (name === 'search') searchRef.current?.focus()
+  }, [])
+  const closeOverlay = useCallback(() => {
+    if (history.state?.overlay) history.back()
+    else setOverlay(null)
+  }, [])
+
+  // Selezione chiesta dalla ricerca: dopo l'eventuale cambio di vista
+  useEffect(() => {
+    if (pending && items.some((it) => it.id === pending)) {
+      select(pending)
+      setPending(null)
+    }
+  }, [pending, items, select])
+
+  const pickFromSearch = (it) => {
+    closeOverlay()
+    const next = it.kind === 'route' ? 'routes' : 'tracks'
+    if (next !== mode) changeMode(next)
+    else select(null)
+    setPending(it.id)
+  }
+  const placeFromSearch = (place) => {
+    closeOverlay()
+    select(null)
+    setSnap(0)
+    mapRef.current?.fitTo(place.bbox)
+  }
+  const currentFromSearch = () => {
+    closeOverlay()
+    select(null)
+    mapRef.current?.recenter()
+  }
+
+  const applyFilters = (next) => {
+    closeOverlay()
+    select(null)
+    setFilters(next)
+    // Se nell'area visibile non resta niente, la mappa inquadra i risultati
+    const list = (mode === 'routes' ? ROUTES : TRACKS).filter((it) => matches(it, next, mode))
+    if (list.length && bounds && !list.some((it) => bounds.contains(it.pin))) {
+      mapRef.current?.fitTo(unionBox(list.map((it) => it.bbox)), 13)
+    }
+  }
+  const filtersOn = activeCount(filters, mode)
 
   // Caso limite: zero route, ma track presenti nell'area visibile
   const tracksCta = mode === 'routes' && !selectedId && counts.routes === 0 && counts.tracks > 0
@@ -137,6 +210,9 @@ export default function Explore() {
         <Searchbar
           onLight={listing}
           placeholder={mode === 'routes' ? 'Search Routes or locations' : 'Search Tracks or locations'}
+          onSearch={() => openOverlay('search')}
+          onFilters={() => openOverlay('filters')}
+          filtersActive={filtersOn}
         />
         <RouteToggle value={mode} onChange={changeMode} counts={counts} onLight={listing} />
         <div className="explore__buttons" aria-hidden={listing}>
@@ -189,9 +265,33 @@ export default function Explore() {
           onClick={() => changeSnap(prevSnap.current === 2 ? 0 : prevSnap.current)}
         />
       </div>
+
+      {/* Fuori da .explore (che crea un contesto di sovrapposizione): sopra la tab bar */}
+      {createPortal(<>
+      <Search
+        ref={searchRef}
+        open={overlay === 'search'}
+        mode={mode}
+        items={items}
+        filtersOn={filtersOn > 0}
+        onPick={pickFromSearch}
+        onPlace={placeFromSearch}
+        onCurrent={currentFromSearch}
+        onClose={closeOverlay}
+      />
+      <Filters
+        open={overlay === 'filters'}
+        mode={mode}
+        value={filters}
+        items={mode === 'routes' ? ROUTES : TRACKS}
+        onApply={applyFilters}
+        onCancel={closeOverlay}
+      />
+      </>, document.body)}
     </div>
   )
 }
+
 
 /* ---------- Stato 2: carosello, la mappa segue la card ---------- */
 function Carousel({ items, mode, selectedId, onPick, hidden }) {

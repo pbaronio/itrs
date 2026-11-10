@@ -73,6 +73,35 @@ const TRACK_META = {
   CT:  { name: 'Ciclabile del Sarca', place: 'Nago-Torbole', difficulty: 'green', exposure: 'green' },
 }
 
+// ---------- Dati per i filtri (passo 1.4) ----------
+// Inventati ma verosimili, come nomi e livelli (ITRS_dati_garda.md). Non sono dati ITRS.
+// Senso unico: discese e sentieri stretti. Le altre track sono percorribili nei due sensi.
+const ONE_WAY = new Set(['VL1', 'CO3', 'GU1', 'LM1', 'MB2', 'NG3', 'TN4'])
+// Technical trail features per track (chiavi di TTF_TYPES in data/filters.js)
+const TRACK_TTF = {
+  VL1: ['other'],
+  CO3: ['drop', 'skinny'],
+  GU1: ['drop'],
+  LM1: ['drop', 'other'],
+  MB2: ['jump', 'drop', 'teeter'],
+  NG3: ['jump'],
+  TN4: ['jump', 'wallride'],
+  AR2: ['pump'],
+}
+// Accessibilità della partenza: bus/treno, auto, famiglie (route). "Wet weather friendly"
+// si calcola dal fondo: meno del 15% di single trail.
+const ROUTE_ACCESS = {
+  'tremalzo-xxl': ['bus', 'car'],
+  'malga-ciapa': ['car', 'family'],
+  'passo-nota-limone': ['car'],
+  'monte-brione': ['bus', 'car'],
+  'lago-di-tenno': ['bus', 'car'],
+  'arco-laghel': ['bus', 'car', 'family'],
+  'nago-busatte': ['bus', 'family'],
+  'lago-di-ledro': ['bus', 'car', 'family'],
+  'concei-cima-oro': ['car'],
+}
+
 // ---------- Route ----------
 // tracks: in ordine di percorrenza; '-' davanti = track percorsa al contrario
 const ROUTE_DEFS = [
@@ -220,6 +249,10 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta], i) => {
     surface: surfaceShare(g.surface),
     bbox: bboxOf(points),
     pin: pointAtHalf(points),                // il pin della track sta a metà percorso
+    town: meta.place,
+    towns: [meta.place],
+    oneWay: ONE_WAY.has(id),
+    ttf: TRACK_TTF[id] ?? [],
   }
 })
 
@@ -238,6 +271,9 @@ export const ROUTES = ROUTE_DEFS.map((def, i) => {
     const s = GEOMETRY[leg.track.id].surface
     return { road: acc.road + s.road, gravel: acc.gravel + s.gravel, single: acc.single + s.single }
   }, { road: 0, gravel: 0, single: 0 })
+  const surface = surfaceShare(surf)
+  const access = [...(ROUTE_ACCESS[def.id] ?? [])]
+  if (surface.single < 0.15) access.push('wet')
   return {
     id: def.id,
     kind: 'route',
@@ -253,9 +289,15 @@ export const ROUTES = ROUTE_DEFS.map((def, i) => {
     climb: up,
     descent: down,
     minutes: durationMin(km, up),
-    surface: surfaceShare(surf),
+    surface,
     bbox: bboxOf(points),
     pin: points[0].slice(0, 2),              // il pin della route sta alla partenza
+    towns: [...new Set([def.place.split(',')[0], ...legs.map((leg) => leg.track.town)])].filter((t) => t !== 'Brescia'), // località (ricerca)
+    // Filtri: senso unico se ne ha una track; anello se arrivo e partenza distano meno di 500 m
+    oneWay: legs.some((leg) => leg.track.oneWay),
+    loop: meters(points[0], points[points.length - 1]) < 500,
+    ttf: [...new Set(legs.flatMap((leg) => leg.track.ttf))],
+    access,
   }
 })
 
@@ -264,6 +306,11 @@ for (const it of [...TRACKS, ...ROUTES]) {
   it.distance = fmtKm(it.km)
   it.climbLabel = fmtClimb(it.climb)
   it.duration = fmtDuration(it.minutes)
+}
+
+// Riquadro che contiene più riquadri [[w, s], [e, n]]
+export function unionBox(boxes) {
+  return bboxOf(boxes.flat())
 }
 
 // Area di tutti i percorsi, per la vista iniziale

@@ -82,3 +82,41 @@
 .switch-row--last { border-bottom: 0; }
 .switch-row__text { min-width: 0; }
 .switch-row__detail { color: var(--text-sub-700); }
+
+/* Slider a due cursori: alto 16, traccia 6 */
+.range {
+  position: relative;
+  height: 16px;
+  touch-action: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.range::before { content: ''; position: absolute; inset: -14px 0; }   /* tocco 44 */
+.range__track,
+.range__fill {
+  position: absolute;
+  top: 5px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  pointer-events: none;
+}
+.range__track { left: 0; right: 0; background: var(--stroke-soft-100); }
+.range__fill { background: var(--brand-base); }
+.range__thumb {
+  position: absolute;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-pill);
+  background: var(--bg-white-0);
+  box-shadow: var(--shadow-thumb);
+  outline: none;
+}
+.range__thumb::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: var(--r-pill);
+  background: var(--brand-base);
+}
+.range__thumb:focus-visible { box-shadow: var(--shadow-thumb), 0 0 0 2px var(--brand-base); }

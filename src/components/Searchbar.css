@@ -38,3 +38,5 @@
 }
 .searchbar__filters::after { content: ''; position: absolute; inset: -2px; }  /* area di tocco 46 */
 .searchbar__filters:active { transform: translateY(-50%) scale(.98); opacity: .85; }
+.searchbar__filters.is-active,
+.searchbar--on-light .searchbar__filters.is-active { background: var(--brand-base); color: var(--text-strong-950); }

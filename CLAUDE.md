@@ -31,13 +31,16 @@ src/
   styles/fonts.css    font e override dei nomi famiglia Fontsource
   styles/base.css     reset, comportamento da app, safe area, durate di movimento
   data/               itrs.js (livelli e nomi), garda.js + garda-geometry.json (route e track di
-                      prova sul Garda: tracciati veri da BRouter/OSM, vedi scripts/README-garda.md), demo.js
+                      prova sul Garda: tracciati veri da BRouter/OSM, vedi scripts/README-garda.md),
+                      filters.js (sezioni, stato vuoto, `matches` e etichette dei filtri), demo.js
   assets/             foto e badge esportati dal Figma (pagina UI Design), webp
   components/         componenti riusabili (.jsx + .css): Icon, LevelShape, Button (+ ActionBar,
-                      FilterBar, FabMap…), Chip, Controls (Checkbox, Switch), Cards (RouteCard,
+                      FilterBar, FabMap…), Chip, Controls (Checkbox, Switch, RangeSlider), Cards (RouteCard,
                       ListingCard, RatingRow, RatingCard, Pentagon), BottomSheet, InfoSheet, TabBar,
                       Searchbar, RouteToggle; map/ (MapView, marker HTML, layer del percorso selezionato)
-  screens/            Explore (mappa), Components (galleria, da Profile), BaseCheck, InstallGuide
+  screens/            Explore (mappa), Search e Filters (pagine sopra la mappa, voci della cronologia,
+                      montate con un portal sopra la tab bar), Components (galleria, da Profile),
+                      BaseCheck, InstallGuide
 ```
 
 ## Regole

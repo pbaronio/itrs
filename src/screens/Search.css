@@ -1,0 +1,108 @@
+/* Ricerca (Figma 3625:18189): pagina bianca sopra mappa e tab bar */
+.search {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--bg-white-0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.search.is-open { opacity: 1; pointer-events: auto; }
+
+/* Searchbar Typing a y 76: bordo stroke-strong-950, senza pulsante filtri; Cancel a destra */
+.search__top {
+  display: flex;
+  align-items: center;
+  gap: var(--s-xs);
+  flex-shrink: 0;
+  padding: calc(var(--safe-top) + var(--s-m)) var(--s-m) 0;
+}
+.search__field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  height: 55px;
+  margin: 0;
+  padding: 0 18px;
+  border: 1px solid var(--stroke-strong-950);
+  border-radius: var(--r-pill);
+  background: var(--bg-white-0);
+  color: var(--text-strong-950);
+}
+.search__field svg { flex-shrink: 0; }
+.search__field input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text-strong-950);
+  caret-color: var(--brand-base);
+  -webkit-appearance: none;
+  appearance: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.search__field input::placeholder { color: var(--text-sub-700); opacity: 1; }
+.search__field input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.search__cancel {
+  flex-shrink: 0;
+  height: 44px;
+  padding: 0 4px;
+  color: var(--text-strong-950);
+}
+.search__cancel:active { opacity: .6; }
+
+/* Contenuto da y 162: Current Location, poi gruppo con gap 32; righe con gap 20 */
+.search__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 31px var(--s-m) calc(var(--s-xl) + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2xl);
+}
+.search__group { display: flex; flex-direction: column; gap: var(--s-l); }
+.search__heading { margin: 0; color: var(--text-strong-950); }
+.search__empty { margin: 0; color: var(--text-sub-700); }
+
+/* Riga: cerchio sabbia 52 con icona 24, gap 12; titolo md/emphasized, meta sm/default */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-s);
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.search-row:active { opacity: .6; }
+.search-row__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r-pill);
+  background: var(--sabbia-light);
+  color: var(--text-strong-950);
+}
+.search-row__text { display: flex; flex-direction: column; gap: var(--s-2xs); min-width: 0; }
+.search-row__title,
+.search-row__meta { color: var(--text-sub-700); }
+.search-row__title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.search-row__meta { display: flex; align-items: center; gap: var(--s-2xs); min-width: 0; white-space: nowrap; }
+.search-row__level { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.search-row__place { overflow: hidden; text-overflow: ellipsis; }
