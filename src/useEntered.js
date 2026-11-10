@@ -9,9 +9,13 @@ export function useEntered(open) {
   const [entered, setEntered] = useState(false)
   useEffect(() => {
     if (!open) { setEntered(false); return }
+    // Due frame (la posizione chiusa viene disegnata), con un timer di riserva se i frame
+    // non arrivano (pagina in background)
     let inner
-    const outer = requestAnimationFrame(() => { inner = requestAnimationFrame(() => setEntered(true)) })
-    return () => { cancelAnimationFrame(outer); cancelAnimationFrame(inner) }
+    const go = () => setEntered(true)
+    const outer = requestAnimationFrame(() => { inner = requestAnimationFrame(go) })
+    const timer = setTimeout(go, 60)
+    return () => { cancelAnimationFrame(outer); cancelAnimationFrame(inner); clearTimeout(timer) }
   }, [open])
   return open && entered
 }
