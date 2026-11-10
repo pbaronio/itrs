@@ -76,6 +76,10 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
       ensureRouteLayers(map)
       setRouteLegs(map, legs)
     })
+    // Attribuzione chiusa (solo la "i"): aperta coprirebbe Explore Route nell'anteprima
+    map.once('load', () => {
+      containerRef.current?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
+    })
     map.on('error', (e) => {
       const status = e?.error?.status
       if (status === 401 || status === 403) state.current.onError?.('key')
