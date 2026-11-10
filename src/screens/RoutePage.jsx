@@ -6,7 +6,7 @@ import ItrsCircle from '../components/ItrsCircle.jsx'
 import ElevationProfile from '../components/ElevationProfile.jsx'
 import LevelShape from '../components/LevelShape.jsx'
 import { ActionBar, MapButton, RoundButton } from '../components/Button.jsx'
-import { MiniMap, RatingRow } from '../components/Cards.jsx'
+import { MiniMap, PhotoGallery, RatingRow } from '../components/Cards.jsx'
 import { FACTORS } from '../data/itrs.js'
 import { fmtKm, legsOf } from '../data/garda.js'
 import { levelInfo } from '../data/levelInfo.js'
@@ -60,16 +60,7 @@ export default function RoutePage({ route, open, mapOpen, onBack, onOpenMap, onC
     <div className={`route-page${open ? ' is-open' : ''}`} role="dialog" aria-modal="true" aria-label={r.name} aria-hidden={!open}>
       <div ref={scrollRef} className="route-page__scroll">
         <div className="route-page__hero">
-          <img src={r.photo} alt="" draggable="false" style={{ objectPosition: r.photoPosition }} />
-          <span className="route-page__dots" aria-hidden="true">
-            <svg width="42.5" height="6" viewBox="0 0 42.5 6">
-              <circle cx="3" cy="3" r="3" />
-              <circle cx="13" cy="3" r="3" opacity=".7" />
-              <circle cx="22.75" cy="3" r="2.75" opacity=".7" />
-              <circle cx="32" cy="3" r="2.5" opacity=".7" />
-              <circle cx="40.5" cy="3" r="2" opacity=".7" />
-            </svg>
-          </span>
+          <PhotoGallery key={r.id} photos={r.photos ?? [r]} label={r.name} className="route-page__gallery" />
         </div>
 
         <div className="route-page__body">

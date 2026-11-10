@@ -28,15 +28,7 @@
   background: var(--sabbia-dark);
   overflow: hidden;
 }
-.route-page__hero img { width: 100%; height: 100%; object-fit: cover; }
-.route-page__dots {
-  position: absolute;
-  left: 50%;
-  bottom: 44px;
-  transform: translateX(-50%);
-  fill: var(--text-white-0);
-  line-height: 0;
-}
+.route-page__gallery .gallery__dots { bottom: 44px; }   /* 20 sopra il bordo del foglio bianco */
 
 /* Header fisso: Back e menu, tondi 46 a y 68 (8 sotto la barra di stato) */
 .route-page__top {

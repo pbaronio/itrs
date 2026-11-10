@@ -15,12 +15,16 @@ import GEOMETRY from './garda-geometry.json'
 import riders from '../assets/photos/riders.webp'
 import trail from '../assets/photos/trail-thumb.webp'
 
-// Solo due foto di esempio dal Figma: si alternano tra route e track
+// Foto di esempio: la prima di ogni galleria è la copertina (card, carosello, ricerca).
+// Per ora due foto dal Figma; con altre foto basta aggiungerle qui e in GALLERY_SIZE.
 const PHOTOS = [
   { photo: riders, photoPosition: '50% 62%' },
   { photo: trail, photoPosition: '50% 40%' },
 ]
 // Località della track → provincia e regione, come nelle card del Figma
+const GALLERY_SIZE = 5
+// Galleria di un elemento: parte dalla sua copertina e prosegue con le altre foto, senza ripetizioni
+const galleryFrom = (start) => Array.from({ length: Math.min(GALLERY_SIZE, PHOTOS.length) }, (_, k) => PHOTOS[(start + k) % PHOTOS.length])
 const REGION = {
   'Tremosine sul Garda': 'Brescia, Lombardy, Italy',
   'Limone sul Garda': 'Brescia, Lombardy, Italy',
@@ -240,7 +244,8 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta], i) => {
     ...meta,
     place: placeOf(meta.place),
     level: meta.difficulty,
-    ...PHOTOS[(i + 1) % 2],
+    ...PHOTOS[(i + 1) % PHOTOS.length],
+    photos: galleryFrom(i + 1),
     points,                                  // [lon, lat, quota]
     km,
     climb: up,
@@ -282,7 +287,8 @@ export const ROUTES = ROUTE_DEFS.map((def, i) => {
     place: def.place,
     ratings: def.ratings,
     level: def.ratings.difficulty,
-    ...PHOTOS[i % 2],
+    ...PHOTOS[i % PHOTOS.length],
+    photos: galleryFrom(i),
     legs: legs.map(({ track, reverse }) => ({ trackId: track.id, reverse })),
     points,
     km,

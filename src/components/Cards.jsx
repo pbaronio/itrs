@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import Icon from './Icon.jsx'
 import LevelShape, { SHAPE_PATHS } from './LevelShape.jsx'
 import { FACTORS, LEVELS } from '../data/itrs.js'
@@ -61,18 +62,7 @@ export function ListingCard({ route, saved, onSave, onClick }) {
   return (
     <article className="listing-card">
       <div className="listing-card__media">
-        <button type="button" className="listing-card__photo" onClick={onClick} aria-label={route.name}>
-          <img src={route.photo} alt="" draggable="false" style={{ objectPosition: route.photoPosition }} />
-        </button>
-        <span className="listing-card__dots" aria-hidden="true">
-          <svg width="42.5" height="6" viewBox="0 0 42.5 6">
-            <circle cx="3" cy="3" r="3" />
-            <circle cx="13" cy="3" r="3" opacity=".7" />
-            <circle cx="22.75" cy="3" r="2.75" opacity=".7" />
-            <circle cx="32" cy="3" r="2.5" opacity=".7" />
-            <circle cx="40.5" cy="3" r="2" opacity=".7" />
-          </svg>
-        </span>
+        <PhotoGallery photos={route.photos ?? [route]} label={route.name} onClick={onClick} className="listing-card__gallery" />
         <button type="button" className="listing-card__save" aria-label={saved ? 'Saved' : 'Save'} aria-pressed={saved} onClick={onSave}>
           <Icon name="bookmarkFilled" size={16} />
         </button>
@@ -84,6 +74,65 @@ export function ListingCard({ route, saved, onSave, onClick }) {
         <Meta level={route.level} distance={route.distance} climb={route.climbLabel ?? route.climb} duration={route.duration} />
       </div>
     </article>
+  )
+}
+
+/* ---------- Galleria foto: scorre col dito, punti in basso (card listing, pagina route) ---------- */
+
+export function PhotoGallery({ photos, label, onClick, className = '' }) {
+  const [index, setIndex] = useState(0)
+  const ref = useRef(null)
+  const onScroll = () => {
+    const el = ref.current
+    if (!el) return
+    const i = Math.round(el.scrollLeft / el.clientWidth)
+    if (i !== index) setIndex(i)
+  }
+  const interactive = onClick ? {
+    role: 'button',
+    tabIndex: 0,
+    'aria-label': label,
+    onClick,
+    onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } },
+  } : { 'aria-label': label ? `Photos of ${label}` : undefined }
+  return (
+    <div className={`gallery ${className}`}>
+      <div ref={ref} className="gallery__track" onScroll={onScroll} {...interactive}>
+        {photos.map((p, i) => (
+          <img
+            key={i}
+            src={p.photo}
+            alt=""
+            draggable="false"
+            loading={i ? 'lazy' : undefined}
+            style={{ objectPosition: p.photoPosition }}
+          />
+        ))}
+      </div>
+      {photos.length > 1 && <GalleryDots count={photos.length} index={index} />}
+    </div>
+  )
+}
+
+// Punti galleria (Figma): attivo pieno, gli altri al 70% e più piccoli allontanandosi
+function GalleryDots({ count, index }) {
+  const n = Math.min(count, 5)
+  const start = Math.max(0, Math.min(index - 2, count - n))
+  const dots = Array.from({ length: n }, (_, k) => start + k)
+  let x = 0
+  const items = dots.map((i) => {
+    const r = Math.max(2, 3 - 0.25 * Math.abs(i - index))
+    const cx = x + r
+    x += 2 * r + 4
+    return { i, r, cx }
+  })
+  const width = x - 4
+  return (
+    <span className="gallery__dots" aria-hidden="true">
+      <svg width={width} height="6" viewBox={`0 0 ${width} 6`}>
+        {items.map(({ i, r, cx }) => <circle key={i} cx={cx} cy="3" r={r} opacity={i === index ? 1 : 0.7} />)}
+      </svg>
+    </span>
   )
 }
 
