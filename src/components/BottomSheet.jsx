@@ -177,7 +177,7 @@ export default function BottomSheet({
     <>
       {scrim && (
         <div
-          className={`sheet-scrim${open && height > 0 ? ' is-visible' : ''}`}
+          className={`sheet-scrim${open && height > 0 ? ' is-visible' : ''}${className ? ` ${className.split(' ')[0]}__scrim` : ''}`}
           onClick={() => { setHeight(0); onClose?.() }}
           aria-hidden="true"
         />

@@ -85,7 +85,8 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
     new maplibregl.Marker({ element: userElement() }).setLngLat(USER_POSITION).addTo(map)
 
     // Numeri delle track a metà di ognuna, poi partenza e arrivo sopra
-    for (const leg of legs) {
+    // (una track da sola: niente numeri, istruzioni §6)
+    for (const leg of legs.length > 1 ? legs : []) {
       new maplibregl.Marker({ element: trackNumberElement(leg.n) }).setLngLat(midpointOf(leg.points)).addTo(map)
     }
     const first = route.points[0]

@@ -195,7 +195,7 @@ export default function ElevationProfile({ route, onScrub }) {
       className={`elevation${scrub ? ' is-scrubbing' : ''}`}
       role="slider"
       tabIndex={0}
-      aria-label={`Elevation profile, ${route.distance}, ${route.climbLabel}. Drag to explore the route`}
+      aria-label={`Elevation profile, ${route.distance}, ${route.climbLabel}. Drag to explore the ${route.kind === 'track' ? 'track' : 'route'}`}
       aria-valuemin={0}
       aria-valuemax={Number(data.total.toFixed(2))}
       aria-valuenow={scrub ? Number(scrub.km.toFixed(2)) : 0}
@@ -232,7 +232,7 @@ export default function ElevationProfile({ route, onScrub }) {
         {data.grid.map(({ v, y }) => (
           <text key={`g${v}`} className="elevation__label elevation__label--halo" x="0" y={y - 6}>{`${v} m`}</text>
         ))}
-        {data.paths.map(({ leg, x0, x1 }) => (x1 - x0 >= NUM + 4) && (
+        {data.paths.length > 1 && data.paths.map(({ leg, x0, x1 }) => (x1 - x0 >= NUM + 4) && (
           <g key={`n${leg.n}`} transform={`translate(${((x0 + x1) / 2 - NUM / 2).toFixed(1)} ${NUM_Y})`}>
             <circle className="elevation__num-bg" cx={NUM / 2} cy={NUM / 2} r={NUM / 2 - 0.75} />
             <text className="elevation__num" x={NUM / 2} y={NUM / 2 + 4} textAnchor="middle">{leg.n}</text>
@@ -262,5 +262,5 @@ export function fmtEle(ele) {
   return `${Math.round(ele)} m`
 }
 function scrubLabel(s, count) {
-  return `${fmtKm(s.km)}, ${fmtEle(s.ele)}, grade ${fmtGrade(s.grade)}, track ${s.leg.n} of ${count}`
+  return `${fmtKm(s.km)}, ${fmtEle(s.ele)}, grade ${fmtGrade(s.grade)}${count > 1 ? `, track ${s.leg.n} of ${count}` : ''}`
 }

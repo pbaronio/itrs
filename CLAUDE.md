@@ -39,8 +39,11 @@ src/
                       ListingCard, RatingRow, RatingCard, Pentagon), BottomSheet, InfoSheet, TabBar,
                       Searchbar, RouteToggle; map/ (MapView, marker HTML, layer del percorso selezionato)
   screens/            Explore (mappa), Search e Filters (pagine sopra la mappa, voci della cronologia,
-                      montate con un portal sopra la tab bar), Components (galleria, da Profile),
-                      BaseCheck, InstallGuide
+                      montate con un portal sopra la tab bar), RoutePage, TrackDetail (TrackPage dalla
+                      mappa, TrackSheet dentro la route), DetailMap (mappa a tutto schermo con pannello
+                      e grafico), Itinerary, Components (galleria, da Profile), BaseCheck, InstallGuide
+                      Pagine di dettaglio: pila `history.state.layers` gestita da Explore (`nav.push`,
+                      `nav.replace`, `nav.back`)
 ```
 
 ## Regole

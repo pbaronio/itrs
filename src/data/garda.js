@@ -371,3 +371,39 @@ export function profileOf(points, startKm = 0, km) {
     return [startKm + (km != null ? (dist[i] / total) * km : dist[i] / 1000), sum / n]
   })
 }
+
+// ---------- Track nei due contesti (passo 2.3, contesto §4.7) ----------
+// Una track vista come "route" di una sola track, nel verso di percorrenza: così mappa
+// (RouteMap) e grafico (ElevationProfile) funzionano uguali per route e track.
+// reverse: track percorsa al contrario dentro una route (salita e discesa si scambiano).
+const SOLO_CACHE = new Map()
+export function trackAsRoute(track, reverse = false) {
+  const id = `track:${track.id}${reverse ? ':r' : ''}`
+  if (SOLO_CACHE.has(id)) return SOLO_CACHE.get(id)
+  const points = reverse ? [...track.points].reverse() : track.points
+  const climb = reverse ? track.descent : track.climb
+  const descent = reverse ? track.climb : track.descent
+  const minutes = reverse ? durationMin(track.km, climb) : track.minutes
+  const solo = {
+    ...track,
+    id,
+    trackId: track.id,
+    reverse,
+    legs: [{ trackId: track.id, reverse }],
+    points,
+    climb,
+    descent,
+    minutes,
+    climbLabel: fmtClimb(climb),
+    duration: fmtDuration(minutes),
+  }
+  SOLO_CACHE.set(id, solo)
+  return solo
+}
+
+// Route che passano da una track (sezione "Routes featuring this track")
+export function routesWithTrack(trackId) {
+  return ROUTES.filter((r) => r.legs.some((leg) => leg.trackId === trackId))
+}
+
+export const TRACK_BY_KEY = TRACK_BY_ID

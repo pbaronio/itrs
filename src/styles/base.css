@@ -18,6 +18,7 @@
   --glass: rgba(255, 255, 255, .3);                 /* salva sulla foto della card listing */
   --shadow-thumb: 0 6px 5px rgba(14, 18, 27, .06), 0 2px 2px rgba(14, 18, 27, .03);   /* cursori dello slider (Figma Slider/Dot) */
   --shadow-route: 0 2px 8px rgba(0, 0, 0, .28);     /* percorso sulla mappa e marker di partenza/arrivo (§6) */
+  --selector-active: rgba(212, 252, 147, .10);      /* riga attiva del selettore track su verde bosco (§6 "Selettore track") */
   --splash-bg: #01181B;                             /* fondo dello splash screen (Figma 3746:31865), come l'icona dell'app */
 
   color-scheme: light;

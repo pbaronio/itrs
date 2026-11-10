@@ -1,0 +1,105 @@
+/* ---------- Track dalla mappa e dentro una route (passo 2.3) ---------- */
+
+/* Pagina track: sotto la pagina route, che può aprirsi sopra da "Routes featuring this track" */
+.route-page.track-page { z-index: 45; }
+
+.track-page__hero {
+  position: relative;
+  height: calc(var(--safe-top) + 360px);
+  background: var(--sabbia-dark);
+  overflow: hidden;
+}
+.track-page__body--sheet { padding-top: var(--s-2xl); }
+
+/* Card Difficulty ed Exposure 181×194, gap 8 */
+.track-page__ratings { display: flex; gap: var(--s-xs); }
+.track-page__ratings.has-selector { margin-top: var(--s-xl); }
+.track-page__map.route-page__map { margin-top: var(--s-xl); }
+
+/* Routes featuring this track: card listing in orizzontale, la successiva si intravede */
+.track-page__routes { margin-top: var(--s-2xl); }
+.track-page__routes h2 { margin: 0 0 var(--s-l); color: var(--text-strong-950); }
+.track-page__routes-scroll {
+  display: flex;
+  gap: var(--s-xs);
+  margin: 0 calc(-1 * var(--s-m));
+  padding: 0 var(--s-m);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--s-m);
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.track-page__routes-scroll::-webkit-scrollbar { display: none; }
+.track-page__route { flex: 0 0 100%; scroll-snap-align: start; }
+.track-page__routes-scroll.is-scrollable .track-page__route { flex-basis: calc(100% - var(--s-xs)); }
+
+/* ---------- Selettore track (istruzioni §6): verde bosco, raggio 16 ---------- */
+.track-selector {
+  border-radius: var(--r-card);
+  background: var(--forest);
+  color: var(--gray-0);
+  overflow: hidden;
+}
+.track-selector__head,
+.track-selector__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-s);
+  width: 100%;
+  color: inherit;
+  text-align: left;
+}
+.track-selector__head { height: 100px; padding: 10px var(--s-m) 10px 10px; }
+.track-selector__head img {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.track-selector__text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.track-selector__text .t-md-em { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.track-selector .track-selector__label { color: var(--gray-0); opacity: .8; }
+.track-selector__chevron { flex-shrink: 0; transition: transform var(--dur-base) var(--ease-out); }
+.track-selector.is-open .track-selector__chevron { transform: rotate(180deg); }
+.track-selector__head:active,
+.track-selector__row:active { opacity: .8; }
+
+/* Espanso: righe da 81, la attiva con fondo chiaro al 10% e linee blu sopra e sotto */
+.track-selector__list { margin: 0; padding: 0 0 var(--s-xs); list-style: none; }
+.track-selector__row { height: 81px; padding: 0 var(--s-m) 0 10px; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
+.track-selector__row img {
+  flex-shrink: 0;
+  width: 57px;
+  height: 57px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.track-selector__row.is-active {
+  background: var(--selector-active);
+  border-color: var(--itrs-blue);
+}
+.track-selector__row svg { flex-shrink: 0; }
+
+/* ---------- Bottom sheet della track sopra la route ---------- */
+.sheet.track-sheet { z-index: 80; box-shadow: none; overflow: hidden; }
+.sheet-scrim.track-sheet__scrim { z-index: 79; }
+/* Testata sopra la foto: solo la maniglia (bianca) e Chiudi */
+.track-sheet .sheet__head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 72px;
+}
+.track-sheet .sheet__handle { background: var(--gray-0); opacity: .8; }
+.track-sheet__close { position: absolute; top: var(--s-m); left: var(--s-m); }
+.track-sheet .track-page__hero { height: 336px; }
+.track-sheet .sheet__content { padding-bottom: calc(114px + var(--safe-bottom)); }
+.track-sheet .action-bar { position: absolute; }
+
+/* Bottom sheet informativo e mappa della track sopra il bottom sheet */
+.track-sheet__info { position: relative; z-index: 85; }
+.route-map-page.track-sheet__map { z-index: 90; }

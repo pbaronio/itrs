@@ -182,3 +182,81 @@
 .route-map.is-static .maplibregl-ctrl-bottom-left { bottom: 0; }
 .route-map.is-static .maplibregl-ctrl-attrib.maplibregl-compact { margin: 0 0 var(--s-xs) var(--s-xs); background: var(--bg-white-0); }
 .route-map.is-static .maplibregl-ctrl-bottom-left { z-index: 4; }
+
+/* ---------- Passo 2.3: lista track, pannello espanso, Itinerary List ---------- */
+.route-page__tracks { margin-top: var(--s-2xl); }
+.route-page__tracks h2 { margin: 0 0 var(--s-l); color: var(--text-strong-950); }
+
+/* Pannello Route details espanso (Figma 3680:8742): testo del livello e Itinerary List */
+.route-details__more { padding: 0 var(--s-m) calc(var(--s-2xl) + var(--s-m)); }
+.route-details__text { margin: 39px 0 0; color: var(--text-sub-700); }
+.route-details__links { margin: 36px 0 0; padding: 0; list-style: none; }
+.route-details__links li { padding-bottom: 19px; border-bottom: 1px solid var(--stroke-soft-100); }
+.route-details__links li + li { padding-top: 19px; }
+.route-details__link {
+  display: flex;
+  align-items: center;
+  gap: var(--s-xs);
+  width: 100%;
+  min-height: 44px;
+  margin: -10px 0;
+  color: var(--text-sub-700);
+  text-align: left;
+}
+.route-details__link:active { opacity: .7; }
+.route-details__chevron { margin-left: auto; color: var(--text-strong-950); }
+
+/* Itinerary List (Figma 3691:26252): pagina bianca sopra la mappa della route */
+.itinerary {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--bg-white-0);
+  transform: translateY(100%);
+  transition: transform var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+.itinerary.is-open { transform: none; pointer-events: auto; }
+.itinerary__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--safe-top) + var(--s-m)) var(--s-m) calc(114px + var(--safe-bottom) + var(--s-xl));
+}
+.itinerary__top { position: relative; display: flex; align-items: center; gap: var(--s-s); height: 46px; }
+.itinerary__scrub {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  gap: var(--s-xs);
+  min-width: 0;
+  margin: 0;
+  color: var(--text-sub-700);
+  white-space: nowrap;
+}
+.itinerary__chart { margin: 36px 0 var(--s-xl); }
+
+/* Chiudi tondo 46 sabbia (Flow/Close, istruzioni §6 "Flussi a passi") */
+.btn-flow-close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--r-pill);
+  background: var(--sand-button);
+  color: var(--text-strong-950);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.btn-flow-close:active { transform: scale(.98); }
+
+/* Dati della track: 4 colonne su una riga */
+.route-data.route-data--track { grid-template-columns: repeat(4, auto); justify-content: space-between; }
+.route-data--track .route-data__item:not(:nth-child(3n + 1)),
+.route-data--track .route-data__item:not(:first-child) { padding-left: var(--s-s); border-left: 1px solid var(--stroke-soft-100); }
+.route-data--track .route-data__item:first-child { padding-left: 0; border-left: 0; }
+.route-data--track .route-data__item { padding-right: var(--s-xs); }

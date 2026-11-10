@@ -1,0 +1,100 @@
+/* ---------- Lista track a timeline (Figma 3697:1497) ---------- */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Riga track 370×72: binario 24, gap 12, contenuto, foto 56 */
+.timeline__row,
+.timeline__end {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-s);
+  width: 100%;
+  text-align: left;
+}
+.timeline__row {
+  height: 72px;
+  color: inherit;
+  border-radius: var(--r-sm);
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.timeline__row:active { opacity: .7; transform: scale(.98); }
+.timeline__row:focus-visible { outline: 2px solid var(--brand-base); outline-offset: 2px; }
+
+/* Binario: marker 24, gap 4, tratto di 3 fino a 48 */
+.timeline__rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2xs);
+  flex-shrink: 0;
+  width: 24px;
+  height: 48px;
+}
+.timeline__rail--finish { height: 24px; }
+.timeline__num,
+.timeline__marker {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-pill);
+}
+.timeline__num {
+  border: 1.5px solid var(--brand-base);
+  background: var(--bg-white-0);
+  color: var(--text-strong-950);
+}
+.timeline__marker { background: var(--bg-strong-950); color: var(--text-white-0); }
+.timeline__marker svg { display: block; }
+.timeline__connector {
+  flex: 1;
+  width: 3px;
+  min-height: 1px;
+  border-radius: 2px;
+}
+.timeline__connector--start { background: var(--stroke-sub-200); }
+
+/* Testi */
+.timeline__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2xs);
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
+}
+.timeline__end .timeline__content { gap: 2px; }
+.timeline__content--end { padding-bottom: 18px; }
+.timeline__title {
+  overflow: hidden;
+  color: var(--text-strong-950);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.timeline__detail { color: var(--text-soft-500); }
+.timeline__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  color: var(--text-sub-700);
+  white-space: nowrap;
+}
+.timeline__level { display: inline-flex; align-items: center; gap: 2px; }
+.timeline__level svg { margin-left: -2px; }   /* la forma da 12 ha margini interni: il punto resta allineato al testo */
+.timeline__dot { color: var(--text-soft-500); }
+
+.timeline__thumb {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+}

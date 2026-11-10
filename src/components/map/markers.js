@@ -47,8 +47,8 @@ export function userElement() {
 
 // Partenza e arrivo: cerchio 28 nero, bordo bianco 3, play o bandierina bianca
 // Centrati nel cerchio: play con il riquadro a mezzo pixel dal centro (centro ottico), bandierina 7×12
-const PLAY = 'M10.5 9.6v8.8c0 .6.6.9 1.1.6l6.6-4.4a.7.7 0 0 0 0-1.2l-6.6-4.4c-.5-.3-1.1 0-1.1.6Z'
-const FLAG = 'M10.6 20V8M10.6 8.2h7l-1.6 2.7 1.6 2.7h-7'
+export const PLAY = 'M10.5 9.6v8.8c0 .6.6.9 1.1.6l6.6-4.4a.7.7 0 0 0 0-1.2l-6.6-4.4c-.5-.3-1.1 0-1.1.6Z'
+export const FLAG = 'M10.6 20V8M10.6 8.2h7l-1.6 2.7 1.6 2.7h-7'
 export function endpointElement(type) {
   const el = document.createElement('div')
   el.className = `map-endpoint map-endpoint--${type}`
