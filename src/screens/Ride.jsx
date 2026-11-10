@@ -5,6 +5,7 @@ import { MapButton, RoundButton } from '../components/Button.jsx'
 import { SPEEDS, buildRide, rideAt } from '../data/ride.js'
 import { useEntered } from '../useEntered.js'
 import { haptic } from '../haptic.js'
+import { RideComplete, Review, Report } from './RideFlows.jsx'
 import { ALERT_M, ControlsPage, DataPage, NextTrackAlert, PageDots, RideActions } from './RidePages.jsx'
 import './Ride.css'
 
@@ -56,6 +57,9 @@ function RideScreen({ ride, entered, active, onClose }) {
   const [topPad, setTopPad] = useState(0)
   const [count, setCount] = useState(COUNT_FROM)      // 3, 2, 1, poi 0 = via
   const [page, setPage] = useState(0)                 // 0 mappa, 1 dati, 2 controlli
+  const [end, setEnd] = useState(null)                // fine giro: stato del giro in quel momento
+  const [review, setReview] = useState(false)         // review dopo Ride complete
+  const [report, setReport] = useState(null)          // segnalazione: stato del giro all'apertura
   const pagerRef = useRef(null)
   const pageRef = useRef(null)
   const panelRef = useRef(null)
@@ -63,7 +67,8 @@ function RideScreen({ ride, entered, active, onClose }) {
   const needleRef = useRef(null)
   const sim = useRef({ t: 0, speed: SPEEDS[0], running: true })
   sim.current.speed = SPEEDS[speedAt]
-  sim.current.running = active && !paused && count === 0
+  const flowOpen = Boolean(end || report)
+  sim.current.running = active && !paused && count === 0 && !flowOpen
 
   // Countdown: un numero al secondo, si parte solo quando il fondo blu è sparito.
   // Parte quando la pagina è entrata, così il 3 si vede per intero.
@@ -106,18 +111,70 @@ function RideScreen({ ride, entered, active, onClose }) {
     return () => cancelAnimationFrame(raf)
   }, [ride])
 
-  // Pagina visibile dallo scorrimento; i pallini e la pillola ci portano con scrollTo
-  const onPagerScroll = () => {
-    const el = pagerRef.current
+  /*
+   * Pagine (3.2, rev. 1): scorrimento gestito a mano, non con lo scroll nativo. Con lo scroll-snap,
+   * su iPhone dalla pagina dati non si tornava più alla mappa. Il dito trascina la fila delle
+   * pagine (sulla mappa solo dal pannello scuro, altrove da tutta la pagina); si cambia pagina
+   * oltre un quarto di larghezza o con uno swipe veloce; ai bordi la fila fa un po' di elastico.
+   */
+  const trackRef = useRef(null)
+  const drag = useRef(null)
+  const dragged = useRef(false)
+  const width = () => pagerRef.current?.clientWidth || window.innerWidth
+  const place = (x, animate) => {
+    const el = trackRef.current
     if (!el) return
-    const i = Math.round(el.scrollLeft / (el.clientWidth || 1))
-    if (i !== page) setPage(i)
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.style.transition = animate && !reduce ? 'transform var(--dur-base) var(--ease-out)' : 'none'
+    el.style.transform = `translate3d(${x}px, 0, 0)`
   }
-  const goTo = (i) => {
-    const el = pagerRef.current
-    if (!el) return
-    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    el.scrollTo({ left: i * el.clientWidth, behavior: smooth ? 'smooth' : 'auto' })
+  useLayoutEffect(() => { place(-page * width(), true) }, [page])
+  useEffect(() => {
+    const onResize = () => place(-page * width(), false)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [page])
+  const goTo = (i) => setPage(Math.max(0, Math.min(2, i)))
+
+  const onPointerDown = (e) => {
+    if (e.button > 0 || flowOpen) return
+    const t = e.target
+    if (page === 0 && !t.closest('.ride__panel')) return            // sulla mappa la mappa si sposta
+    if (t.closest('.ride__round--stop, .switch, textarea, input')) return
+    drag.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, t0: performance.now(), on: false }
+  }
+  const onPointerMove = (e) => {
+    const d = drag.current
+    if (!d || e.pointerId !== d.id) return
+    const dx = e.clientX - d.x0, dy = e.clientY - d.y0
+    if (!d.on) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
+      if (Math.abs(dy) > Math.abs(dx)) { drag.current = null; return }   // gesto verticale: scorre la pagina
+      d.on = true
+      try { pagerRef.current.setPointerCapture(e.pointerId) } catch { /* già rilasciato */ }
+    }
+    const edge = (page === 0 && dx > 0) || (page === 2 && dx < 0)
+    place(-page * width() + (edge ? dx * 0.3 : dx), false)
+  }
+  const onPointerUp = (e) => {
+    const d = drag.current
+    drag.current = null
+    if (!d || !d.on || e.pointerId !== d.id) return
+    dragged.current = true
+    setTimeout(() => { dragged.current = false }, 0)
+    const dx = e.clientX - d.x0
+    const v = dx / Math.max(1, performance.now() - d.t0)        // px/ms
+    const w = width()
+    let next = page
+    if (dx < -w / 4 || v < -0.4) next = page + 1
+    else if (dx > w / 4 || v > 0.4) next = page - 1
+    next = Math.max(0, Math.min(2, next))
+    if (next === page) place(-page * w, true)
+    else setPage(next)
+  }
+  const onPointerCancel = () => {
+    if (drag.current?.on) place(-page * width(), true)
+    drag.current = null
   }
 
   // Android: barra di sistema scura sulla pagina dati, chiara altrove
@@ -125,7 +182,7 @@ function RideScreen({ ride, entered, active, onClose }) {
     const meta = document.querySelector('meta[name="theme-color"]')
     if (!meta) return
     const prev = meta.content
-    if (active && page === 1) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--nav-dark').trim() || prev
+    if (active && page === 1) meta.content = getComputedStyle(pageRef.current ?? document.documentElement).getPropertyValue('--nav-dark').trim() || prev
     return () => { meta.content = prev }
   }, [active, page])
 
@@ -136,7 +193,16 @@ function RideScreen({ ride, entered, active, onClose }) {
 
   const pause = () => setPaused(true)
   const resume = () => setPaused(false)
-  const actionProps = { paused, onPause: pause, onResume: resume, onEnd: onClose }
+  // Fine giro: tenendo premuto stop, oppure arrivati in fondo (dopo un attimo) → Ride complete
+  const endRide = () => { setPaused(true); setEnd(rideAt(ride, sim.current.t)) }
+  useEffect(() => {
+    if (!state.finished || end) return
+    const t = setTimeout(() => setEnd(rideAt(ride, ride.totalSec)), 1200)
+    return () => clearTimeout(t)
+  }, [state.finished, end, ride])
+  // Segnalazione dal pulsante giallo o dai controlli: il giro si ferma finché è aperta
+  const openReport = () => setReport(rideAt(ride, sim.current.t))
+  const actionProps = { paused, onPause: pause, onResume: resume, onEnd: endRide }
 
   const many = ride.legs.length > 1
   const label = many ? `Track ${state.leg.n} of ${ride.legs.length}` : 'Track'
@@ -151,9 +217,18 @@ function RideScreen({ ride, entered, active, onClose }) {
       aria-label={`Navigation, ${ride.item.name}`}
       aria-hidden={!active}
     >
-      <div ref={pagerRef} className="ride__pager" onScroll={onPagerScroll}>
+      <div
+        ref={pagerRef}
+        className="ride__pager"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onClickCapture={(e) => { if (dragged.current) { e.stopPropagation(); e.preventDefault() } }}
+      >
+        <div ref={trackRef} className="ride__track">
         {/* Pagina 1: mappa */}
-        <section className="ride-page ride-page--map" aria-label="Map" aria-hidden={page !== 0}>
+        <section className="ride-page ride-page--map" aria-label="Map" aria-hidden={page !== 0} inert={page !== 0 || flowOpen}>
           {error ? (
             <div className="ride__error">
               <p className="t-md">{error === 'key' ? 'The map is not available right now.' : 'Can’t load the map. Check your connection.'}</p>
@@ -199,7 +274,7 @@ function RideScreen({ ride, entered, active, onClose }) {
               aria-pressed={follow}
               onClick={() => mapRef.current?.recenter()}
             />
-            <button type="button" className="btn-round ride__report" aria-label="Report a hazard">
+            <button type="button" className="btn-round ride__report" aria-label="Report a hazard" onClick={openReport}>
               <Icon name="warning" size={24} />
             </button>
           </div>
@@ -226,7 +301,7 @@ function RideScreen({ ride, entered, active, onClose }) {
         </section>
 
         {/* Pagina 2: dati */}
-        <section className="ride-page ride-page--data" aria-label="Ride data" aria-hidden={page !== 1}>
+        <section className="ride-page ride-page--data" aria-label="Ride data" aria-hidden={page !== 1} inert={page !== 1 || flowOpen}>
           <DataPage
             ride={ride}
             state={state}
@@ -237,10 +312,15 @@ function RideScreen({ ride, entered, active, onClose }) {
         </section>
 
         {/* Pagina 3: controlli */}
-        <section className="ride-page ride-page--controls" aria-label="Controls" aria-hidden={page !== 2}>
-          <ControlsPage elapsed={state.t} onBack={() => goTo(0)} />
+        <section className="ride-page ride-page--controls" aria-label="Controls" aria-hidden={page !== 2} inert={page !== 2 || flowOpen}>
+          <ControlsPage elapsed={state.t} onBack={() => goTo(0)} onReport={openReport} />
         </section>
+        </div>
       </div>
+
+      {end && <RideComplete ride={ride} end={end} onRate={() => setReview(true)} onClose={onClose} />}
+      {end && review && <Review onClose={() => setReview(false)} onDone={onClose} />}
+      {report && <Report ride={ride} at={report} onClose={() => setReport(null)} />}
 
       <div className={`ride-countdown${count === 0 ? ' is-done' : ''}`} aria-hidden={count === 0}>
         {count > 0 && (

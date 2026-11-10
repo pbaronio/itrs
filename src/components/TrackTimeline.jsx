@@ -94,15 +94,16 @@ function Rail({ end }) {
  * foto 70 raggio 6, titolo con numero (`1- Accesso Malga Ciapa`), meta con distanza, salita e livello.
  * Tap su una riga: track in bottom sheet. La timeline resta nella Itinerary List.
  */
-export function TrackList({ route, onOpen }) {
+export function TrackList({ route, onOpen, legs, label }) {
+  const Row = onOpen ? 'button' : 'div'      // senza onOpen (Ride complete) le righe non si toccano
   return (
-    <ul className="track-list" aria-label={`Tracks of ${route.name}`}>
-      {legsOf(route).map((leg) => {
+    <ul className="track-list" aria-label={label ?? `Tracks of ${route.name}`}>
+      {(legs ?? legsOf(route)).map((leg) => {
         const climb = leg.reverse ? leg.track.descent : leg.track.climb
         const name = FACTORS.difficulty.names[leg.level]
         return (
           <li key={leg.n}>
-            <button type="button" className="track-list__row" onClick={() => onOpen?.(leg)}>
+            <Row {...(onOpen ? { type: 'button', onClick: () => onOpen(leg) } : {})} className="track-list__row">
               <img
                 className="track-list__thumb"
                 src={leg.track.photo}
@@ -121,7 +122,7 @@ export function TrackList({ route, onOpen }) {
                   <span className="track-list__item"><LevelShape level={leg.level} size={12} />{name}</span>
                 </span>
               </span>
-            </button>
+            </Row>
           </li>
         )
       })}

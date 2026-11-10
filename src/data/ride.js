@@ -57,9 +57,15 @@ export function buildRide(item) {
     const profile = profileOf(leg.points, leg.startKm, leg.km)
     const climb = leg.reverse ? leg.track.descent : leg.track.climb
     // salita smussata cumulata, poi scalata sulla salita ufficiale della track
-    const ups = [0]
-    for (let i = 1; i < profile.length; i++) ups.push(ups[i - 1] + Math.max(0, profile[i][1] - profile[i - 1][1]))
+    const descent = leg.reverse ? leg.track.climb : leg.track.descent
+    const ups = [0], downs = [0]
+    for (let i = 1; i < profile.length; i++) {
+      const dz = profile[i][1] - profile[i - 1][1]
+      ups.push(ups[i - 1] + Math.max(0, dz))
+      downs.push(downs[i - 1] + Math.max(0, -dz))
+    }
     const upTot = ups[ups.length - 1] || 1
+    const downTot = downs[downs.length - 1] || 1
     leg.points.forEach((p, i) => {
       if (i === 0 && pts.length) return            // il primo punto coincide con l'ultimo della track prima
       const km = profile[i][0]
@@ -71,14 +77,18 @@ export function buildRide(item) {
         const h = dz >= 0 ? dKm / 14 + dz / 600 : dKm / 20
         t += h * 3600
       }
-      pts.push({ lngLat: [p[0], p[1]], km, ele, t, n: leg.n, legKm: km - leg.startKm, legUp: (ups[i] / upTot) * climb })
+      pts.push({ lngLat: [p[0], p[1]], km, ele, t, n: leg.n, legKm: km - leg.startKm, legUp: (ups[i] / upTot) * climb, legDown: (downs[i] / downTot) * descent })
     })
   }
   // salita delle track già finite, per i metri saliti di tutto il giro (pagina dati, 3.2)
-  const upBefore = []
-  let up = 0
-  for (const leg of legs) { upBefore.push(up); up += leg.reverse ? leg.track.descent : leg.track.climb }
-  const ride = { item, legs, pts, upBefore, totalUp: up, totalKm: legs[legs.length - 1].endKm, totalSec: t }
+  const upBefore = [], downBefore = []
+  let up = 0, down = 0
+  for (const leg of legs) {
+    upBefore.push(up); downBefore.push(down)
+    up += leg.reverse ? leg.track.descent : leg.track.climb
+    down += leg.reverse ? leg.track.climb : leg.track.descent
+  }
+  const ride = { item, legs, pts, upBefore, downBefore, totalUp: up, totalKm: legs[legs.length - 1].endKm, totalSec: t }
   CACHE.set(item.id, ride)
   return ride
 }
@@ -110,6 +120,7 @@ export function rideAt(ride, t) {
   const sameLeg = a.n === b.n
   const legKm = sameLeg ? lerp(a.legKm, b.legKm, f) : f * b.legKm
   const legUp = sameLeg ? lerp(a.legUp, b.legUp, f) : f * b.legUp
+  const legDown = sameLeg ? lerp(a.legDown, b.legDown, f) : f * b.legDown
   const climb = leg.reverse ? leg.track.descent : leg.track.climb
   // direzione: verso un punto circa 30 m più avanti
   const j = segmentAt(pts, 'km', Math.min(km + 0.03, ride.totalKm))
@@ -130,6 +141,7 @@ export function rideAt(ride, t) {
     legLeftUp: Math.max(0, climb - legUp),
     legUpFrac: climb ? Math.min(1, legUp / climb) : 1,
     upDone: ride.upBefore[leg.n - 1] + Math.min(climb, legUp),   // metri saliti dalla partenza
+    downDone: ride.downBefore[leg.n - 1] + legDown,             // metri scesi dalla partenza
     legEndLeftKm: Math.max(0, leg.endKm - km),                   // all'inizio della track dopo
   }
 }

@@ -108,6 +108,9 @@
 /* Pannello scuro (Nav/Ride Sheet): 245 + indicatore Home */
 .ride {
   --safe-bottom-panel: max(var(--safe-bottom), var(--s-m));
+  /* Fondo scuro della navigazione (pannello mappa e pagina dati): #01181B al posto del nero,
+     richiesta di Paolo. È il colore dello splash e dell'icona (--splash-bg). */
+  --nav-dark: var(--splash-bg);
 }
 .ride__panel {
   position: absolute;
@@ -208,25 +211,23 @@
   .ride-countdown__num { animation: none; }
 }
 
-/* ---------- 3.2: pagine che scorrono ---------- */
+/* ---------- 3.2: pagine che scorrono (gesto gestito in Ride.jsx) ---------- */
 .ride__pager {
   position: absolute;
   inset: 0;
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
+  overflow: hidden;
+  touch-action: pan-y;          /* il gesto orizzontale lo gestisce il codice */
 }
-.ride__pager::-webkit-scrollbar { display: none; }
+.ride__track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
 .ride-page {
   position: relative;
   flex: 0 0 100%;
   height: 100%;
   overflow: hidden;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 .ride-page--data { background: var(--nav-dark); color: var(--text-white-0); }
 .ride-page--controls { background: var(--bg-white-0); }
@@ -443,6 +444,7 @@
 .ride-controls {
   height: 100%;
   overflow-y: auto;
+  touch-action: pan-y;          /* contenitore che scorre: il touch-action del pager non arriva qui */
   padding: calc(var(--safe-top) + 24px) var(--s-m) calc(var(--safe-bottom) + 120px);
   color: var(--text-strong-950);
 }

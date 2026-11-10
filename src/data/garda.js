@@ -25,6 +25,8 @@ const PHOTO = Object.fromEntries(Object.entries(FILES).map(([path, src]) => {
   return [n, { photo: src, photoPosition: `50% ${FOCUS[n] ?? 50}%` }]
 }))
 const ALL_PHOTOS = Object.keys(PHOTO).map(Number).sort((x, y) => x - y)
+// Foto della "galleria del telefono" simulata nella review e nella segnalazione (4.1, 4.2)
+export const DEVICE_PHOTOS = ALL_PHOTOS.map((n) => PHOTO[n])
 
 // Copertina di ogni route, scelta per carattere del percorso
 const ROUTE_COVER = {

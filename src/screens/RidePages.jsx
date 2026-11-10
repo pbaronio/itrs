@@ -11,7 +11,7 @@ import { haptic } from '../haptic.js'
  * stop tenendo premuto 3711:28405, avviso track successiva 3711:29806.
  */
 
-export const HOLD_MS = 4000
+export const HOLD_MS = 2000
 
 // Tempo del giro: m:ss sotto l'ora, h:mm oltre (pagina dati); h:mm:ss nella pillola [P]
 const pad = (n) => String(n).padStart(2, '0')
@@ -31,7 +31,7 @@ function spokenTime(sec) {
 }
 
 /*
- * Stop tenendo premuto 4 secondi (contesto §4.11, Figma 3711:28405 e 3711:28866):
+ * Stop tenendo premuto 2 secondi (rev. di Paolo: 4 erano troppi; contesto §4.11, Figma 3711:28405 e 3711:28866):
  * durante la pressione un anello accent/stop si riempie sul bordo del pulsante; lasciando prima
  * l'anello torna indietro e compare per 2 s il suggerimento "Hold to end the ride" [P].
  * Funziona anche da tastiera (Spazio o Invio tenuti premuti).
@@ -74,7 +74,7 @@ export function HoldStop({ size, className = '', onDone, onHint }) {
       type="button"
       className={`ride__round ride__round--stop ${className}`}
       style={{ width: size, height: size }}
-      aria-label="End the ride. Press and hold for 4 seconds"
+      aria-label="End the ride. Press and hold for 2 seconds"
       onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); start() }}
       onPointerUp={release}
       onPointerCancel={release}
@@ -215,9 +215,9 @@ export function DataPage({ ride, state, paused, actions, dots }) {
  * Pagina controlli (Figma 3711:28955): fondo bianco, titolo CONTROLS, card sabbia
  * (Share live location, Report a hazard) e interruttori Nav/Switch; pillola blu col tempo
  * del giro per tornare alla mappa. Interruttori e condivisione cambiano solo stato [P];
- * Report a hazard senza azione fino al passo 4.2.
+ * Report a hazard apre la segnalazione (RideFlows.jsx).
  */
-export function ControlsPage({ elapsed, onBack }) {
+export function ControlsPage({ elapsed, onBack, onReport }) {
   const [live, setLive] = useState(false)
   const [lock, setLock] = useState(false)
   const [voice, setVoice] = useState(true)
@@ -233,7 +233,7 @@ export function ControlsPage({ elapsed, onBack }) {
           </span>
           <Icon name="radar" size={24} />
         </button>
-        <button type="button" className="ride-controls__card">
+        <button type="button" className="ride-controls__card" onClick={onReport}>
           <span>
             <span className="t-lg-em">Report a hazard</span>
             <span className="t-sm ride-controls__detail">Warn other riders</span>
