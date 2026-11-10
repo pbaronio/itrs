@@ -39,7 +39,7 @@ export default function BottomSheet({
   const drag = useRef(null)
   const heightRef = useRef(height)
   heightRef.current = height
-  const handleHidden = hideHandleAtTop && index === snaps.length - 1
+  const handleHidden = hideHandleAtTop && snaps.length > 1 && index === snaps.length - 1
 
   // Stato controllato dall'esterno (es. FAB Map → stato 1)
   useEffect(() => {
@@ -49,8 +49,11 @@ export default function BottomSheet({
   }, [snap]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Altezze ricalcolate (rotazione, resize): resta sullo stesso stato
+  // Se gli stati diminuiscono (es. overlay con la sola CTA), si resta sull'ultimo disponibile
   useEffect(() => {
-    if (open && !drag.current) setHeight(snaps[index])
+    const i = Math.min(snap ?? index, snaps.length - 1)
+    if (i !== index) setIndex(i)
+    if (open && !drag.current) setHeight(snaps[i])
   }, [snaps.join(',')]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apertura e chiusura animate

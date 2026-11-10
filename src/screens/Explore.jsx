@@ -3,7 +3,7 @@ import MapView from '../components/map/MapView.jsx'
 import Searchbar from '../components/Searchbar.jsx'
 import RouteToggle from '../components/RouteToggle.jsx'
 import BottomSheet from '../components/BottomSheet.jsx'
-import { RoundButton, FabMap } from '../components/Button.jsx'
+import { Button, RoundButton, FabMap } from '../components/Button.jsx'
 import { RouteCard, ListingCard } from '../components/Cards.jsx'
 import { ROUTES, TRACKS } from '../data/garda.js'
 import './Explore.css'
@@ -13,11 +13,14 @@ import './Explore.css'
  * - Stato 1 (86): handle e conteggio.
  * - Stato 2 (226): carosello delle route/track dell'area visibile; scorrendo, la mappa segue la card.
  * - Stato 3: listing a tutta pagina, senza maniglia visibile: si esce con uno swipe in giù dall'inizio della lista o col FAB Map (torna allo stato di prima).
- * Tap su un pin: percorso sulla mappa e overlay in stato 2 con la sua card.
+ * Tap su un pin: percorso sulla mappa e overlay in stato 2 con la sua card (passo 1.3).
+ * Caso limite (passo 1.3, contesto §4.4): nessuna route ma track nell'area visibile →
+ *   overlay con `No routes in this area` e la CTA blu `See N tracks`, che passa alla vista Tracks.
  * Ricerca e filtri: passo 1.4.
  */
 const SNAP_PEEK = 86
 const SNAP_HALF = 226
+const SNAP_CTA = 136   // testata 56 + 4 + pulsante 60 + 16
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export default function Explore() {
@@ -81,10 +84,16 @@ export default function Explore() {
     })
   }, [])
 
+  // Caso limite: zero route, ma track presenti nell'area visibile
+  const tracksCta = mode === 'routes' && !selectedId && counts.routes === 0 && counts.tracks > 0
+  useEffect(() => {
+    if (tracksCta) setSnap(0)
+  }, [tracksCta])
+
   // Spazio libero per inquadrare un percorso: sotto il toggle, sopra l'overlay
   const padding = useMemo(() => ({
     top: insets.safeTop + 156,
-    bottom: insets.tabH + (snap === 0 ? SNAP_PEEK : SNAP_HALF) + 40,
+    bottom: insets.tabH + (tracksCta ? SNAP_CTA : snap === 0 ? SNAP_PEEK : SNAP_HALF) + 40,
     left: 72,
     right: 32,
   }), [insets, snap])
@@ -95,6 +104,8 @@ export default function Explore() {
     () => [SNAP_PEEK, SNAP_HALF, Math.max(SNAP_HALF + 100, insets.vh - insets.tabH - listTop)],
     [insets, listTop],
   )
+
+  const sheetSnaps = useMemo(() => (tracksCta ? [SNAP_CTA] : snaps), [tracksCta, snaps])
 
   const count = counts[mode]
   const unit = mode === 'routes' ? (count === 1 ? 'Route' : 'Routes') : (count === 1 ? 'Track' : 'Tracks')
@@ -146,8 +157,8 @@ export default function Explore() {
       </div>
 
       <BottomSheet
-        snaps={snaps}
-        snap={snap}
+        snaps={sheetSnaps}
+        snap={tracksCta ? 0 : snap}
         onSnapChange={changeSnap}
         bottom={insets.tabH}
         className="explore__overlay"
@@ -155,7 +166,16 @@ export default function Explore() {
         hideHandleAtTop
         header={<p className="t-display explore__overlay-title" aria-live="polite">{title}</p>}
       >
-        {listing ? (
+        {tracksCta ? (
+          <div className="explore__cta">
+            <Button
+              variant="confirm"
+              onClick={() => { changeMode('tracks'); changeSnap(1) }}
+            >
+              {`See ${counts.tracks} ${counts.tracks === 1 ? 'track' : 'tracks'}`}
+            </Button>
+          </div>
+        ) : listing ? (
           <Listing items={list} onPick={(id) => { select(id); changeSnap(1) }} />
         ) : (
           <Carousel items={list} mode={mode} selectedId={selectedId} onPick={select} hidden={snap === 0} />

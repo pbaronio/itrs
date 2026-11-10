@@ -146,3 +146,7 @@
   background: var(--bg-strong-950);
   color: var(--text-white-0);
 }
+
+/* Caso limite (contesto §4.4): CTA Conferma blu a tutta larghezza sotto il titolo */
+.explore__cta { padding: var(--s-2xs) var(--s-m) var(--s-m); }
+.explore__cta .btn { width: 100%; }
