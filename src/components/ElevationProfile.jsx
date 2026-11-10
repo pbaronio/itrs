@@ -160,7 +160,7 @@ export default function ElevationProfile({ route, onScrub }) {
     if (e.pointerType === 'mouse' && e.button !== 0) return
     if (active.current != null) return
     active.current = e.pointerId
-    e.currentTarget.setPointerCapture?.(e.pointerId)
+    try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* puntatore già finito */ }
     show(sampleAt(kmFromClient(e.clientX)), false)
   }
   const onPointerMove = (e) => {
