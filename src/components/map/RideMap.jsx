@@ -16,7 +16,7 @@ import './MapView.css'
  *   bussola). Se l'utente sposta la mappa col dito smette di seguire: `recenter()` riprende.
  * `update(state)` si chiama a ogni frame dal giro simulato.
  */
-const FOLLOW_ZOOM = 16
+const FOLLOW_ZOOM = 15
 
 const RideMap = forwardRef(function RideMap({ ride, styleKind = 'topo', topPad = 0, onError, onFollowChange, needleRef }, ref) {
   const containerRef = useRef(null)
