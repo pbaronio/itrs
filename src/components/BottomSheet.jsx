@@ -117,12 +117,19 @@ export default function BottomSheet({
     if (d.samples.length > 5) d.samples.shift()
   }, [dismissible, maxH, snaps])
 
+  // Posizione del foglio per un'altezza visibile (stessa formula del render)
+  const translateFor = useCallback(
+    (h) => `translate3d(0, ${maxH - h + (h === 0 ? bottom : 0)}px, 0)`,
+    [maxH, bottom],
+  )
+
   const end = useCallback(() => {
     const d = drag.current
     drag.current = null
     setDragging(false)
-    if (!d || d.mode !== 'sheet') return
-    if (sheetRef.current) sheetRef.current.style.transform = ''
+    // Tocco senza trascinamento (es. tap sulla testata): niente da fare
+    if (!d || d.mode !== 'sheet' || !d.active) return
+    const el = sheetRef.current
 
     const first = d.samples[0]
     const last = d.samples[d.samples.length - 1]
@@ -130,15 +137,21 @@ export default function BottomSheet({
     const h = heightRef.current
     const projected = h - v * 180
 
+    // La posizione scritta durante il trascinamento va sostituita con quella di arrivo, non
+    // cancellata: se il foglio torna allo stesso stato React non riscrive il transform e,
+    // svuotato, il foglio restava tutto aperto mentre lo stato diceva "basso" (contenuto
+    // bloccato e trascinamento che lo faceva saltare su e giù).
     if (dismissible && (projected < snaps[0] * 0.6 || v > 0.9)) {
+      if (el) el.style.transform = translateFor(0)
       setHeight(0)
       onClose?.()
       return
     }
     let best = 0
     snaps.forEach((s, i) => { if (Math.abs(s - projected) < Math.abs(snaps[best] - projected)) best = i })
+    if (el) el.style.transform = translateFor(snaps[best])
     goTo(best)
-  }, [dismissible, goTo, onClose, snaps])
+  }, [dismissible, goTo, onClose, snaps, translateFor])
 
   // Listener nativi: touchmove non passivo per poter bloccare lo scroll
   useEffect(() => {
@@ -188,7 +201,7 @@ export default function BottomSheet({
         style={{
           height: maxH,
           bottom,
-          transform: `translate3d(0, ${maxH - height + (height === 0 ? bottom : 0)}px, 0)`,
+          transform: translateFor(height),
         }}
         data-snap={index}
         role={scrim ? 'dialog' : 'region'}
