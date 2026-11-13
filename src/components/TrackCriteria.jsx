@@ -1,14 +1,13 @@
 import { LEVELS, FACTORS } from '../data/itrs.js'
 import { CRITERIA } from '../data/garda.js'
-import LevelShape, { SHAPE_PATHS } from './LevelShape.jsx'
 import './DifficultyBreakdown.css'
 import './TrackCriteria.css'
 
 /*
  * Come è calcolata la difficoltà di una track (richiesta di Paolo, 13 nov; esempio del cliente):
- * una barra per criterio, lunga quanto il livello (1 passo = Beginner … 4 = Expert), col colore
- * del livello e la sua forma bianca in fondo alla barra (mai solo colore). Sotto, la scala con le
- * forme dei livelli allineate ai passi. Criteri senza l'elemento (es. nessun salto): "None".
+ * una barra per criterio, lunga quanto il livello (1 passo = Beginner … 4 = Expert) e col suo
+ * colore: il livello si legge da colore e lunghezza (senza forme né scala, scelta di Paolo).
+ * Criteri senza l'elemento (es. nessun salto): "None".
  * In entrata le barre crescono da sinistra una dopo l'altra; *Riduci movimento*: niente.
  */
 const STEPS = ['green', 'blue', 'red', 'black']
@@ -44,11 +43,7 @@ export default function TrackCriteria({ track }) {
                     style={{ '--n': n, '--color': LEVELS[r.level].color, '--delay': `${DELAY_MS + i * STAGGER_MS}ms` }}
                     role="img"
                     aria-label={`${r.label}: ${FACTORS.difficulty.names[r.level]}`}
-                  >
-                    <svg className="track-criteria__shape" width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
-                      {SHAPE_PATHS[LEVELS[r.level].shape]('var(--gray-0)')}
-                    </svg>
-                  </span>
+                  />
                 ) : (
                   <span className="t-sm track-criteria__none">None</span>
                 )}
@@ -58,13 +53,6 @@ export default function TrackCriteria({ track }) {
         })}
       </ul>
 
-      {/* Scala: forme dei livelli al centro di ogni passo */}
-      <div className="track-criteria__scale" style={{ '--steps': steps.length }} aria-hidden="true">
-        <span />
-        <span className="track-criteria__steps">
-          {steps.map((s) => <span key={s}><LevelShape level={s} size={14} /></span>)}
-        </span>
-      </div>
     </section>
   )
 }

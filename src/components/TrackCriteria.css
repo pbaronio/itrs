@@ -7,8 +7,7 @@
   padding: 0;
   list-style: none;
 }
-.track-criteria__row,
-.track-criteria__scale {
+.track-criteria__row {
   display: grid;
   grid-template-columns: 124px 1fr;
   gap: var(--s-s);
@@ -29,24 +28,14 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(100% * var(--n) / var(--steps));
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 6px;
   border-radius: var(--r-thumb);
   background: var(--color);
   transform-origin: left center;
   animation: crit-grow var(--dur-map) var(--ease-out) var(--delay) both;
 }
-.track-criteria__shape { flex-shrink: 0; animation: crit-fade var(--dur-base) var(--ease-out) calc(var(--delay) + 250ms) both; }
 .track-criteria__none { position: absolute; left: var(--s-xs); top: 50%; transform: translateY(-50%); color: var(--text-soft-500); }
 
-.track-criteria__scale { margin-top: var(--s-xs); }
-.track-criteria__steps { display: grid; grid-template-columns: repeat(var(--steps), 1fr); }
-.track-criteria__steps > span { display: grid; place-items: center; }
-
 @keyframes crit-grow { from { transform: scaleX(0); } to { transform: none; } }
-@keyframes crit-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .track-criteria__bar, .track-criteria__shape { animation: none; }
+  .track-criteria__bar { animation: none; }
 }
