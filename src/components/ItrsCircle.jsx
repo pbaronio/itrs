@@ -79,7 +79,8 @@ export const itrsSummary = (ratings) => Object.keys(QUADRANTS)
 export const hasFullRating = (item) => Boolean(item?.ratings && Object.keys(QUADRANTS).every((f) => item.ratings[f]))
 
 /* Quadranti, divisori e icone, centrati in (cx, cy): stessa geometria del cerchio grande */
-function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider' }) {
+function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider', iconScale = 1 }) {
+  const box = SHAPE_BOX * iconScale
   return (
     <>
       {Object.entries(QUADRANTS).map(([f, q]) => (
@@ -93,16 +94,16 @@ function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider' }) {
       <line className={divider} x1={cx - R} x2={cx + R} y1={cy} y2={cy} />
       <line className={divider} x1={cx} x2={cx} y1={cy - R} y2={cy + R} />
       <svg
-        x={cx + DIFF.dx - SHAPE_BOX / 2}
-        y={cy + DIFF.dy - SHAPE_BOX / 2}
-        width={SHAPE_BOX}
-        height={SHAPE_BOX}
+        x={cx + DIFF.dx - box / 2}
+        y={cy + DIFF.dy - box / 2}
+        width={box}
+        height={box}
         viewBox="0 0 14 14"
       >
         {SHAPE_PATHS[LEVELS[ratings.difficulty].shape]('var(--gray-0)')}
       </svg>
       {Object.entries(ICONS).map(([f, ic]) => (
-        <g key={f} fill="var(--gray-0)" transform={`translate(${(cx + ic.dx - ic.w / 2).toFixed(2)} ${(cy + ic.dy - ic.h / 2).toFixed(2)})`}>
+        <g key={f} fill="var(--gray-0)" transform={`translate(${(cx + ic.dx).toFixed(2)} ${(cy + ic.dy).toFixed(2)}) scale(${iconScale}) translate(${(-ic.w / 2).toFixed(2)} ${(-ic.h / 2).toFixed(2)})`}>
           {ic.body}
         </g>
       ))}
@@ -115,10 +116,13 @@ function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider' }) {
  * con bordo bianco, sulle foto delle route. Stesso linguaggio della mini-mappa, a specchio.
  * size: 76 su listing e pagina route, 44 sulla card overlay.
  */
+// Nella torta piccola le icone sono più grandi che nel cerchio da 262, per restare leggibili
+const PIE_ICON_SCALE = 1.55
+
 export function ItrsPie({ ratings, size = 76, className = '', onClick, label }) {
   const art = (
     <svg className="itrs-pie__svg" viewBox={`${-R} ${-R} ${2 * R} ${2 * R}`} aria-hidden="true">
-      <PieBody ratings={ratings} cx={0} cy={0} divider="itrs-pie__divider" />
+      <PieBody ratings={ratings} cx={0} cy={0} divider="itrs-pie__divider" iconScale={PIE_ICON_SCALE} />
     </svg>
   )
   const style = { '--pie': `${size}px` }

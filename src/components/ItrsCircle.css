@@ -14,12 +14,12 @@
   height: var(--pie);
   padding: 0;
   border-radius: var(--r-pill);
-  border: 2px solid var(--stroke-white-0);
+  border: 1px solid var(--stroke-white-0);
   background: var(--stroke-white-0);
   overflow: hidden;
   line-height: 0;
 }
 .itrs-pie__svg { display: block; width: 100%; height: 100%; }
-.itrs-pie__divider { stroke: var(--stroke-white-0); stroke-width: 6; }
+.itrs-pie__divider { stroke: var(--stroke-white-0); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .itrs-pie--button { cursor: pointer; transition: transform var(--dur-fast) var(--ease-out); }
 .itrs-pie--button:active { transform: scale(.96); }
