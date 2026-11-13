@@ -11,7 +11,7 @@ import './DifficultyBreakdown.css'
  *   2 px di stacco bianco tra gli archi. In entrata gli archi si disegnano uno dopo l'altro in
  *   senso orario (stroke-dashoffset), poi compaiono centro e legenda. *Riduci movimento*: niente.
  * - Legenda come Surface type: forma del livello 18 (colore + forma), nome, % • km.
- * - Strada: colore di "Road and cycle paths" del tipo di fondo (sabbia), così le due sezioni si leggono uguali.
+ * - Strada: viola `--road-unrated` (#BE88DB), indicato da Paolo come nell'esempio del cliente.
  */
 const SIZE = 176
 const STROKE = 22
@@ -58,7 +58,7 @@ export default function DifficultyBreakdown({ route }) {
       rotate: -90 + (at / C) * 360,
       delay: DELAY_MS + (at / C) * DRAW_MS,
       dur: Math.max(60, p.share * DRAW_MS),
-      color: p.key === 'road' ? 'var(--sabbia-dark)' : LEVELS[p.key].color,
+      color: p.key === 'road' ? 'var(--road-unrated)' : LEVELS[p.key].color,
       i,
     }
     at += len

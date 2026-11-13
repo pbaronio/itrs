@@ -59,7 +59,7 @@
   height: 18px;
   flex-shrink: 0;
   padding: 3.2px;
-  background: var(--sabbia-dark);
+  background: var(--road-unrated);
   background-clip: content-box;
   border-radius: 2px;
 }
