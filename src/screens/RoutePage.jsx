@@ -169,7 +169,6 @@ export default function RoutePage({ route, open, layers = [], nav }) {
         level={info ? r.ratings[info] : null}
         title={infoText?.title}
         text={infoText?.text}
-        tall={info === 'difficulty'}
       >
         {info === 'difficulty' && <DifficultyBreakdown route={r} />}
       </InfoSheet>

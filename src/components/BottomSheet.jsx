@@ -39,6 +39,8 @@ export default function BottomSheet({
   const drag = useRef(null)
   const heightRef = useRef(height)
   heightRef.current = height
+  const snapsRef = useRef(snaps)            // stati aggiornati anche dentro l'animazione di apertura
+  snapsRef.current = snaps
   const handleHidden = hideHandleAtTop && snaps.length > 1 && index === snaps.length - 1
 
   // Stato controllato dall'esterno (es. FAB Map → stato 1)
@@ -61,9 +63,13 @@ export default function BottomSheet({
     if (open) {
       setMounted(true)
       setHeight(0)
+      // Altezza letta al momento dell'apertura (gli stati possono cambiare mentre il foglio sale,
+      // es. bottom sheet informativo che si adatta al contenuto appena montato)
       const id = requestAnimationFrame(() => requestAnimationFrame(() => {
-        setIndex(snap ?? 0)
-        setHeight(snaps[snap ?? 0])
+        const list = snapsRef.current
+        const i = Math.min(snap ?? 0, list.length - 1)
+        setIndex(i)
+        setHeight(list[i])
       }))
       return () => cancelAnimationFrame(id)
     }

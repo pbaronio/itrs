@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import BottomSheet from './BottomSheet.jsx'
 import { CloseButton } from './Button.jsx'
 import { Badge } from './Cards.jsx'
@@ -6,26 +6,44 @@ import { FACTORS } from '../data/itrs.js'
 
 /*
  * Bottom sheet informativo (Figma 3625:20072): spiega un livello ITRS
- * senza lasciare la pagina. 402×428, si chiude con X, tap sul velo o
- * trascinando in giù.
+ * senza lasciare la pagina. Si chiude con X, tap sul velo o trascinando in giù.
+ * Altezza (comportamento da bottom sheet nativo): segue il contenuto, almeno 428 come nel Figma;
+ * se il contenuto è più lungo il foglio arriva al massimo lasciando 24 px di velo sotto la barra
+ * di stato (si capisce che è un foglio sopra la pagina) e il contenuto scorre. La maniglia resta.
  */
-// tall: foglio alto quasi quanto lo schermo, il contenuto scorre (es. dettaglio della difficoltà)
-export default function InfoSheet({ open, onClose, factor, level, title, text, tall = false, children }) {
-  const [viewH, setViewH] = useState(() => window.innerHeight)
-  useLayoutEffect(() => {
-    if (!tall) return
-    const probe = document.createElement('div')
-    probe.style.cssText = 'position:absolute;visibility:hidden;padding-top:var(--safe-top)'
-    document.body.appendChild(probe)
-    const safeTop = parseFloat(getComputedStyle(probe).paddingTop) || 0
-    probe.remove()
-    setViewH(window.innerHeight - safeTop)
-  }, [tall, open])
+const MIN_H = 428
+const HEAD_H = 24        // testata con la maniglia (BottomSheet)
+const TOP_GAP = 24       // velo visibile sopra il foglio alla massima altezza
 
-  // In chiusura il foglio resta alto finché non è uscito (niente salto di altezza)
-  const tallRef = useRef(tall)
-  if (open) tallRef.current = tall
-  const height = tallRef.current ? Math.max(428, viewH - 12) : 428
+function safeTopPx() {
+  const probe = document.createElement('div')
+  probe.style.cssText = 'position:absolute;visibility:hidden;padding-top:var(--safe-top)'
+  document.body.appendChild(probe)
+  const v = parseFloat(getComputedStyle(probe).paddingTop) || 0
+  probe.remove()
+  return v
+}
+
+export default function InfoSheet({ open, onClose, factor, level, title, text, children }) {
+  const [body, setBody] = useState(null)      // corpo del foglio (montato dopo l'apertura)
+  const [need, setNeed] = useState(MIN_H)
+  const [maxH, setMaxH] = useState(() => window.innerHeight - TOP_GAP)
+
+  // Altezza del contenuto e spazio disponibile, ricalcolati se cambiano (testi, rotazione)
+  useLayoutEffect(() => {
+    if (!open) return
+    const measure = () => {
+      setMaxH(window.innerHeight - safeTopPx() - TOP_GAP)
+      if (body) setNeed(HEAD_H + body.offsetHeight)
+    }
+    measure()
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
+    if (body) ro?.observe(body)
+    window.addEventListener('resize', measure)
+    return () => { ro?.disconnect(); window.removeEventListener('resize', measure) }
+  }, [open, body])
+
+  const height = Math.round(Math.min(Math.max(MIN_H, need), maxH))
   return (
     <BottomSheet
       open={open}
@@ -37,7 +55,7 @@ export default function InfoSheet({ open, onClose, factor, level, title, text, t
       header={<CloseButton className="info-sheet__close" onClick={onClose} />}
     >
       {factor && level && (
-        <div className="info-sheet__body">
+        <div ref={setBody} className="info-sheet__body">
           <Badge factor={factor} level={level} className="info-sheet__badge" />
           <p className="t-display info-sheet__name">{FACTORS[factor].names[level]}</p>
           {title && <p className="t-md-em info-sheet__title">{title}</p>}

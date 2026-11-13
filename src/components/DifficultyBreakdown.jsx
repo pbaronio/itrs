@@ -68,7 +68,6 @@ export default function DifficultyBreakdown({ route }) {
 
   return (
     <section className="diff-breakdown" aria-labelledby="diff-breakdown-title">
-      <p className="t-label">How it's calculated</p>
       <h3 id="diff-breakdown-title" className="t-md-em diff-breakdown__title">Details on technical difficulty</h3>
       <p className="t-md diff-breakdown__text">{summary(parts)}</p>
 

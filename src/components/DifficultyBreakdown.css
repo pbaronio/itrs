@@ -4,9 +4,9 @@
   margin-top: var(--s-2xl);
   padding-top: var(--s-2xl);
   border-top: 1px solid var(--stroke-soft-100);
-  text-align: left;
+  text-align: center;
 }
-.diff-breakdown__title { margin-top: var(--s-2xs); color: var(--text-strong-950); }
+.diff-breakdown__title { color: var(--text-strong-950); }
 .diff-breakdown__text { margin-top: var(--s-xs); color: var(--text-sub-700); }
 
 .diff-breakdown__chart {
@@ -48,6 +48,7 @@
 }
 .diff-breakdown__legend li {
   display: flex;
+  text-align: left;
   align-items: center;
   gap: var(--s-xs);
   color: var(--text-strong-950);
