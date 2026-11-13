@@ -79,8 +79,7 @@ export const itrsSummary = (ratings) => Object.keys(QUADRANTS)
 export const hasFullRating = (item) => Boolean(item?.ratings && Object.keys(QUADRANTS).every((f) => item.ratings[f]))
 
 /* Quadranti, divisori e icone, centrati in (cx, cy): stessa geometria del cerchio grande */
-function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider', iconScale = 1 }) {
-  const box = SHAPE_BOX * iconScale
+function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider', uniform = false }) {
   return (
     <>
       {Object.entries(QUADRANTS).map(([f, q]) => (
@@ -93,21 +92,68 @@ function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider', iconScale 
       ))}
       <line className={divider} x1={cx - R} x2={cx + R} y1={cy} y2={cy} />
       <line className={divider} x1={cx} x2={cx} y1={cy - R} y2={cy + R} />
-      <svg
-        x={cx + DIFF.dx - box / 2}
-        y={cy + DIFF.dy - box / 2}
-        width={box}
-        height={box}
-        viewBox="0 0 14 14"
-      >
-        {SHAPE_PATHS[LEVELS[ratings.difficulty].shape]('var(--gray-0)')}
-      </svg>
-      {Object.entries(ICONS).map(([f, ic]) => (
-        <g key={f} fill="var(--gray-0)" transform={`translate(${(cx + ic.dx).toFixed(2)} ${(cy + ic.dy).toFixed(2)}) scale(${iconScale}) translate(${(-ic.w / 2).toFixed(2)} ${(-ic.h / 2).toFixed(2)})`}>
-          {ic.body}
-        </g>
-      ))}
+      {uniform ? <UniformGlyphs ratings={ratings} cx={cx} cy={cy} /> : (
+        <>
+          <svg
+            x={cx + DIFF.dx - SHAPE_BOX / 2}
+            y={cy + DIFF.dy - SHAPE_BOX / 2}
+            width={SHAPE_BOX}
+            height={SHAPE_BOX}
+            viewBox="0 0 14 14"
+          >
+            {SHAPE_PATHS[LEVELS[ratings.difficulty].shape]('var(--gray-0)')}
+          </svg>
+          {Object.entries(ICONS).map(([f, ic]) => (
+            <g key={f} fill="var(--gray-0)" transform={`translate(${(cx + ic.dx - ic.w / 2).toFixed(2)} ${(cy + ic.dy - ic.h / 2).toFixed(2)})`}>
+              {ic.body}
+            </g>
+          ))}
+        </>
+      )}
     </>
+  )
+}
+
+/*
+ * Torta piccola: ogni simbolo è centrato sul baricentro del suo quadrante (4R/3π dal centro)
+ * e portato alla stessa misura (lato più lungo = GLYPH), misurando l'ingombro reale del tracciato.
+ * k = correzione ottica: quadrato e cerchio pieni sembrano più grandi di triangolo e rombo.
+ */
+const GLYPH = 52
+const C = (4 * R) / (3 * Math.PI)
+const ICON_BBOX = {
+  fitness:    { x: 1.884, y: 1.884, w: 39.948, h: 34.233, k: 1 },
+  exposure:   { x: 0, y: 0, w: 31.364, h: 34.482, k: 0.96 },
+  wilderness: { x: -0.31, y: 0, w: 33.937, h: 34.747, k: 0.96 },
+}
+const SHAPE_BBOX = {
+  circle:   { x: 2.5, y: 2.5, w: 9, h: 9, k: 0.86 },
+  square:   { x: 2.5, y: 2.5, w: 9, h: 9, k: 0.78 },
+  triangle: { x: 1.5, y: 2.067, w: 11, h: 9.526, k: 1, dy: 3 },
+  diamond:  { x: 0.636, y: 0.636, w: 12.728, h: 12.728, k: 1 },
+  double:   { x: 0, y: 0.934, w: 14, h: 12.087, k: 1 },
+}
+const GLYPH_POS = {
+  difficulty: [-1, -1], fitness: [1, -1], exposure: [1, 1], wilderness: [-1, 1],
+}
+
+function fit(b, px, py) {
+  const s = (GLYPH * b.k) / Math.max(b.w, b.h)
+  const tx = px - (b.w * s) / 2 - b.x * s
+  const ty = py - (b.h * s) / 2 - b.y * s + (b.dy ?? 0)
+  return `translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${s.toFixed(4)})`
+}
+
+function UniformGlyphs({ ratings, cx, cy }) {
+  const shape = LEVELS[ratings.difficulty].shape
+  const at = (f) => [cx + GLYPH_POS[f][0] * C, cy + GLYPH_POS[f][1] * C]
+  return (
+    <g fill="var(--gray-0)">
+      <g transform={fit(SHAPE_BBOX[shape], ...at('difficulty'))}>{SHAPE_PATHS[shape]('var(--gray-0)')}</g>
+      {Object.entries(ICONS).map(([f, ic]) => (
+        <g key={f} transform={fit(ICON_BBOX[f], ...at(f))}>{ic.body}</g>
+      ))}
+    </g>
   )
 }
 
@@ -116,13 +162,10 @@ function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider', iconScale 
  * con bordo bianco, sulle foto delle route. Stesso linguaggio della mini-mappa, a specchio.
  * size: 76 su listing e pagina route, 44 sulla card overlay.
  */
-// Nella torta piccola le icone sono più grandi che nel cerchio da 262, per restare leggibili
-const PIE_ICON_SCALE = 1.55
-
 export function ItrsPie({ ratings, size = 76, className = '', onClick, label }) {
   const art = (
     <svg className="itrs-pie__svg" viewBox={`${-R} ${-R} ${2 * R} ${2 * R}`} aria-hidden="true">
-      <PieBody ratings={ratings} cx={0} cy={0} divider="itrs-pie__divider" iconScale={PIE_ICON_SCALE} />
+      <PieBody ratings={ratings} cx={0} cy={0} divider="itrs-pie__divider" uniform />
     </svg>
   )
   const style = { '--pie': `${size}px` }
