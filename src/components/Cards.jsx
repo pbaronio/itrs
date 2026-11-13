@@ -44,8 +44,8 @@ export function LevelLabel({ level, factor = 'difficulty' }) {
 
 /* ---------- Card overlay (carosello) 347×125 ---------- */
 
-// Route (4 fattori): torta ITRS sulla foto al posto dell'etichetta del livello.
-// Track: etichetta del livello come prima.
+// Route (4 fattori): torta ITRS sulla foto, etichetta del livello sopra il titolo come prima.
+// Track: solo etichetta del livello.
 export function RouteCard({ route, onClick, active }) {
   const pie = hasFullRating(route)
   return (
@@ -55,7 +55,7 @@ export function RouteCard({ route, onClick, active }) {
         {pie && <ItrsPie ratings={route.ratings} size={44} className="route-card__pie" />}
       </span>
       <span className="route-card__body">
-        {!pie && <LevelLabel level={route.level} />}
+        <LevelLabel level={route.level} />
         <span className="route-card__title t-md-em">{route.name}</span>
         <Meta distance={route.distance} duration={route.duration} />
       </span>
