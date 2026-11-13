@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import Icon from './Icon.jsx'
 import LevelShape, { SHAPE_PATHS } from './LevelShape.jsx'
 import { FACTORS, LEVELS } from '../data/itrs.js'
+import { ItrsPie, hasFullRating } from './ItrsCircle.jsx'
 import badgeDifficultyGreen from '../assets/badges/difficulty-green.webp'
 import badgeExposureGreen from '../assets/badges/exposure-green.webp'
 import minimapImg from '../assets/photos/minimap.webp'
@@ -43,12 +44,18 @@ export function LevelLabel({ level, factor = 'difficulty' }) {
 
 /* ---------- Card overlay (carosello) 347×125 ---------- */
 
+// Route (4 fattori): torta ITRS sulla foto al posto dell'etichetta del livello.
+// Track: etichetta del livello come prima.
 export function RouteCard({ route, onClick, active }) {
+  const pie = hasFullRating(route)
   return (
     <button type="button" className={`route-card${active ? ' is-active' : ''}`} onClick={onClick}>
-      <img className="route-card__img" src={route.photo} alt="" draggable="false" />
+      <span className="route-card__media">
+        <img className="route-card__img" src={route.photo} alt="" draggable="false" />
+        {pie && <ItrsPie ratings={route.ratings} size={44} className="route-card__pie" />}
+      </span>
       <span className="route-card__body">
-        <LevelLabel level={route.level} />
+        {!pie && <LevelLabel level={route.level} />}
         <span className="route-card__title t-md-em">{route.name}</span>
         <Meta distance={route.distance} duration={route.duration} />
       </span>
@@ -58,15 +65,18 @@ export function RouteCard({ route, onClick, active }) {
 
 /* ---------- Card listing 370 ---------- */
 
+// Route: mini-mappa a sinistra e torta ITRS a destra (Figma 3625:17581). Track: solo mini-mappa a destra.
 export function ListingCard({ route, saved, onSave, onClick }) {
+  const pie = hasFullRating(route)
   return (
-    <article className="listing-card">
+    <article className={`listing-card${pie ? ' listing-card--pie' : ''}`}>
       <div className="listing-card__media">
         <PhotoGallery photos={route.photos ?? [route]} label={route.name} onClick={onClick} className="listing-card__gallery" />
         <button type="button" className="listing-card__save" aria-label={saved ? 'Saved' : 'Save'} aria-pressed={saved} onClick={onSave}>
           <Icon name="bookmarkFilled" size={16} />
         </button>
         <MiniMap route={route} />
+        {pie && <ItrsPie ratings={route.ratings} className="listing-card__pie" />}
       </div>
       {/* Tutta la card porta al dettaglio, non solo la foto (rev. 2.3) */}
       <div

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import RouteMap from '../components/map/RouteMap.jsx'
 import InfoSheet from '../components/InfoSheet.jsx'
-import ItrsCircle from '../components/ItrsCircle.jsx'
+import ItrsCircle, { ItrsPie } from '../components/ItrsCircle.jsx'
 import LevelShape from '../components/LevelShape.jsx'
 import { TrackList } from '../components/TrackTimeline.jsx'
 import { Datum, Surface } from '../components/DetailParts.jsx'
@@ -38,6 +38,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
   const [saved, setSaved] = useState(() => new Set())
   const [info, setInfo] = useState(null)           // fattore del bottom sheet informativo
   const scrollRef = useRef(null)
+  const itrsRef = useRef(null)
   const entered = useEntered(open && Boolean(route))
 
   useEffect(() => {
@@ -73,6 +74,14 @@ export default function RoutePage({ route, open, layers = [], nav }) {
   const legs = legsOf(r)
   const infoText = info ? levelInfo(info, r.ratings[info], r) : null
   const has = (t) => layers.some((l) => l.t === t)
+  // Tap sulla torta in cima: scorre fino alla card ITRS, sotto i pulsanti fissi in alto [P]
+  const scrollToItrs = () => {
+    const box = scrollRef.current, el = itrsRef.current
+    if (!box || !el) return
+    const top = box.scrollTop + el.getBoundingClientRect().top - box.getBoundingClientRect().top - 72
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    box.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' })
+  }
   const openLeg = (leg) => nav.push({ t: 'leg', n: leg.n })
 
   return (
@@ -84,6 +93,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
 
         <div className="route-page__body">
           <MiniMap route={r} className="route-page__minimap" label="Explore the route on the map" onClick={() => nav.push({ t: 'routeMap' })} />
+          <ItrsPie ratings={r.ratings} className="route-page__pie" label="Go to the ITRS rating" onClick={scrollToItrs} />
 
           <section className="route-page__title">
             <h1 className="t-2xl-em">{r.name}</h1>
@@ -111,7 +121,7 @@ export default function RoutePage({ route, open, layers = [], nav }) {
 
           <hr className="route-page__divider" />
 
-          <section className="itrs-card" aria-label="ITRS rating">
+          <section ref={itrsRef} className="itrs-card" aria-label="ITRS rating">
             <ItrsCircle ratings={r.ratings} />
             <div className="rating-rows itrs-card__rows">
               {RATING_ORDER.map((f, i) => (

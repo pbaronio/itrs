@@ -31,6 +31,8 @@
   transition: transform var(--dur-fast) var(--ease-out);
 }
 .route-card:active { transform: scale(.98); }
+.route-card__media { position: relative; flex-shrink: 0; line-height: 0; }
+.route-card__pie { position: absolute; right: 6px; bottom: 6px; }
 .route-card__img {
   width: 111px;
   height: 111px;
@@ -117,6 +119,8 @@
   overflow: hidden;
   pointer-events: none;
 }
+.listing-card--pie .listing-card__map { left: 14px; right: auto; }
+.listing-card__pie { position: absolute; right: 14px; bottom: 17px; pointer-events: none; }
 .listing-card__map--button { display: block; padding: 0; pointer-events: auto; cursor: pointer; transition: transform var(--dur-fast) var(--ease-out); }
 .listing-card__map--button:active { transform: scale(.96); }
 .listing-card__map img { width: 100%; height: 100%; object-fit: cover; }

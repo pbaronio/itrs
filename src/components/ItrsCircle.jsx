@@ -71,29 +71,30 @@ function arc(angle, top) {
   return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 0 ${top ? 1 : 0} ${x1.toFixed(2)} ${y1.toFixed(2)}`
 }
 
-export default function ItrsCircle({ ratings }) {
-  const summary = Object.keys(QUADRANTS)
-    .map((f) => `${FACTORS[f].label}: ${FACTORS[f].names[ratings[f]]}`)
-    .join(', ')
+export const itrsSummary = (ratings) => Object.keys(QUADRANTS)
+  .map((f) => `${FACTORS[f].label}: ${FACTORS[f].names[ratings[f]]}`)
+  .join(', ')
+
+// Una route ha i 4 fattori; le track solo Difficulty ed Exposure (niente torta)
+export const hasFullRating = (item) => Boolean(item?.ratings && Object.keys(QUADRANTS).every((f) => item.ratings[f]))
+
+/* Quadranti, divisori e icone, centrati in (cx, cy): stessa geometria del cerchio grande */
+function PieBody({ ratings, cx, cy, divider = 'itrs-circle__divider' }) {
   return (
-    <svg className="itrs-circle" width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`ITRS rating. ${summary}`}>
-      <defs>
-        {Object.entries(QUADRANTS).map(([f, q]) => <path key={f} id={`itrs-arc-${f}`} d={arc(q.angle, q.top)} />)}
-      </defs>
+    <>
       {Object.entries(QUADRANTS).map(([f, q]) => (
         <path
           key={f}
           d={QUAD}
           fill={LEVELS[ratings[f]].color}
-          transform={`translate(${CX} ${CY}) scale(${q.sx} ${q.sy}) translate(-131.273 -131.295)`}
+          transform={`translate(${cx} ${cy}) scale(${q.sx} ${q.sy}) translate(-131.273 -131.295)`}
         />
       ))}
-      <line className="itrs-circle__divider" x1={CX - R} x2={CX + R} y1={CY} y2={CY} />
-      <line className="itrs-circle__divider" x1={CX} x2={CX} y1={CY - R} y2={CY + R} />
-
+      <line className={divider} x1={cx - R} x2={cx + R} y1={cy} y2={cy} />
+      <line className={divider} x1={cx} x2={cx} y1={cy - R} y2={cy + R} />
       <svg
-        x={CX + DIFF.dx - SHAPE_BOX / 2}
-        y={CY + DIFF.dy - SHAPE_BOX / 2}
+        x={cx + DIFF.dx - SHAPE_BOX / 2}
+        y={cy + DIFF.dy - SHAPE_BOX / 2}
         width={SHAPE_BOX}
         height={SHAPE_BOX}
         viewBox="0 0 14 14"
@@ -101,10 +102,48 @@ export default function ItrsCircle({ ratings }) {
         {SHAPE_PATHS[LEVELS[ratings.difficulty].shape]('var(--gray-0)')}
       </svg>
       {Object.entries(ICONS).map(([f, ic]) => (
-        <g key={f} fill="var(--gray-0)" transform={`translate(${(CX + ic.dx - ic.w / 2).toFixed(2)} ${(CY + ic.dy - ic.h / 2).toFixed(2)})`}>
+        <g key={f} fill="var(--gray-0)" transform={`translate(${(cx + ic.dx - ic.w / 2).toFixed(2)} ${(cy + ic.dy - ic.h / 2).toFixed(2)})`}>
           {ic.body}
         </g>
       ))}
+    </>
+  )
+}
+
+/*
+ * Torta ITRS (Figma 3625:17581 card listing, 3625:18793 pagina route): il cerchio senza etichette,
+ * con bordo bianco, sulle foto delle route. Stesso linguaggio della mini-mappa, a specchio.
+ * size: 76 su listing e pagina route, 44 sulla card overlay.
+ */
+export function ItrsPie({ ratings, size = 76, className = '', onClick, label }) {
+  const art = (
+    <svg className="itrs-pie__svg" viewBox={`${-R} ${-R} ${2 * R} ${2 * R}`} aria-hidden="true">
+      <PieBody ratings={ratings} cx={0} cy={0} divider="itrs-pie__divider" />
+    </svg>
+  )
+  const style = { '--pie': `${size}px` }
+  if (onClick) {
+    return (
+      <button type="button" className={`itrs-pie itrs-pie--button ${className}`} style={style} onClick={onClick} aria-label={label ?? `ITRS rating. ${itrsSummary(ratings)}`}>
+        {art}
+      </button>
+    )
+  }
+  return (
+    <span className={`itrs-pie ${className}`} style={style} role="img" aria-label={`ITRS rating. ${itrsSummary(ratings)}`}>
+      {art}
+    </span>
+  )
+}
+
+export default function ItrsCircle({ ratings }) {
+  const summary = itrsSummary(ratings)
+  return (
+    <svg className="itrs-circle" width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`ITRS rating. ${summary}`}>
+      <defs>
+        {Object.entries(QUADRANTS).map(([f, q]) => <path key={f} id={`itrs-arc-${f}`} d={arc(q.angle, q.top)} />)}
+      </defs>
+      <PieBody ratings={ratings} cx={CX} cy={CY} />
 
       {Object.entries(QUADRANTS).map(([f, q]) => (
         <text key={f} className="itrs-circle__label">

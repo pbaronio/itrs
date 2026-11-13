@@ -51,6 +51,8 @@
   background: var(--bg-white-0);
 }
 .listing-card__map.route-page__minimap { top: -38px; left: var(--s-m); right: auto; bottom: auto; }
+/* Torta ITRS a specchio della mini-mappa (Figma 3625:18793) */
+.route-page__pie { position: absolute; top: -38px; right: var(--s-m); }
 
 .route-page__title { display: flex; flex-direction: column; gap: var(--s-s); }
 .route-page__title h1 { margin: 0; color: var(--text-strong-950); }
