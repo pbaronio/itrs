@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import RouteMap from '../components/map/RouteMap.jsx'
 import InfoSheet from '../components/InfoSheet.jsx'
+import TrackCriteria from '../components/TrackCriteria.jsx'
 import LevelShape from '../components/LevelShape.jsx'
 import Icon from '../components/Icon.jsx'
 import { Datum, Surface } from '../components/DetailParts.jsx'
@@ -131,7 +132,9 @@ function useInfo(track) {
       level={info && track ? track[info] : null}
       title={text?.title}
       text={text?.text}
-    />
+    >
+      {info === 'difficulty' && track?.criteria && <TrackCriteria track={track} />}
+    </InfoSheet>
   )
   return [setInfo, sheet]
 }

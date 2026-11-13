@@ -408,6 +408,58 @@ export function exposureOf(item) {
   return out.sort((x, y) => x.km - y.km)
 }
 
+// ---------- Criteri della difficoltà di una track (richiesta di Paolo, 13 nov) ----------
+// Esempio del cliente: un livello per criterio (larghezza, fondo, pendenza media e massima,
+// contropendenza, curve, ostacoli, salti, drop, north shore). Inventati ma verosimili:
+// pendenze dal tracciato vero, larghezza dal tipo di fondo, salti/drop/north shore solo se la
+// track ha quei TTF. Nessun criterio sopra il livello della track e almeno uno uguale: il livello
+// della track è quello del criterio più difficile [P]. level null = elemento non presente.
+export const CRITERIA = [
+  { key: 'width', label: 'Trail width' },
+  { key: 'surface', label: 'Trail surface' },
+  { key: 'gradeAvg', label: 'Trail grade (avg)' },
+  { key: 'gradeMax', label: 'Trail grade (max)' },
+  { key: 'camber', label: 'Off-camber' },
+  { key: 'corners', label: 'Corners' },
+  { key: 'obstacles', label: 'Obstacles' },
+  { key: 'jumps', label: 'Jumps' },
+  { key: 'drops', label: 'Drops' },
+  { key: 'northShore', label: 'North Shore' },
+]
+
+function criteriaOf(id, points, level, surface, ttf) {
+  const L = LEVEL_ORDER.indexOf(level)
+  const rnd = seeded(`${id}:crit`)
+  const dist = [0]
+  for (let i = 1; i < points.length; i++) dist.push(dist[i - 1] + meters(points[i - 1], points[i]))
+  const total = dist[dist.length - 1] || 1
+  const { up, down } = climbOf(points)
+  const avg = ((up + down) / total) * 100
+  let max = 0, a = 0
+  for (let i = 0; i < points.length; i++) {
+    while (dist[i] - dist[a] > 200) a++
+    if (dist[i] - dist[a] >= 150) max = Math.max(max, (Math.abs(points[i][2] - points[a][2]) / (dist[i] - dist[a])) * 100)
+  }
+  const tot = surface.road + surface.gravel + surface.single || 1
+  const single = surface.single / tot
+  const step = (v, cuts) => cuts.filter((c) => v >= c).length
+  const lv = {
+    width: single < 0.2 ? 0 : single < 0.5 ? Math.max(0, L - 1) : L,
+    surface: Math.max(0, L - (rnd() < 0.55 ? 0 : 1)),
+    gradeAvg: step(avg, [4, 8, 12]),
+    gradeMax: step(max, [8, 14, 20]),
+    camber: Math.floor(rnd() * (L + 1) * 0.8),
+    corners: Math.floor(rnd() * (L + 1) * 0.9),
+    obstacles: Math.max(0, L - (rnd() < 0.5 ? 0 : 1)),
+    jumps: ttf.includes('jump') ? Math.max(0, L - (rnd() < 0.5 ? 0 : 1)) : null,
+    drops: ttf.includes('drop') ? L : null,
+    northShore: ttf.includes('skinny') ? Math.max(0, L - 1) : null,
+  }
+  for (const k of Object.keys(lv)) if (lv[k] != null) lv[k] = Math.min(lv[k], L)
+  if (!Object.values(lv).some((v) => v === L)) lv.obstacles = L
+  return Object.fromEntries(Object.entries(lv).map(([k, v]) => [k, v == null ? null : LEVEL_ORDER[v]]))
+}
+
 const covers = Object.fromEntries(Object.entries(TRACK_META).map(([id, meta]) => [id, trackCover(meta.name)]))
 export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
   const g = GEOMETRY[id]
@@ -436,6 +488,7 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
     ttf: TRACK_TTF[id] ?? [],
     segments: segmentsOf(id, points, meta.difficulty),
     exposurePts: exposurePointsOf(id, points, meta.exposure),
+    criteria: criteriaOf(id, points, meta.difficulty, g.surface, TRACK_TTF[id] ?? []),
   }
 })
 

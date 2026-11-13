@@ -1,4 +1,6 @@
-/* Dettaglio della difficoltà tecnica (bottom sheet informativo della Difficulty di una route) */
+/* Dettaglio della difficoltà tecnica (bottom sheet informativo della Difficulty): sezione comune
+   a route (ciambella) e track (criteri) */
+.diff-section,
 .diff-breakdown {
   width: 100%;
   margin-top: var(--s-2xl);
@@ -6,8 +8,8 @@
   border-top: 1px solid var(--stroke-soft-100);
   text-align: center;
 }
-.diff-breakdown__title { color: var(--text-strong-950); }
-.diff-breakdown__text { margin-top: var(--s-xs); color: var(--text-sub-700); }
+.diff-section__title, .diff-breakdown__title { color: var(--text-strong-950); }
+.diff-section__text, .diff-breakdown__text { margin-top: var(--s-xs); color: var(--text-sub-700); }
 
 .diff-breakdown__chart {
   position: relative;
