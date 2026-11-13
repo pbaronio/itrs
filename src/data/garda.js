@@ -269,6 +269,93 @@ function surfaceShare(s) {
   return { road: s.road / tot, gravel: s.gravel / tot, single: s.single / tot }
 }
 
+// ---------- Segmenti di difficoltà (richiesta di Paolo, 13 nov) ----------
+// Una track è fatta di segmenti, ognuno col suo livello di difficoltà. Il livello della track è
+// quello del segmento più difficile [P]. Dati inventati ma verosimili: la track è divisa in tratti
+// di ~700 m; i tratti più ripidi o irregolari prendono il livello della track, gli altri quello
+// sotto (Expert: i più facili anche due sotto). Beginner: un solo segmento verde.
+// segments: [{ from, to, level }] con indici di `points` (to incluso, il punto di confine è comune).
+const LEVEL_ORDER = ['green', 'blue', 'red', 'black', 'orange']
+
+function seeded(str) {
+  let h = 2166136261
+  for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) }
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507)
+    h = Math.imul(h ^ (h >>> 13), 3266489909)
+    h ^= h >>> 16
+    return (h >>> 0) / 4294967296
+  }
+}
+
+function segmentsOf(id, points, level) {
+  const li = LEVEL_ORDER.indexOf(level)
+  const last = points.length - 1
+  if (li <= 0 || last < 4) return [{ from: 0, to: last, level }]
+  const rnd = seeded(id)
+  const dist = [0]
+  for (let i = 1; i <= last; i++) dist.push(dist[i - 1] + meters(points[i - 1], points[i]))
+  const total = dist[last]
+  const n = Math.max(2, Math.min(9, Math.round(total / 700)))
+  const cuts = [0]
+  for (let k = 1; k < n; k++) {
+    const target = (total * (k + (rnd() - 0.5) * 0.6)) / n
+    let i = cuts[cuts.length - 1] + 2
+    while (i < last - 2 && dist[i] < target) i++
+    if (i < last - 2) cuts.push(i)
+  }
+  cuts.push(last)
+  const chunks = []
+  for (let k = 0; k < cuts.length - 1; k++) {
+    const a = cuts[k], b = cuts[k + 1]
+    let rough = 0
+    for (let i = a + 1; i <= b; i++) rough += Math.abs(points[i][2] - points[i - 1][2])
+    const len = dist[b] - dist[a] || 1
+    chunks.push({ from: a, to: b, score: rough / len + rnd() * 0.02 })
+  }
+  const ranked = [...chunks].sort((x, y) => y.score - x.score)
+  const hard = Math.max(1, Math.round(chunks.length * (0.35 + rnd() * 0.25)))
+  const easiest = li >= 3 ? Math.floor(chunks.length * 0.2) : 0
+  ranked.forEach((c, r) => {
+    c.level = r < hard ? level
+      : r >= ranked.length - easiest ? LEVEL_ORDER[li - 2]
+      : LEVEL_ORDER[li - 1]
+  })
+  // tratti vicini dello stesso livello diventano un segmento solo
+  const out = []
+  for (const c of chunks) {
+    const prev = out[out.length - 1]
+    if (prev && prev.level === c.level) prev.to = c.to
+    else out.push({ from: c.from, to: c.to, level: c.level })
+  }
+  return out
+}
+
+// Segmenti nel verso di percorrenza (track al contrario dentro una route)
+function segmentsFor(track, reverse) {
+  if (!reverse) return track.segments
+  const last = track.points.length - 1
+  return [...track.segments].reverse().map((sg) => ({ from: last - sg.to, to: last - sg.from, level: sg.level }))
+}
+
+// Tratti colorati di una linea: [{ level, coords: [[lng, lat], …] }]
+function runsOfLeg(points, segments) {
+  return segments.map((sg) => ({ level: sg.level, coords: points.slice(sg.from, sg.to + 1).map((p) => [p[0], p[1]]) }))
+}
+
+// Tratti colorati di una route, di una track della mappa o di una track dentro una route
+export function runsOf(item) {
+  if (!item.legs) return runsOfLeg(item.points, item.segments)
+  return legsOf(item).flatMap((leg) => runsOfLeg(leg.points, leg.segments))
+}
+
+// Livello di ogni vertice di una track nel verso di percorrenza (navigazione)
+export function vertexLevels(leg) {
+  const out = new Array(leg.points.length)
+  for (const sg of leg.segments) for (let i = sg.from; i <= sg.to; i++) if (!out[i] || i > sg.from) out[i] = sg.level
+  return out
+}
+
 const covers = Object.fromEntries(Object.entries(TRACK_META).map(([id, meta]) => [id, trackCover(meta.name)]))
 export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
   const g = GEOMETRY[id]
@@ -295,6 +382,7 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
     towns: [meta.place],
     oneWay: ONE_WAY.has(id),
     ttf: TRACK_TTF[id] ?? [],
+    segments: segmentsOf(id, points, meta.difficulty),
   }
 })
 
@@ -382,7 +470,7 @@ export function legsOf(route) {
   const legs = route.legs.map(({ trackId, reverse }, i) => {
     const track = TRACK_BY_ID[trackId]
     const points = reverse ? [...track.points].reverse() : track.points
-    const leg = { n: i + 1, track, reverse, points, level: track.difficulty, km: track.km, startKm: at, endKm: at + track.km }
+    const leg = { n: i + 1, track, reverse, points, segments: segmentsFor(track, reverse), level: track.difficulty, km: track.km, startKm: at, endKm: at + track.km }
     at += track.km
     return leg
   })

@@ -1,7 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import { KEY, STYLES } from './MapView.jsx'
-import { LEVELS } from '../../data/itrs.js'
 import { rideLines } from '../../data/ride.js'
 import { endpointElement, trackNumberElement, rideUserElement } from './markers.js'
 import { ensureRideLayers, setRideLines } from './routeLayers.js'
@@ -36,7 +35,7 @@ const RideMap = forwardRef(function RideMap({ ride, styleKind = 'topo', topPad =
     // linee: a ogni frame (il tratto fatto finisce sotto il punto blu)
     if (map.getSource('itrs-ride-done')) {
       const { done, todo } = rideLines(ride, state)
-      setRideLines(map, done, todo.map((leg) => ({ coords: leg.coords, hex: LEVELS[ride.legs[leg.n - 1].level].hex })))
+      setRideLines(map, done, todo)
     }
     // numeri: solo le track ancora da fare
     if (force || l.lastLeg !== state.leg.n) {

@@ -7,7 +7,7 @@
  * Distanze e salite si scalano sui valori ufficiali di ogni track (km e +m mostrati nelle pagine),
  * così pannello, liste e grafico dicono gli stessi numeri.
  */
-import { ROUTES, TRACK_BY_KEY, legsOf, profileOf, trackAsRoute } from './garda.js'
+import { ROUTES, TRACK_BY_KEY, legsOf, profileOf, trackAsRoute, vertexLevels } from './garda.js'
 
 export const SPEEDS = [1, 5, 20]
 
@@ -64,6 +64,7 @@ export function buildRide(item) {
       ups.push(ups[i - 1] + Math.max(0, dz))
       downs.push(downs[i - 1] + Math.max(0, -dz))
     }
+    const lv = vertexLevels(leg)
     const upTot = ups[ups.length - 1] || 1
     const downTot = downs[downs.length - 1] || 1
     leg.points.forEach((p, i) => {
@@ -77,7 +78,7 @@ export function buildRide(item) {
         const h = dz >= 0 ? dKm / 14 + dz / 600 : dKm / 20
         t += h * 3600
       }
-      pts.push({ lngLat: [p[0], p[1]], km, ele, t, n: leg.n, legKm: km - leg.startKm, legUp: (ups[i] / upTot) * climb, legDown: (downs[i] / downTot) * descent })
+      pts.push({ lngLat: [p[0], p[1]], km, ele, t, n: leg.n, lv: lv[i], legKm: km - leg.startKm, legUp: (ups[i] / upTot) * climb, legDown: (downs[i] / downTot) * descent })
     })
   }
   // salita delle track già finite, per i metri saliti di tutto il giro (pagina dati, 3.2)
@@ -146,20 +147,21 @@ export function rideAt(ride, t) {
   }
 }
 
-// Linee per la mappa: tratto fatto (grigio) e tratto da fare, diviso per track col suo colore
+// Linee per la mappa: tratto fatto (grigio) e tratto da fare, diviso per segmento col suo colore
 export function rideLines(ride, state) {
   const { pts } = ride
   const done = pts.slice(0, state.index + 1).map((p) => p.lngLat)
   done.push(state.lngLat)
   const todo = []
-  let cur = { n: state.leg.n, coords: [state.lngLat] }
+  const here = pts[Math.min(state.index + 1, pts.length - 1)]
+  let cur = { n: here.n, level: here.lv, coords: [state.lngLat] }
   for (let k = state.index + 1; k < pts.length; k++) {
     const p = pts[k]
     cur.coords.push(p.lngLat)
     const next = pts[k + 1]
-    if (next && next.n !== p.n) {             // giunzione: parte la track dopo
+    if (next && (next.n !== p.n || next.lv !== cur.level)) {   // cambia track o livello
       todo.push(cur)
-      cur = { n: next.n, coords: [p.lngLat] }
+      cur = { n: next.n, level: next.lv, coords: [p.lngLat] }
     }
   }
   if (cur.coords.length > 1) todo.push(cur)

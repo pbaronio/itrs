@@ -4,9 +4,12 @@
  * - contorno bianco 10 px
  * - linea 6 px col colore di difficoltà, estremi e angoli arrotondati
  * - frecce bianche di direzione (tratto 1.6) dentro la linea ogni ~40 px
- * Prima di entrare nella route il percorso ha un solo colore e niente numeri.
+ * Il percorso è colorato per segmento di difficoltà ovunque (prima: un colore solo in Explore).
  * I layer si rimettono a ogni cambio di stile (topografica ↔ satellite).
  */
+import { LEVELS } from '../../data/itrs.js'
+import { runsOf } from '../../data/garda.js'
+
 const SOURCE = 'itrs-selection'
 const ARROW = 'itrs-arrow'
 
@@ -68,32 +71,22 @@ export function ensureRouteLayers(map) {
   })
 }
 
-// item: route o track (data/garda.js), oppure null per togliere il percorso
-export function setRouteSelection(map, item, levelHex) {
-  const source = map.getSource(SOURCE)
-  if (!source) return
-  source.setData(item
-    ? {
-        type: 'Feature',
-        properties: { color: levelHex },
-        geometry: { type: 'LineString', coordinates: item.points.map((p) => [p[0], p[1]]) },
-      }
-    : { type: 'FeatureCollection', features: [] })
+// Tratti colorati → GeoJSON: un tratto per segmento di difficoltà, col colore del suo livello
+function runsData(runs) {
+  return {
+    type: 'FeatureCollection',
+    features: runs.map((run) => ({
+      type: 'Feature',
+      properties: { color: LEVELS[run.level].hex },
+      geometry: { type: 'LineString', coordinates: run.coords },
+    })),
+  }
 }
 
-// Percorso della route nella pagina route: un tratto per track, ognuno col colore
-// di difficoltà della sua track (istruzioni §6: "colorato per segmento nella mappa di dettaglio")
-export function setRouteLegs(map, legs) {
-  const source = map.getSource(SOURCE)
-  if (!source) return
-  source.setData({
-    type: 'FeatureCollection',
-    features: legs.map((leg) => ({
-      type: 'Feature',
-      properties: { color: leg.hex },
-      geometry: { type: 'LineString', coordinates: leg.points.map((p) => [p[0], p[1]]) },
-    })),
-  })
+// Percorso colorato per segmento (richiesta di Paolo, 13 nov): vale in Explore, nelle mappe
+// di route e track e nelle anteprime. item: route o track (data/garda.js), oppure null.
+export function setRouteSelection(map, item) {
+  map.getSource(SOURCE)?.setData(item ? runsData(runsOf(item)) : { type: 'FeatureCollection', features: [] })
 }
 
 /*
@@ -117,15 +110,10 @@ export function ensureRideLayers(map) {
   }, 'itrs-sel-arrows')
 }
 
-// done: [[lng, lat], …]; todo: [{ coords, hex }] una per track
+// done: [[lng, lat], …]; todo: [{ coords, level }] un tratto per segmento di difficoltà
 export function setRideLines(map, done, todo) {
   map.getSource(DONE)?.setData({
     type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: done },
   })
-  map.getSource(SOURCE)?.setData({
-    type: 'FeatureCollection',
-    features: todo.map((leg) => ({
-      type: 'Feature', properties: { color: leg.hex }, geometry: { type: 'LineString', coordinates: leg.coords },
-    })),
-  })
+  map.getSource(SOURCE)?.setData(runsData(todo))
 }

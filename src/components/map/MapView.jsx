@@ -3,7 +3,6 @@ import * as maplibregl from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import Supercluster from 'supercluster'
-import { LEVELS } from '../../data/itrs.js'
 import { ALL_BOUNDS, USER_POSITION } from '../../data/garda.js'
 import { pinElement, clusterElement, userElement, endpointElement } from './markers.js'
 import { ensureRouteLayers, setRouteSelection } from './routeLayers.js'
@@ -162,7 +161,7 @@ const MapView = forwardRef(function MapView(
     const { items: list, selectedId: id } = state.current
     const item = list.find((it) => it.id === id) || null
     ensureRouteLayers(map)
-    setRouteSelection(map, item, item ? LEVELS[item.level].hex : null)
+    setRouteSelection(map, item)
 
     for (const m of endpointsRef.current) m.remove()
     endpointsRef.current = []

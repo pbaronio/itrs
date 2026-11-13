@@ -1,10 +1,9 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import { KEY, STYLES } from './MapView.jsx'
-import { LEVELS } from '../../data/itrs.js'
 import { USER_POSITION, legsOf, midpointOf } from '../../data/garda.js'
 import { userElement, endpointElement, trackNumberElement, cursorElement } from './markers.js'
-import { ensureRouteLayers, setRouteLegs } from './routeLayers.js'
+import { ensureRouteLayers, setRouteSelection } from './routeLayers.js'
 import './MapView.css'
 
 /*
@@ -56,7 +55,7 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
 
   useEffect(() => {
     if (!KEY) { onError?.('key'); return }
-    const legs = legsOf(route).map((leg) => ({ ...leg, hex: LEVELS[leg.level].hex }))
+    const legs = legsOf(route)
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: STYLES[styleKind](KEY),
@@ -96,7 +95,7 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
 
     map.on('style.load', () => {
       ensureRouteLayers(map)
-      setRouteLegs(map, legs)
+      setRouteSelection(map, route)
     })
     // Attribuzione chiusa (solo la "i"): aperta coprirebbe Explore Route nell'anteprima
     map.once('load', () => {
