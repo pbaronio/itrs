@@ -1,0 +1,75 @@
+/* Dettaglio della difficoltà tecnica (bottom sheet informativo della Difficulty di una route) */
+.diff-breakdown {
+  width: 100%;
+  margin-top: var(--s-2xl);
+  padding-top: var(--s-2xl);
+  border-top: 1px solid var(--stroke-soft-100);
+  text-align: left;
+}
+.diff-breakdown__title { margin-top: var(--s-2xs); color: var(--text-strong-950); }
+.diff-breakdown__text { margin-top: var(--s-xs); color: var(--text-sub-700); }
+
+.diff-breakdown__chart {
+  position: relative;
+  width: 176px;
+  height: 176px;
+  margin: var(--s-xl) auto 0;
+}
+.diff-breakdown__chart svg { display: block; }
+.diff-breakdown__track { fill: none; stroke: var(--bg-weak-50); }
+.diff-breakdown__arc {
+  fill: none;
+  stroke-dashoffset: 0;
+  animation: diff-draw var(--dur) var(--ease-out) var(--delay) both;
+}
+@keyframes diff-draw {
+  from { stroke-dashoffset: var(--len); }
+  to { stroke-dashoffset: 0; }
+}
+.diff-breakdown__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-strong-950);
+  animation: diff-fade var(--dur-base) var(--ease-out) var(--delay) both;
+}
+.diff-breakdown__center-label { color: var(--text-soft-500); }
+
+.diff-breakdown__legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-s);
+  margin: var(--s-xl) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.diff-breakdown__legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-xs);
+  color: var(--text-strong-950);
+  animation: diff-rise var(--dur-base) var(--ease-out) var(--delay) both;
+}
+.diff-breakdown__legend svg { flex-shrink: 0; }
+.diff-breakdown__swatch {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  padding: 3.2px;
+  background: var(--sabbia-dark);
+  background-clip: content-box;
+  border-radius: 2px;
+}
+.diff-breakdown__value { margin-left: auto; white-space: nowrap; color: var(--text-sub-700); font-variant-numeric: tabular-nums; }
+
+@keyframes diff-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes diff-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .diff-breakdown__arc,
+  .diff-breakdown__center,
+  .diff-breakdown__legend li { animation: none; }
+}

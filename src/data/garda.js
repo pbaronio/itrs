@@ -585,3 +585,28 @@ export function routesWithTrack(trackId) {
 }
 
 export const TRACK_BY_KEY = TRACK_BY_ID
+
+// ---------- Dettaglio della difficoltà tecnica di una route (richiesta di Paolo, 13 nov) ----------
+// Quanta parte della route è di ogni livello: per ogni track la quota su strada e ciclabile
+// (surface.road) è "Road (not rated)", il resto si divide tra i suoi segmenti in proporzione
+// alla lunghezza. Restituisce le parti dal livello più facile al più difficile, poi la strada.
+export function difficultyBreakdown(route) {
+  const km = Object.fromEntries([...LEVEL_ORDER, 'road'].map((k) => [k, 0]))
+  for (const leg of legsOf(route)) {
+    const { track } = leg
+    const road = track.surface?.road ?? 0
+    km.road += track.km * road
+    const rated = track.km * (1 - road)
+    const lens = leg.segments.map((sg) => {
+      let d = 0
+      for (let i = sg.from + 1; i <= sg.to; i++) d += meters(leg.points[i - 1], leg.points[i])
+      return d
+    })
+    const tot = lens.reduce((a, b) => a + b, 0) || 1
+    leg.segments.forEach((sg, i) => { km[sg.level] += (rated * lens[i]) / tot })
+  }
+  const total = Object.values(km).reduce((a, b) => a + b, 0) || 1
+  return [...LEVEL_ORDER, 'road']
+    .map((key) => ({ key, km: km[key], share: km[key] / total }))
+    .filter((p) => p.share >= 0.001)
+}

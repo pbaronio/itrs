@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import RouteMap from '../components/map/RouteMap.jsx'
 import InfoSheet from '../components/InfoSheet.jsx'
+import DifficultyBreakdown from '../components/DifficultyBreakdown.jsx'
 import ItrsCircle, { ItrsPie } from '../components/ItrsCircle.jsx'
 import LevelShape from '../components/LevelShape.jsx'
 import { TrackList } from '../components/TrackTimeline.jsx'
@@ -168,7 +169,10 @@ export default function RoutePage({ route, open, layers = [], nav }) {
         level={info ? r.ratings[info] : null}
         title={infoText?.title}
         text={infoText?.text}
-      />
+        tall={info === 'difficulty'}
+      >
+        {info === 'difficulty' && <DifficultyBreakdown route={r} />}
+      </InfoSheet>
 
       <DetailMap
         key={r.id}
