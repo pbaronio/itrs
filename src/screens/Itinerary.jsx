@@ -5,7 +5,7 @@ import LevelShape from '../components/LevelShape.jsx'
 import Icon from '../components/Icon.jsx'
 import { ActionBar } from '../components/Button.jsx'
 import { FACTORS } from '../data/itrs.js'
-import { fmtKm } from '../data/garda.js'
+import { fmtKm, exposureOf } from '../data/garda.js'
 import { useEntered } from '../useEntered.js'
 
 /*
@@ -47,7 +47,7 @@ export default function Itinerary({ route, open, onClose, onOpenLeg, saved, onSa
           )}
         </div>
         <div className="itinerary__chart">
-          <ElevationProfile route={route} onScrub={setScrub} />
+          <ElevationProfile route={route} onScrub={setScrub} exposure={exposureOf(route)} />
         </div>
         <TrackTimeline route={route} onOpen={onOpenLeg} />
       </div>

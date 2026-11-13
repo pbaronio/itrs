@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import RouteMap from '../components/map/RouteMap.jsx'
 import BottomSheet from '../components/BottomSheet.jsx'
 import ElevationProfile, { fmtEle, fmtGrade } from '../components/ElevationProfile.jsx'
@@ -6,7 +6,8 @@ import LevelShape from '../components/LevelShape.jsx'
 import Icon from '../components/Icon.jsx'
 import { ActionBar, RoundButton } from '../components/Button.jsx'
 import { FACTORS } from '../data/itrs.js'
-import { fmtKm } from '../data/garda.js'
+import { exposureOf, fmtKm } from '../data/garda.js'
+import InfoSheet from '../components/InfoSheet.jsx'
 import { levelInfo } from '../data/levelInfo.js'
 import { useEntered } from '../useEntered.js'
 
@@ -32,12 +33,14 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
   const [error, setError] = useState(null)
   const [scrub, setScrub] = useState(null)        // punto del grafico sotto il dito
   const [snap, setSnap] = useState(0)
+  const [exposureInfo, setExposureInfo] = useState(null)   // punto di esposizione toccato sulla mappa
   const pageRef = useRef(null)
   const mapRef = useRef(null)
   const entered = useEntered(open)
+  const exposure = useMemo(() => exposureOf(route), [route])
 
   useEffect(() => {
-    if (open) { setMounted(true); setError(null); setScrub(null); setSnap(0); return }
+    if (open) { setMounted(true); setError(null); setScrub(null); setSnap(0); setExposureInfo(null); return }
     const t = setTimeout(() => setMounted(false), 550)
     return () => clearTimeout(t)
   }, [open])
@@ -88,7 +91,7 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
           <p className="t-md">{error === 'key' ? 'The map is not available right now.' : 'Can’t load the map. Check your connection.'}</p>
         </div>
       ) : (
-        <RouteMap ref={mapRef} route={route} interactive styleKind={styleKind} padding={padding} onError={setError} />
+        <RouteMap ref={mapRef} route={route} interactive styleKind={styleKind} padding={padding} onError={setError} exposure={exposure} onExposure={setExposureInfo} />
       )}
 
       <div className="route-map-page__left">
@@ -135,7 +138,7 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
         }
       >
         <div className="route-details__chart">
-          <ElevationProfile route={route} onScrub={onScrub} />
+          <ElevationProfile route={route} onScrub={onScrub} exposure={exposure} />
         </div>
         {onItinerary && (
           <div className="route-details__more" aria-hidden={snap === 0} inert={snap === 0 ? true : undefined}>
@@ -154,6 +157,16 @@ export default function DetailMap({ route, open, onClose, saved, onSave, startLa
       </BottomSheet>
 
       <ActionBar item={route} startLabel={startLabel} saved={saved} onSave={onSave} />
+
+      {/* Tap su un punto di esposizione: spiegazione del livello (stesso bottom sheet della pagina) */}
+      <InfoSheet
+        open={Boolean(exposureInfo)}
+        onClose={() => setExposureInfo(null)}
+        factor="exposure"
+        level={exposureInfo?.level ?? null}
+        title={exposureInfo ? levelInfo('exposure', exposureInfo.level, route)?.title : undefined}
+        text={exposureInfo ? levelInfo('exposure', exposureInfo.level, route)?.text : undefined}
+      />
     </div>
   )
 }

@@ -27,3 +27,7 @@
 .elevation__cursor-line { stroke: var(--text-strong-950); stroke-width: 1.5; }
 .elevation__cursor-dot { fill: var(--bg-strong-950); stroke: var(--bg-white-0); stroke-width: 2; }
 .elevation__cursor-handle { fill: var(--bg-strong-950); }
+
+/* Punti di esposizione sulla curva: pentagono col bordo bianco (come sulla mappa) */
+.elevation__exposure { pointer-events: none; }
+.elevation__exposure-ring { fill: var(--gray-0); stroke: var(--gray-0); stroke-width: 7; stroke-linejoin: round; }

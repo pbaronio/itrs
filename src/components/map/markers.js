@@ -4,6 +4,7 @@
  * Ogni marker è un pulsante con area di tocco 44×44 attorno al disegno.
  */
 import { LEVELS, FACTORS } from '../../data/itrs.js'
+import { PENTAGON, PENTAGON_BOX, EXPOSURE_PATHS, glyphTransform } from '../exposureGlyph.js'
 
 // IconSend del Figma, nel riquadro 28×28 del pin
 const SEND = 'M14.44 21.3139L19.5387 7.58661L5.8114 12.6853L12.0867 15.0385L14.44 21.3139Z'
@@ -97,5 +98,23 @@ export function rideUserElement() {
     <circle class="map-user__halo" cx="19.33" cy="19.33" r="19.33"/>
     <circle class="map-user__dot" cx="19.33" cy="19.33" r="8.45" stroke-width="2.42"/>
   </svg>`
+  return el
+}
+
+// Punto di esposizione (richiesta di Paolo, 13 nov): pentagono ITRS 30 col colore del livello,
+// bordo bianco, simbolo Exposure bianco, ombra del percorso. Pulsante: apre la spiegazione del livello.
+export function exposureElement({ level, km, onClick }) {
+  const el = document.createElement('button')
+  el.type = 'button'
+  el.className = 'map-marker map-exposure'
+  el.setAttribute('aria-label', `Exposure: ${FACTORS.exposure.names[level]}, at ${km.toFixed(1)} km`)
+  el.style.setProperty('--pin-color', LEVELS[level].color)
+  const { x, y, size } = PENTAGON_BOX
+  el.innerHTML = `<svg class="map-exposure__shape" viewBox="${x} ${y} ${size} ${size}" aria-hidden="true">
+    <path class="map-exposure__ring" d="${PENTAGON}"/>
+    <path class="map-exposure__fill" d="${PENTAGON}"/>
+    <g class="map-exposure__icon" transform="${glyphTransform()}">${EXPOSURE_PATHS.map((d) => `<path d="${d}"/>`).join('')}</g>
+  </svg>`
+  if (onClick) el.addEventListener('click', (e) => { e.stopPropagation(); onClick() })
   return el
 }

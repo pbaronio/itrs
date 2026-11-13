@@ -43,6 +43,12 @@
 .map-pin__fill { fill: var(--pin-color); stroke: var(--stroke-white-0); }
 .map-pin__icon { fill: var(--gray-0); }
 
+/* Punto di esposizione: pentagono 30, colore del livello, bordo bianco, simbolo bianco */
+.map-exposure__shape { width: 30px; height: 30px; overflow: visible; filter: drop-shadow(var(--shadow-route)); }
+.map-exposure__ring { fill: var(--gray-0); stroke: var(--gray-0); stroke-width: 6; stroke-linejoin: round; }
+.map-exposure__fill { fill: var(--pin-color); }
+.map-exposure__icon { fill: var(--gray-0); }
+
 /* Cluster: 28, nero, bordo bianco, numero sm/emphasized bianco */
 .map-cluster__dot {
   display: grid;

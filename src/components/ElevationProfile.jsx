@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { LEVELS } from '../data/itrs.js'
 import { fmtKm, legsOf, profileOf } from '../data/garda.js'
 import { haptic } from '../haptic.js'
+import { PENTAGON, PENTAGON_BOX, EXPOSURE_PATHS, glyphTransform } from './exposureGlyph.js'
 import './ElevationProfile.css'
 
 /*
@@ -45,7 +46,9 @@ function indexAt(kms, km) {
   return lo
 }
 
-export default function ElevationProfile({ route, onScrub }) {
+const EXP = 20                // punti di esposizione sul grafico
+
+export default function ElevationProfile({ route, onScrub, exposure }) {
   const data = useMemo(() => {
     const legs = legsOf(route)
     const total = legs[legs.length - 1].endKm
@@ -241,6 +244,19 @@ export default function ElevationProfile({ route, onScrub }) {
         {data.ticks.map((t, i) => (
           <text key={i} className="elevation__label" x={t.x} y={H - 4} textAnchor={t.align}>{t.label}</text>
         ))}
+        {/* Punti di esposizione: pentagono 20 sulla curva, al km del punto */}
+        {(exposure ?? []).map((p, i) => {
+          const px = Math.min(Math.max(data.x(p.km), EXP / 2), W - EXP / 2)
+          const py = data.y(sampleAt(p.km).ele)
+          const { x, y, size } = PENTAGON_BOX
+          return (
+            <svg key={`e${i}`} className="elevation__exposure" x={px - EXP / 2} y={py - EXP / 2} width={EXP} height={EXP} viewBox={`${x} ${y} ${size} ${size}`} overflow="visible">
+              <path className="elevation__exposure-ring" d={PENTAGON} />
+              <path d={PENTAGON} fill={LEVELS[p.level].color} />
+              <g fill="var(--gray-0)" transform={glyphTransform()}>{EXPOSURE_PATHS.map((d) => <path key={d} d={d} />)}</g>
+            </svg>
+          )
+        })}
         {/* Cursore: linea verticale, punto sulla curva, maniglia sull'asse */}
         {scrub && (
           <g className="elevation__cursor">

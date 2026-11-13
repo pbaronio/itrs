@@ -356,6 +356,58 @@ export function vertexLevels(leg) {
   return out
 }
 
+// ---------- Punti di esposizione (richiesta di Paolo, 13 nov) ----------
+// Inventati ma verosimili: nei punti più ripidi della track (pendenza su ±100 m), distanti almeno
+// 800 m tra loro e 200 m dalle estremità. Il primo ha il livello di Exposure della track, gli
+// altri quello sotto (mai Low risk). Track Low risk: nessun punto [P].
+// exposurePts: [{ i, level }] con i = indice in `points`.
+function exposurePointsOf(id, points, level) {
+  const li = LEVEL_ORDER.indexOf(level)
+  if (li <= 0 || points.length < 10) return []
+  const last = points.length - 1
+  const dist = [0]
+  for (let i = 1; i <= last; i++) dist.push(dist[i - 1] + meters(points[i - 1], points[i]))
+  const total = dist[last]
+  const count = Math.min(3, 1 + (total > 6000 ? 1 : 0) + (li >= 2 && total > 4000 ? 1 : 0))
+  const rnd = seeded(`${id}:exp`)
+  const steep = []
+  let a = 0, b = 0
+  for (let i = 0; i <= last; i++) {
+    if (dist[i] < 200 || total - dist[i] < 200) continue
+    while (dist[i] - dist[a] > 100) a++
+    while (b < last && dist[b + 1] - dist[i] <= 100) b++
+    const span = dist[b] - dist[a]
+    if (span > 50) steep.push({ i, g: Math.abs(points[b][2] - points[a][2]) / span + rnd() * 0.01 })
+  }
+  steep.sort((x, y) => y.g - x.g)
+  const picked = []
+  for (const c of steep) {
+    if (picked.length >= count) break
+    if (picked.every((q) => Math.abs(dist[q.i] - dist[c.i]) >= 800)) picked.push(c)
+  }
+  return picked
+    .map((c, k) => ({ i: c.i, level: k === 0 ? level : LEVEL_ORDER[Math.max(1, li - 1)] }))
+    .sort((x, y) => x.i - y.i)
+}
+
+// Punti di esposizione di una route o di una track, nel verso di percorrenza:
+// [{ level, lngLat, km }] con km lungo la route (stessa scala del grafico altimetrico)
+export function exposureOf(item) {
+  const legs = item.legs ? legsOf(item) : [{ points: item.points, track: item, reverse: false, startKm: 0, km: item.km }]
+  const out = []
+  for (const leg of legs) {
+    const pts = leg.track.exposurePts ?? []
+    if (!pts.length) continue
+    const prof = profileOf(leg.points, leg.startKm, leg.km)
+    const last = leg.points.length - 1
+    for (const p of pts) {
+      const i = leg.reverse ? last - p.i : p.i
+      out.push({ level: p.level, lngLat: [leg.points[i][0], leg.points[i][1]], km: prof[i][0] })
+    }
+  }
+  return out.sort((x, y) => x.km - y.km)
+}
+
 const covers = Object.fromEntries(Object.entries(TRACK_META).map(([id, meta]) => [id, trackCover(meta.name)]))
 export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
   const g = GEOMETRY[id]
@@ -383,6 +435,7 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
     oneWay: ONE_WAY.has(id),
     ttf: TRACK_TTF[id] ?? [],
     segments: segmentsOf(id, points, meta.difficulty),
+    exposurePts: exposurePointsOf(id, points, meta.exposure),
   }
 })
 

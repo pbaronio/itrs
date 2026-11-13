@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import { KEY, STYLES } from './MapView.jsx'
 import { USER_POSITION, legsOf, midpointOf } from '../../data/garda.js'
-import { userElement, endpointElement, trackNumberElement, cursorElement } from './markers.js'
+import { userElement, endpointElement, trackNumberElement, cursorElement, exposureElement } from './markers.js'
 import { ensureRouteLayers, setRouteSelection } from './routeLayers.js'
 import './MapView.css'
 
@@ -17,12 +17,12 @@ import './MapView.css'
  */
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styleKind = 'topo', padding, onError, attribution = 'bottom-right' }, ref) {
+const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styleKind = 'topo', padding, onError, attribution = 'bottom-right', exposure, onExposure }, ref) {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const state = useRef({})
   const cursorRef = useRef(null)
-  state.current = { padding, onError }
+  state.current = { padding, onError, onExposure }
 
   useImperativeHandle(ref, () => ({
     recenter() {
@@ -87,6 +87,11 @@ const RouteMap = forwardRef(function RouteMap({ route, interactive = false, styl
     // (una track da sola: niente numeri, istruzioni §6)
     for (const leg of legs.length > 1 ? legs : []) {
       new maplibregl.Marker({ element: trackNumberElement(leg.n) }).setLngLat(midpointOf(leg.points)).addTo(map)
+    }
+    // Punti di esposizione (solo mappa di dettaglio): sotto partenza e arrivo
+    for (const p of exposure ?? []) {
+      const el = exposureElement({ ...p, onClick: () => state.current.onExposure?.(p) })
+      new maplibregl.Marker({ element: el }).setLngLat(p.lngLat).addTo(map)
     }
     const first = route.points[0]
     const last = route.points[route.points.length - 1]
