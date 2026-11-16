@@ -272,7 +272,7 @@ function surfaceShare(s) {
 // ---------- Segmenti di difficoltà (richiesta di Paolo, 13 nov) ----------
 // Una track è fatta di segmenti, ognuno col suo livello di difficoltà. Il livello della track è
 // quello del segmento più difficile [P]. Dati inventati ma verosimili: la track è divisa in tratti
-// di ~300 m; i più ripidi o irregolari prendono il livello della track, gli altri uno o due
+// di ~120 m; i più ripidi o irregolari prendono il livello della track, gli altri uno o due
 // livelli sotto, alternati. Beginner: un solo segmento verde (non c'è un livello sotto).
 // segments: [{ from, to, level }] con indici di `points` (to incluso, il punto di confine è comune).
 const LEVEL_ORDER = ['green', 'blue', 'red', 'black', 'orange']
@@ -296,15 +296,15 @@ function segmentsOf(id, points, level) {
   const dist = [0]
   for (let i = 1; i <= last; i++) dist.push(dist[i - 1] + meters(points[i - 1], points[i]))
   const total = dist[last]
-  // Versione "esasperata" (richiesta di Paolo, 16 nov): tratti di ~300 m, fino a 14 per track,
-  // per capire nei test se la mappa resta leggibile con tanti cambi di colore
-  const n = Math.max(3, Math.min(14, Math.round(total / 300)))
+  // Versione "esasperata" (richiesta di Paolo, 16 nov): piccoli tratti di ~120 m, fino a 60 per
+  // track, per capire nei test se la mappa resta leggibile con tanti cambi di colore
+  const n = Math.max(4, Math.min(60, Math.round(total / 120)))
   const cuts = [0]
   for (let k = 1; k < n; k++) {
     const target = (total * (k + (rnd() - 0.5) * 0.5)) / n
     let i = cuts[cuts.length - 1] + 1
     while (i < last - 1 && dist[i] < target) i++
-    if (i < last - 1 && dist[i] - dist[cuts[cuts.length - 1]] > 60) cuts.push(i)
+    if (i < last - 1 && dist[i] - dist[cuts[cuts.length - 1]] > 40) cuts.push(i)
   }
   cuts.push(last)
   const chunks = []
