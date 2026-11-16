@@ -94,6 +94,22 @@
   gap: var(--s-2xl);
   padding: var(--s-m) var(--s-m) calc(70px + var(--s-xl) * 2);
 }
+.explore__pie {
+  position: absolute;
+  right: var(--s-m);
+  bottom: calc(var(--tab-bar-h) + 226px + var(--s-s));   /* sopra l'overlay in stato 2 */
+  z-index: 28;                                            /* sotto il foglio quando sale */
+  opacity: 0;
+  transform: scale(.85);
+  transform-origin: 100% 100%;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+.explore__pie.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+.explore__pie-art { box-shadow: var(--shadow-route); animation: pie-swap var(--dur-base) var(--ease-out) both; }
+@keyframes pie-swap { from { opacity: 0; transform: scale(.9) rotate(-20deg); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .explore__pie-art { animation: none; } }
+
 .explore__fab {
   position: absolute;
   left: 50%;

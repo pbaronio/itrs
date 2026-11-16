@@ -31,8 +31,6 @@
   transition: transform var(--dur-fast) var(--ease-out);
 }
 .route-card:active { transform: scale(.98); }
-.route-card__media { position: relative; flex-shrink: 0; line-height: 0; }
-.route-card__pie { position: absolute; right: 6px; bottom: 6px; }
 .route-card__img {
   width: 111px;
   height: 111px;

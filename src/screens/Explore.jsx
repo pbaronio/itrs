@@ -5,6 +5,7 @@ import Searchbar from '../components/Searchbar.jsx'
 import RouteToggle from '../components/RouteToggle.jsx'
 import BottomSheet from '../components/BottomSheet.jsx'
 import { Button, RoundButton, FabMap } from '../components/Button.jsx'
+import { ItrsPie, hasFullRating } from '../components/ItrsCircle.jsx'
 import { RouteCard, ListingCard } from '../components/Cards.jsx'
 import { ROUTES, TRACKS, unionBox } from '../data/garda.js'
 import { activeCount, emptyFilters, matches } from '../data/filters.js'
@@ -78,6 +79,12 @@ export default function Explore() {
   }, [bounds, routes, tracks])
 
   const list = frozen ? frozen.ids.map((id) => items.find((it) => it.id === id)) : visible
+
+  // Torta ITRS sulla mappa: route selezionata, overlay in stato 2, nessuna pagina sopra
+  const selectedItem = selectedId ? items.find((it) => it.id === selectedId) : null
+  const pieRoute = mode === 'routes' && snap === 1 && hasFullRating(selectedItem) ? selectedItem : null
+  const lastPie = useRef(null)            // resta disegnata mentre sfuma in uscita
+  if (pieRoute) lastPie.current = pieRoute
   const counts = frozen ? frozen.counts : liveCounts
 
   const select = useCallback((id) => {
@@ -229,8 +236,8 @@ export default function Explore() {
     top: insets.safeTop + 156,
     bottom: insets.tabH + (tracksCta ? SNAP_CTA : snap === 0 ? SNAP_PEEK : SNAP_HALF) + 40,
     left: 72,
-    right: 32,
-  }), [insets, snap])
+    right: mode === 'routes' && snap === 1 ? 100 : 32,   // spazio per la torta ITRS in basso a destra
+  }), [insets, snap, mode])
 
   // Stato 3: il foglio arriva sotto il toggle, la parte sopra diventa bianca
   const listTop = insets.safeTop + 134
@@ -322,6 +329,20 @@ export default function Explore() {
           <Carousel items={list} mode={mode} selectedId={selectedId} onPick={select} onOpen={(it) => { select(it.id); openItem(it) }} hidden={snap === 0} />
         )}
       </BottomSheet>
+
+      {/* Torta ITRS della route selezionata, fissa sulla mappa in basso a destra sopra l'overlay
+          in stato 2 (Figma 3839:4833). Cambia con la card al centro del carosello; tap = pagina route */}
+      <div className={`explore__pie${pieRoute ? ' is-visible' : ''}`} aria-hidden={!pieRoute}>
+        {(pieRoute ?? lastPie.current) && (
+          <ItrsPie
+            key={(pieRoute ?? lastPie.current).id}
+            ratings={(pieRoute ?? lastPie.current).ratings}
+            className="explore__pie-art"
+            label={`ITRS rating of ${(pieRoute ?? lastPie.current).name}. Open the route`}
+            onClick={pieRoute ? () => openItem(pieRoute) : undefined}
+          />
+        )}
+      </div>
 
       {/* Fuori dal foglio: 24 sopra la tab bar (Figma 3625:17579), qualunque sia la safe area */}
       <div className={`explore__fab${listing ? ' is-visible' : ''}`} aria-hidden={!listing}>

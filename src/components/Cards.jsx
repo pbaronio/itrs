@@ -45,16 +45,12 @@ export function LevelLabel({ level, factor = 'difficulty' }) {
 
 /* ---------- Card overlay (carosello) 347×125 ---------- */
 
-// Route (4 fattori): torta ITRS sulla foto, etichetta del livello sopra il titolo come prima.
-// Track: solo etichetta del livello.
+// Card del carosello (route e track). La torta ITRS delle route non è più sulla foto:
+// sta fissa sulla mappa in basso a destra (Explore, Figma 3839:4833).
 export function RouteCard({ route, onClick, active }) {
-  const pie = hasFullRating(route)
   return (
     <button type="button" className={`route-card${active ? ' is-active' : ''}`} onClick={onClick}>
-      <span className="route-card__media">
-        <img className="route-card__img" src={route.photo} alt="" draggable="false" />
-        {pie && <ItrsPie ratings={route.ratings} size={44} className="route-card__pie" />}
-      </span>
+      <img className="route-card__img" src={route.photo} alt="" draggable="false" />
       <span className="route-card__body">
         <LevelLabel level={route.level} />
         <span className="route-card__title t-md-em">{route.name}</span>
