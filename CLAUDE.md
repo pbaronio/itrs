@@ -2,12 +2,16 @@
 
 Prototipo dell'app mobile ITRS (mountain bike, International Trail Rating System) per test utente moderati. Web app installabile (PWA) per iOS e Android, interfaccia in **inglese**.
 
-## Documenti di riferimento (nel Project "ITRS" su claude.ai)
+## Documenti di riferimento (Claude Vault di Paolo, Progetto «Creative Studio»)
 
+Dal 17 nov 2026 il progetto si gestisce dal Progetto «Creative Studio» su claude.ai, collegato alla Claude Vault (`Documents/Claude Vault`). I documenti sono in `02 Progetti/itrs/`:
+
+- `README.md`: stato del progetto, link, prossimi passi.
 - `ITRS_contesto.md`: prodotto, sistema ITRS, flussi, decisioni, punti aperti.
-- `ITRS_istruzioni.md`: regole visive, token, componenti, correzioni al Figma (§8).
+- `design-system.md`: regole visive, token, componenti, correzioni al Figma (§8). In cima gli aggiornamenti dal prototipo, che valgono sul testo sotto.
 - `ITRS_piano_prototipo.md`: fasi, passi e registro. Si lavora **un passo alla volta**, con l'ok di Paolo prima del successivo.
-- Figma `2026_ITRS_Mobile-App` (fileKey `GEK8IrR2GgTDuLYr1tUjBD`): solo per i dettagli.
+- `ITRS_dati_garda.md`, `ITRS_fonte_garda_733.md`: dati di prova e scheda ufficiale della route 733.
+- Figma `2026_ITRS_Mobile-App` (fileKey `GEK8IrR2GgTDuLYr1tUjBD`, pagina UI Design `2045:2`): solo per i dettagli.
 
 Se istruzioni e Figma divergono, valgono le istruzioni.
 
@@ -63,4 +67,4 @@ src/
 
 ## Fine passo
 
-Aggiorna il registro in `ITRS_piano_prototipo.md` (fatto, cambiato rispetto al design, aperto). Se una modifica cambia il design, aggiorna anche contesto o istruzioni.
+Aggiorna il registro in `02 Progetti/itrs/ITRS_piano_prototipo.md` della vault (fatto, cambiato rispetto al design, aperto). Se una modifica cambia il design, aggiorna anche `ITRS_contesto.md` o `design-system.md`. Segui anche il protocollo di fine sessione della vault (`CLAUDE.md` della vault).
