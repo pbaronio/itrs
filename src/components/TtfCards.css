@@ -47,6 +47,7 @@
   position: absolute;
   top: 19px;
   left: var(--s-m);
+  right: var(--s-m);
   color: var(--text-white-0);
 }
 .ttf-card__count {
