@@ -4,7 +4,7 @@
 
 .ttf__row {
   display: flex;
-  gap: var(--s-m);
+  gap: var(--s-xs);   /* design-system: 8 tra le card TTF */
   margin: 0;
   padding: 0;
   list-style: none;
@@ -25,7 +25,7 @@
   --ttf-bg: var(--ttf-jump-bg);
   --ttf-accent: var(--ttf-jump-accent);
   position: relative;
-  flex: 0 0 calc((100% - var(--s-m)) / 2);
+  flex: 0 0 calc((100% - var(--s-xs)) / 2);
   aspect-ratio: 177 / 223;
   border: 1px solid var(--stroke-soft-100);
   border-radius: var(--r-sm);
@@ -33,7 +33,7 @@
   overflow: hidden;
   scroll-snap-align: start;
 }
-.ttf__row.is-scrollable .ttf-card { flex-basis: calc((100% - 2 * var(--s-m)) / 2.15); }
+.ttf__row.is-scrollable .ttf-card { flex-basis: calc((100% - 2 * var(--s-xs)) / 2.15); }
 /* Curve di livello: la stessa immagine del Figma come maschera, colore dal token */
 .ttf-card::before {
   content: "";
