@@ -5,6 +5,7 @@ import TrackCriteria from '../components/TrackCriteria.jsx'
 import LevelShape from '../components/LevelShape.jsx'
 import Icon from '../components/Icon.jsx'
 import { Datum, Surface } from '../components/DetailParts.jsx'
+import TtfCards from '../components/TtfCards.jsx'
 import { ActionBar, MapButton, RoundButton } from '../components/Button.jsx'
 import { ListingCard, MiniMap, PhotoGallery, RatingCard } from '../components/Cards.jsx'
 import { FACTORS } from '../data/itrs.js'
@@ -25,7 +26,7 @@ import './TrackDetail.css'
  * anteprima della mappa con `Explore Track` (→ mappa della track con grafico), tipo di fondo,
  * barra azioni `Start the track` + salva + download (istruzioni §8).
  * Dentro una route i dati seguono il verso di percorrenza (track al contrario: salita ↔ discesa).
- * Non ancora: Technical trail features, Wilderness Details, Recommended tracks.
+ * Technical trail features dopo il tipo di fondo (18/11). Non ancora: Wilderness Details, Recommended tracks.
  */
 const FACTORS_TRACK = ['difficulty', 'exposure']
 
@@ -86,6 +87,9 @@ function TrackBody({ track, inRoute, onOpenMap, onInfo, onOpenRoute, selector })
         <hr className="route-page__divider" />
 
         <Surface route={track} />
+
+        {/* Technical trail features (richiesta di Paolo 18/11): dopo il fondo, come nel Figma */}
+        <TtfCards item={track} />
       </div>
     </>
   )

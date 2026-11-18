@@ -1,0 +1,67 @@
+/* ---------- Technical trail features (Figma Card/TTF 3875:423) ---------- */
+.ttf { margin-top: var(--s-2xl); }
+.ttf h2 { margin: 0 0 var(--s-l); color: var(--text-strong-950); }
+
+.ttf__row {
+  display: flex;
+  gap: var(--s-m);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Più di due card: scorrono, la terza si intravede */
+.ttf__row.is-scrollable {
+  margin: 0 calc(-1 * var(--s-m));
+  padding: 0 var(--s-m);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--s-m);
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.ttf__row.is-scrollable::-webkit-scrollbar { display: none; }
+
+.ttf-card {
+  --ttf-bg: var(--ttf-jump-bg);
+  --ttf-accent: var(--ttf-jump-accent);
+  position: relative;
+  flex: 0 0 calc((100% - var(--s-m)) / 2);
+  aspect-ratio: 177 / 223;
+  border: 1px solid var(--stroke-soft-100);
+  border-radius: var(--r-sm);
+  background: var(--ttf-bg);
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+.ttf__row.is-scrollable .ttf-card { flex-basis: calc((100% - 2 * var(--s-m)) / 2.15); }
+/* Curve di livello: la stessa immagine del Figma come maschera, colore dal token */
+.ttf-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--topo-line);
+  -webkit-mask: url('../assets/patterns/ttf-topo.svg') center / cover no-repeat;
+          mask: url('../assets/patterns/ttf-topo.svg') center / cover no-repeat;
+}
+.ttf-card__label {
+  position: absolute;
+  top: 19px;
+  left: var(--s-m);
+  color: var(--text-white-0);
+}
+.ttf-card__count {
+  position: absolute;
+  left: 14px;
+  bottom: var(--s-s);
+  font-size: 72px;
+  line-height: 84px;
+  letter-spacing: -.02em;
+  color: var(--ttf-accent);
+}
+
+.ttf-card--drop     { --ttf-bg: var(--ttf-drop-bg);     --ttf-accent: var(--ttf-drop-accent); }
+.ttf-card--skinny   { --ttf-bg: var(--ttf-skinny-bg);   --ttf-accent: var(--ttf-skinny-accent); }
+.ttf-card--teeter   { --ttf-bg: var(--ttf-teeter-bg);   --ttf-accent: var(--ttf-teeter-accent); }
+.ttf-card--wallride { --ttf-bg: var(--ttf-wallride-bg); --ttf-accent: var(--ttf-wallride-accent); }
+.ttf-card--pump     { --ttf-bg: var(--ttf-pump-bg);     --ttf-accent: var(--ttf-pump-accent); }
+.ttf-card--other    { --ttf-bg: var(--ttf-other-bg);    --ttf-accent: var(--ttf-other-accent); }

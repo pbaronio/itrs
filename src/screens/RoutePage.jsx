@@ -16,6 +16,7 @@ import DetailMap from './DetailMap.jsx'
 import Itinerary from './Itinerary.jsx'
 import { TrackSheet } from './TrackDetail.jsx'
 import Notebook from '../components/Notebook.jsx'
+import TtfCards from '../components/TtfCards.jsx'
 import { useEntered } from '../useEntered.js'
 import './RoutePage.css'
 
@@ -148,6 +149,9 @@ export default function RoutePage({ route, open, layers = [], nav }) {
 
           {/* ITRS Notebook (passo 2.4, Figma 3625:18950): 32 sotto l'anteprima della mappa */}
           <Notebook key={r.id} route={r} />
+
+          {/* Technical trail features (richiesta di Paolo 18/11): dopo il Notebook, come nel Figma */}
+          <TtfCards item={r} />
 
           <hr className="route-page__divider" />
 

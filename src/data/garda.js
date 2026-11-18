@@ -117,16 +117,26 @@ const TRACK_META = {
 // Inventati ma verosimili, come nomi e livelli (ITRS_dati_garda.md). Non sono dati ITRS.
 // Senso unico: discese e sentieri stretti. Le altre track sono percorribili nei due sensi.
 const ONE_WAY = new Set(['VL1', 'CO3', 'GU1', 'LM1', 'MB2', 'NG3', 'TN4'])
-// Technical trail features per track (chiavi di TTF_TYPES in data/filters.js)
-const TRACK_TTF = {
-  VL1: ['other'],
-  CO3: ['drop', 'skinny'],
-  GU1: ['drop'],
-  LM1: ['drop', 'other'],
-  MB2: ['jump', 'drop', 'teeter'],
-  NG3: ['jump'],
-  TN4: ['jump', 'wallride'],
-  AR2: ['pump'],
+// Technical trail features per track (chiavi di TTF_TYPES in data/filters.js) con il numero di
+// passaggi, per le card «Technical trail features» (×2). Inventati ma verosimili, come i filtri.
+// Malga Ciapa: Jump ×2 e Drop ×1 sul Traverso Panorama Garda, come nel Figma (richiesta di Paolo, 18/11).
+const TRACK_TTF_COUNT = {
+  VL1: { other: 1 },
+  CO3: { drop: 2, skinny: 1 },
+  GU1: { drop: 1 },
+  LM1: { drop: 2, other: 1 },
+  MB2: { jump: 3, drop: 1, teeter: 1 },
+  NG3: { jump: 2 },
+  TN4: { jump: 2, wallride: 1 },
+  AR2: { pump: 1 },
+  MCc: { jump: 2, drop: 1 },
+}
+const TRACK_TTF = Object.fromEntries(Object.entries(TRACK_TTF_COUNT).map(([id, c]) => [id, Object.keys(c)]))
+// Somma dei passaggi per tipo, nell'ordine di TTF_TYPES
+function sumTtf(counts) {
+  const out = {}
+  for (const c of counts) for (const [k, n] of Object.entries(c)) out[k] = (out[k] ?? 0) + n
+  return out
 }
 // Accessibilità della partenza: bus/treno, auto, famiglie (route). "Wet weather friendly"
 // si calcola dal fondo: meno del 15% di single trail.
@@ -494,6 +504,7 @@ export const TRACKS = Object.entries(TRACK_META).map(([id, meta]) => {
     towns: [meta.place],
     oneWay: ONE_WAY.has(id),
     ttf: TRACK_TTF[id] ?? [],
+    ttfCount: TRACK_TTF_COUNT[id] ?? {},
     segments: segmentsOf(id, points, meta.difficulty),
     exposurePts: exposurePointsOf(id, points, meta.exposure),
     criteria: criteriaOf(id, points, meta.difficulty, g.surface, TRACK_TTF[id] ?? []),
@@ -542,6 +553,7 @@ export const ROUTES = ROUTE_DEFS.map((def) => {
     oneWay: legs.some((leg) => leg.track.oneWay),
     loop: meters(points[0], points[points.length - 1]) < 500,
     ttf: [...new Set(legs.flatMap((leg) => leg.track.ttf))],
+    ttfCount: sumTtf(legs.map((leg) => leg.track.ttfCount)),
     access,
   }
 })

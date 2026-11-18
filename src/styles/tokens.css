@@ -34,6 +34,10 @@
   --ttf-jump-bg:#0B1C37; --ttf-jump-accent:#669FF6;
   --ttf-drop-bg:#331E09; --ttf-drop-accent:#A09AF8;
   --ttf-skinny-bg:#355136; --ttf-skinny-accent:#B3F0DC;
+  --ttf-teeter-bg:#2B1233; --ttf-teeter-accent:#E49BF2;
+  --ttf-wallride-bg:#3A1414; --ttf-wallride-accent:#F79A8E;
+  --ttf-pump-bg:#382A08; --ttf-pump-accent:#F5C95C;
+  --ttf-other-bg:#25282D; --ttf-other-accent:#C7CCD4;
   --wild-blue:#D4E2F9; --wild-green:#E1F9D4;
   --accent-stop:#F67966; --warning-soft:#FFF3AE;
   --nav-dark:#0E0E0F; --nav-track:rgba(233,233,234,.30); --ios-blue:#007AFF;
